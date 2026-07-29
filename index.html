@@ -518,7 +518,6 @@ footer pre{
    ctOS PROFILER — scanning subject card
    ============================================================ */
 .profiler h3{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.profiler h3 .uid{font-family:var(--hud);letter-spacing:.14em;opacity:.75}
 .profiler .scan{
   position:absolute;left:0;right:0;height:2px;top:0;z-index:2;pointer-events:none;
   background:linear-gradient(90deg,transparent,var(--primary-lo),transparent);
@@ -528,7 +527,7 @@ footer pre{
 @keyframes profscan{0%{top:26px;opacity:0}8%{opacity:1}92%{opacity:1}100%{top:100%;opacity:0}}
 .profiler .foot{
   border-top:1px solid rgba(18,113,140,.4);padding:8px 14px;
-  display:flex;justify-content:space-between;gap:10px;
+  display:flex;justify-content:flex-end;gap:10px;
   font-family:var(--hud);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--grid);
 }
 .meter{display:flex;gap:2px;align-items:center}
@@ -746,7 +745,7 @@ footer pre{
   <div class="hero-grid">
     <div>
       <p class="lede"><span id="typed"></span><span class="cursor" aria-hidden="true"></span></p>
-      <p class="hero-sub">Fifth-year ECE at the University of Thessaly. Remote sensing, computer vision, and the mathematics underneath.</p>
+      <p class="hero-sub">Neural networks, computer vision, and remote sensing. Fifth-year ECE at the University of Thessaly.</p>
 
       <div class="actions">
         <a class="btn primary" href="https://mavroul1s.github.io/neo_tracker/neo-tracker.html" target="_blank" rel="noopener"><span class="k">▸</span><span>Launch NEOW tracker</span></a>
@@ -764,9 +763,10 @@ footer pre{
 
     <aside class="profiler">
       <div class="scan" aria-hidden="true"></div>
-      <h3>Profiler <span class="uid">UID 04-MVR</span></h3>
+      <h3>Profile</h3>
       <dl>
         <dt>Name</dt><dd><b>Nikolaos Mavros</b> — Νίκος Μαύρος</dd>
+        <dt>Born</dt><dd>26 April 2004</dd>
         <dt>Role</dt><dd>ECE student, year 5</dd>
         <dt>Node</dt><dd>Univ. of Thessaly, Volos</dd>
         <dt>Focus</dt><dd>Deep learning · remote sensing · computer vision</dd>
@@ -774,7 +774,6 @@ footer pre{
         <dt>Status</dt><dd><span class="ok-dot">●</span> Available</dd>
       </dl>
       <div class="foot">
-        <span>Scan complete</span>
         <span class="meter" aria-hidden="true"><b class="on"></b><b class="on"></b><b class="on"></b><b class="on"></b><b class="on"></b><b></b><b></b></span>
       </div>
     </aside>
@@ -797,7 +796,7 @@ footer pre{
       <span>Manuscript under review at MDPI <em>Sensors</em>. Not accepted, not published, no DOI. Results below are from the repository.</span>
     </div>
 
-    <p style="margin:0 0 20px;max-width:78ch">Wildfire remote sensing on the TS-SatFire dataset (Zhao et al., <em>Scientific Data</em>, 2025), across three tasks: active fire detection, burned area mapping, and fire progression prediction.</p>
+    <p style="margin:0 0 20px;max-width:78ch">Wildfire remote sensing on the TS-SatFire benchmark (2025), which consolidates multispectral VIIRS image stacks from Suomi-NPP and NOAA-20 across three tasks: active fire detection, burned area mapping, and fire progression prediction.</p>
 
     <div class="cols">
       <div>
@@ -815,8 +814,8 @@ footer pre{
       <div>
         <h4 class="sub">What the project actually contributes</h4>
         <ol class="find">
-          <li><b>Label-quality audit</b> across all three tasks and every split. The source paper documents no label completeness. Substantial missing labels were found as all-NaN label bands and excluded. Training on audited data raised active fire recall from <span class="datum" tabindex="0" data-src="SOURCE: before/after audit training runs, DeepFire-Forecaster.">~0.80 to 0.86</span>.</li>
-          <li><b>Burned area label encoding.</b> The paper never specified the encoding. Band 8 finite values turn out to be Julian-day or perimeter-ID codes in the range <span class="datum" tabindex="0" data-src="SOURCE: band-8 value inspection across the TS-SatFire splits.">2,119–908,660</span>, so correct label extraction is a finiteness mask, not a value threshold. Burned area modelling was deliberately deferred and the finding released as a standalone data-quality result.</li>
+          <li><b>Label-quality audit</b> across all three tasks and every split. Many fires lack ground-truth annotations entirely. <span class="datum" tabindex="0" data-src="SOURCE: label-completeness audit, DeepFire-Forecaster manuscript abstract.">18 training fires and 2 test fires</span> are excluded for active fire — and the two unannotated test fires cannot be scored by any model, not just this one. Training on audited data raised active fire recall from <span class="datum" tabindex="0" data-src="SOURCE: before/after audit training runs, DeepFire-Forecaster.">~0.80 to 0.86</span>. The benchmark's own scoring procedure is documented too: it differs from ours in ways that make the two sets of figures incomparable.</li>
+          <li><b>Burned area label encoding.</b> The paper never specified the encoding. Band 8 finite values turn out to be Julian-day or perimeter-ID codes in the range <span class="datum" tabindex="0" data-src="SOURCE: band-8 value inspection across the TS-SatFire splits.">2,119–908,660</span>, so correct label extraction is a finiteness mask, not a value threshold. The burned area task is audited only — modelling was deliberately deferred and the finding released as a standalone data-quality result.</li>
         </ol>
       </div>
     </div>
@@ -824,14 +823,14 @@ footer pre{
     <h4 class="sub" style="margin-top:24px">Results</h4>
     <div class="tbl-wrap">
       <table>
-        <caption>Test set of 15 verified fires. Optimal inference threshold 0.20–0.22. Active fire precision 0.848, recall 0.861.</caption>
+        <caption>F1 micro-averaged over all test pixels, mean ± std. Test set of 15 verified fires, optimal inference threshold 0.20–0.22, active fire precision 0.848 and recall 0.861. IoU is derived from micro-F1 as F1/(2−F1). No baseline delta is quoted: the benchmark scores differently than we do, in ways that make the two sets of figures incomparable.</caption>
         <thead>
-          <tr><th>Task</th><th>Configuration</th><th style="text-align:right">F1</th><th style="text-align:right">IoU</th><th>Baseline</th><th style="text-align:right">Δ</th></tr>
+          <tr><th>Task</th><th>Configuration</th><th style="text-align:right">F1</th><th style="text-align:right">IoU</th><th>Against published baselines</th></tr>
         </thead>
         <tbody>
-          <tr><td>Active fire</td><td>SpaSE-UNet3D · TS=2</td><td class="num">0.855</td><td class="num">0.746</td><td>SwinUNETR-3D 0.823</td><td class="win">+3.2%</td></tr>
-          <tr><td>Active fire</td><td>SpaSE-UNet3D · TS=1</td><td class="num">0.854</td><td class="num">0.745</td><td>SwinUNETR-3D 0.823</td><td class="win">+3.1%</td></tr>
-          <tr><td>Fire progression</td><td>SpaSE-UNet3D · TS=2</td><td class="num">0.424</td><td class="num">0.269</td><td>U-Net-3D 0.375</td><td class="win">+4.9%</td></tr>
+          <tr><td>Active fire</td><td>SpaSE-UNet3D · TS=2</td><td class="num">0.8549 ± 0.0005</td><td class="num">0.747</td><td>Matches or exceeds the strongest, on their respective terms</td></tr>
+          <tr><td>Active fire</td><td>SpaSE-UNet3D · TS=1</td><td class="num">0.8520 ± 0.0008</td><td class="num">0.742</td><td>Within 0.003 of the two-day figure — one acquisition carries most of the detectable signal, where baselines use up to six days</td></tr>
+          <tr><td>Fire progression</td><td>SpaSE-UNet3D · TS=2</td><td class="num">0.3845 ± 0.0221</td><td class="num">0.238</td><td>One third of the baselines' temporal context, at <span class="datum" tabindex="0" data-src="SOURCE: DeepFire-Forecaster manuscript abstract.">2.72× fewer parameters</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -1095,8 +1094,10 @@ footer pre{
 
   /* ---------- ticker ---------- */
   var items = [
-    'DEEPFIRE-FORECASTER :: ACTIVE FIRE F1 0.855 / IOU 0.746',
+    'DEEPFIRE-FORECASTER :: ACTIVE FIRE F1 0.8549 ± 0.0005 MICRO',
     'MANUSCRIPT :: UNDER REVIEW AT MDPI SENSORS — NOT PUBLISHED',
+    'ONE ACQUISITION :: 0.8520 VS 0.8549 — BASELINES USE UP TO SIX DAYS',
+    'LABEL AUDIT :: 18 TRAINING FIRES AND 2 TEST FIRES EXCLUDED',
     'LABEL AUDIT :: ACTIVE FIRE RECALL 0.80 → 0.86',
     'BURNED AREA :: BAND 8 IS AN ID CODE, NOT A THRESHOLD',
     'NEOW :: KEPLER SOLVER CONVERGES TO MACHINE PRECISION THROUGH e = 0.99',
@@ -1140,15 +1141,32 @@ footer pre{
 
   /* ---------- hero typing + glitch ---------- */
   var typedEl = document.getElementById('typed');
-  var LEDE = 'Deep learning for remote sensing.';
+  var LEDES = [
+    'Deep learning for remote sensing.',
+    'Auditing the labels everyone else trusted.',
+    'Ten seeds, reported as mean ± standard deviation.',
+    'Orbital mechanics from published osculating elements.',
+    'Computer vision that runs locally — no network, no API.',
+    'Volos, Greece. Open to research and internships.'
+  ];
   var started = false;
   function startHero(){
     if(started) return; started = true;
-    if(reduce){ typedEl.textContent = LEDE; return; }
-    var n = 0;
-    (function type(){
-      typedEl.textContent = LEDE.slice(0, ++n);
-      if(n < LEDE.length) setTimeout(type, 21);
+    if(reduce){ typedEl.textContent = LEDES[0]; return; }
+    /* type it, hold it, wipe it, move to the next one */
+    var li = 0, n = 0;
+    (function cycle(){
+      var s = LEDES[li];
+      (function type(){
+        typedEl.textContent = s.slice(0, ++n);
+        if(n < s.length) return setTimeout(type, 21);
+        setTimeout(function erase(){
+          typedEl.textContent = s.slice(0, --n);
+          if(n > 0) return setTimeout(erase, 11);
+          li = (li + 1) % LEDES.length;
+          setTimeout(cycle, 260);
+        }, 3400);
+      })();
     })();
     var plate = document.getElementById('nameplate');
     (function burst(){
