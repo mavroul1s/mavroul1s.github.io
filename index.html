@@ -554,6 +554,45 @@ footer pre{
 @keyframes cardscan{from{top:0}to{top:100%}}
 
 /* ============================================================
+   ASCII FIELDS — per-project art, drawn character by character
+   ============================================================ */
+.ascii-box{
+  position:relative;overflow:hidden;
+  border:1px solid rgba(18,113,140,.28);
+  background:rgba(4,6,11,.55);
+  padding:7px 8px;
+}
+/* corner ticks — same beveled register as the cards */
+.ascii-box::before,.ascii-box::after{
+  content:"";position:absolute;width:6px;height:6px;
+  border:1px solid rgba(255,179,71,.45);pointer-events:none;
+}
+.ascii-box::before{top:3px;left:3px;border-right:0;border-bottom:0}
+.ascii-box::after{bottom:3px;right:3px;border-left:0;border-top:0}
+.ascii{
+  margin:0;font-family:var(--hud);font-size:9px;line-height:1.05;
+  letter-spacing:.5px;white-space:pre;overflow:hidden;
+  color:var(--muted);
+}
+.ascii.rail{opacity:.8;font-size:9px}
+/* Y2K chrome: a specular band travelling across the glyphs.
+   Guarded — without background-clip:text the fill would go transparent. */
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .ascii{
+    background-image:linear-gradient(100deg,
+      var(--muted) 0%,var(--muted) 36%,
+      var(--primary-lo) 46%,#eafcff 50%,var(--primary-lo) 54%,
+      var(--muted) 64%,var(--muted) 100%);
+    background-size:320% 100%;background-position:100% 0;
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:asciisweep 8s linear infinite;
+  }
+  .card:hover .ascii{animation-duration:2.6s}
+}
+@keyframes asciisweep{0%{background-position:100% 0}100%{background-position:-60% 0}}
+
+/* ============================================================
    NEOW LAUNCH BAY — the one-click route to the tracker
    ============================================================ */
 .bay{
@@ -707,7 +746,7 @@ footer pre{
   <div class="hero-grid">
     <div>
       <p class="lede"><span id="typed"></span><span class="cursor" aria-hidden="true"></span></p>
-      <p class="hero-sub">Fifth-year Electrical and Computer Engineering at the University of Thessaly. I work on deep learning for remote sensing, computer vision, and the applied mathematics underneath them. The recurring theme is not the model — it is auditing the data everyone else trusted.</p>
+      <p class="hero-sub">Fifth-year ECE at the University of Thessaly. Remote sensing, computer vision, and the mathematics underneath.</p>
 
       <div class="actions">
         <a class="btn primary" href="https://mavroul1s.github.io/neo_tracker/neo-tracker.html" target="_blank" rel="noopener"><span class="k">▸</span><span>Launch NEOW tracker</span></a>
@@ -720,7 +759,7 @@ footer pre{
         <span class="chip">EL NATIVE · EN ECCE B2</span>
         <span class="chip live">● OPEN TO RESEARCH &amp; INTERNSHIPS</span>
       </div>
-      <div class="dither" style="margin-top:22px" aria-hidden="true"></div>
+      <pre class="ascii rail" data-art="wave" data-rows="5" style="margin-top:22px" aria-hidden="true"></pre>
     </div>
 
     <aside class="profiler">
@@ -847,6 +886,7 @@ footer pre{
       <h3>GridSense</h3>
       <p class="stack" style="margin:0">FastAPI<span>/</span>Docker Compose</p>
       <p>Polyglot-persistence smart grid analytics prototype. Cassandra for time-series sensor readings, Neo4j for network topology and fault-impact and restoration-path queries, MongoDB for equipment metadata, PostgreSQL for ACID billing, Redis for dashboard cache and pub/sub alerts — all behind one REST gateway.</p>
+      <div class="ascii-box" aria-hidden="true"><pre class="ascii" data-art="grid" data-rows="7"></pre></div>
       <div class="meta">
         <span class="kv">Endpoints <b>14</b></span>
         <span class="kv">Setup <b>one docker compose up</b></span>
@@ -858,6 +898,7 @@ footer pre{
       <h3>NCF Reproduction</h3>
       <p class="stack" style="margin:0">PyTorch<span>/</span>ECE480</p>
       <p>Reproduction of Neural Collaborative Filtering (He et al., WWW 2017) on MovieLens-100K. Every experiment repeated ten times with independent seeds, all results reported as mean ± standard deviation. MLP depth and GMF+MLP pretraining show no mean benefit at this dataset size, contradicting the paper's MovieLens-1M finding.</p>
+      <div class="ascii-box" aria-hidden="true"><pre class="ascii" data-art="matrix" data-rows="7"></pre></div>
       <div class="meta">
         <span class="kv">NeuMF best <b><span class="datum" tabindex="0" data-src="SOURCE: 10 seeds, mean ± std. 107,761 parameters.">HR@10 0.649 ± 0.011</span></b></span>
         <span class="kv">KD student <b><span class="datum" tabindex="0" data-src="SOURCE: response-based knowledge distillation, 53,177 parameters — matches the teacher on 50.7% fewer.">HR@10 0.655 ± 0.010</span></b></span>
@@ -870,6 +911,7 @@ footer pre{
       <h3>vit-gradient-flow</h3>
       <p class="stack" style="margin:0">Julia<span>/</span>ECE452</p>
       <p>Derives the explicit Jacobian of the self-attention mechanism using matrix calculus, then verifies it numerically with ForwardDiff.jl. Compares orthogonal initialisation (WᵀW = I) against Xavier/Glorot on Jacobian conditioning and feature saliency, using MNIST as sequential patches.</p>
+      <div class="ascii-box" aria-hidden="true"><pre class="ascii" data-art="attn" data-rows="7"></pre></div>
       <div class="meta">
         <span class="kv">Commits <b>52</b></span>
         <span class="kv">Verification <b>numerical vs analytic</b></span>
@@ -881,6 +923,7 @@ footer pre{
       <h3>Galaxy-Morphology-CNN</h3>
       <p class="stack" style="margin:0">TensorFlow</p>
       <p>Custom VGG-style CNN predicting 37 probabilistic morphological features on Galaxy Zoo, through a five-phase experimental pipeline that isolates each architectural decision one at a time. Includes an IEEE-formatted report.</p>
+      <div class="ascii-box" aria-hidden="true"><pre class="ascii" data-art="galaxy" data-rows="9"></pre></div>
       <div class="meta">
         <span class="kv">Blind test <b><span class="datum" tabindex="0" data-src="SOURCE: blind test split, Galaxy Zoo. ~2.6M parameters, 64×64 input.">0.109 RMSE</span></b></span>
         <span class="kv">Parameters <b>~2.6M</b></span>
@@ -892,6 +935,7 @@ footer pre{
       <h3>KinetiCore</h3>
       <p class="stack" style="margin:0">Python<span>/</span>OpenCV<span>/</span>MediaPipe</p>
       <p>Real-time bare-hand computer vision sandbox. Webcam gesture and face tracking, biometric mapping, and standalone demo scripts. Runs entirely locally — no network, no API.</p>
+      <div class="ascii-box" aria-hidden="true"><pre class="ascii" data-art="hand" data-rows="9"></pre></div>
       <div class="meta">
         <span class="kv">Input <b>webcam only</b></span>
         <span class="kv">Network <b>none</b></span>
@@ -961,6 +1005,7 @@ footer pre{
       <dt>Machine learning</dt><dd>PyTorch · TensorFlow · scikit-learn · 3D segmentation · CNNs · ViTs · knowledge distillation · recommender systems</dd>
       <dt>Data / backend</dt><dd>FastAPI · Docker Compose · Cassandra · Neo4j · MongoDB · PostgreSQL · Redis</dd>
       <dt>CV / DSP</dt><dd>OpenCV · MediaPipe · MFCC and LPC · spectral analysis · classical filtering</dd>
+      <dt>Realtime / media</dt><dd>TouchDesigner · Avidemux</dd>
       <dt>Other</dt><dd>three.js · LaTeX · Git · Kaggle GPU workflows · rasterio and geospatial rasters</dd>
       <dt>Domains</dt><dd>Wildfire remote sensing · orbital mechanics · astronomy imaging · information retrieval · speech and audio</dd>
     </dl>
@@ -1095,7 +1140,7 @@ footer pre{
 
   /* ---------- hero typing + glitch ---------- */
   var typedEl = document.getElementById('typed');
-  var LEDE = 'Deep learning for remote sensing. A result that survives an audit, or it does not count.';
+  var LEDE = 'Deep learning for remote sensing.';
   var started = false;
   function startHero(){
     if(started) return; started = true;
@@ -1164,6 +1209,195 @@ footer pre{
         g.fillText(col.ch, c * CW, col.y - 14);
       }
     })(0);
+  }
+
+  /* ---------- ASCII fields ----------
+     Each project draws its own subject into a character buffer: the
+     datastore fan-in for GridSense, a factorised matrix for NCF, an
+     attention diagonal for the ViT work, a differentially-rotating
+     spiral for Galaxy Zoo, a tracked hand for KinetiCore. */
+  var RAMP = ' .:;+=*x#';
+  function mkbuf(W,H){
+    var b=[],y,x;
+    for(y=0;y<H;y++){ var r=[]; for(x=0;x<W;x++) r.push(' '); b.push(r); }
+    return b;
+  }
+  function put(b,x,y,ch){
+    x=Math.round(x); y=Math.round(y);
+    if(y>=0 && y<b.length && x>=0 && x<b[0].length) b[y][x]=ch;
+  }
+  function txt(b,x,y,s){ for(var i=0;i<s.length;i++) put(b,x+i,y,s.charAt(i)); }
+  function seg(b,x0,y0,x1,y1,ch){
+    var n=Math.round(Math.max(Math.abs(x1-x0), Math.abs(y1-y0)*2));
+    if(n<1) n=1;
+    for(var i=0;i<=n;i++) put(b, x0+(x1-x0)*i/n, y0+(y1-y0)*i/n, ch);
+  }
+  function ramp(v){
+    var i=Math.floor(v*RAMP.length);
+    if(i<0) i=0; if(i>=RAMP.length) i=RAMP.length-1;
+    return RAMP.charAt(i);
+  }
+
+  /* GridSense — five datastores fanning into one gateway, packets in flight */
+  function artGrid(b,W,H,t){
+    var names=['CAS','NEO','MON','PGS','RDS'];
+    var rows=Math.min(5,H), top=Math.floor((H-rows)/2);
+    var x0=5, gx=W-11;
+    if(gx<=x0+4) gx=W-1;
+    for(var i=0;i<rows;i++){
+      var y=top+i, x;
+      txt(b,0,y,names[i]);
+      for(x=x0;x<gx;x++) put(b,x,y,'-');
+      put(b,gx,y, i===0?',':(i===rows-1?'\'':'|'));
+      var span=gx-x0;
+      if(span>3){
+        var p=x0+1+Math.floor((t*(11+i*2.6)+i*9)%(span-1));
+        put(b,p,y,'#'); put(b,p-1,y,'=');
+      }
+      put(b,x0-1,y,'o');            /* node last — a pulse must not eat it */
+    }
+    var my=top+Math.floor(rows/2);
+    if(W-gx>=10) txt(b,gx+1,my,'-> [GW] ->');
+  }
+
+  /* NCF — latent factors interfering across a user x item matrix */
+  function artMatrix(b,W,H,t){
+    for(var y=0;y<H;y++) for(var x=0;x<W;x++){
+      var v=(Math.sin(x*0.35+t*1.2)+Math.sin(y*0.9-t*0.8)+Math.sin((x+y)*0.22+t*0.5))/3;
+      b[y][x]=ramp(Math.pow(v*0.5+0.5,1.7));
+    }
+  }
+
+  /* vit-gradient-flow — attention mass on the diagonal, gradient washing along it */
+  function artAttn(b,W,H,t){
+    for(var y=0;y<H;y++) for(var x=0;x<W;x++){
+      var u=W>1?x/(W-1):0, w=H>1?y/(H-1):0;
+      var d=u-w;
+      var band=Math.exp(-d*d*16);
+      var flow=Math.sin(u*6.5-t*2.2+w*3)*0.5+0.5;
+      b[y][x]=ramp(band*(0.4+0.6*flow));
+    }
+  }
+
+  /* Galaxy Zoo — two arms, inner radii rotating faster than outer */
+  function artGalaxy(b,W,H,t){
+    /* elliptical, not circular — character cells are about twice as tall as wide,
+       so the arms have to be stretched in x to fill the panel */
+    var cx=(W-1)/2, cy=(H-1)/2, rx=cx*0.95, ry=cy*0.95;
+    for(var a=0;a<2;a++) for(var s=1;s<=300;s++){
+      var r=s/300;
+      var th=a*Math.PI + r*4.3 + t*0.55/(0.32+r);
+      put(b, cx+Math.cos(th)*r*rx, cy+Math.sin(th)*r*ry,
+            r<0.28?'#':(r<0.58?'*':(r<0.82?'+':'.')));
+    }
+    put(b,cx,cy,'@');
+  }
+
+  /* KinetiCore — a tracked hand, fingers flexing inside a reticle */
+  function artHand(b,W,H,t){
+    var bw=Math.min(W-16,26); if(bw<14) bw=Math.max(10,W-3);
+    var bh=H-1, bx=1, x, y, i;
+    for(x=bx;x<=bx+bw;x++){ put(b,x,0,'-'); put(b,x,bh,'-'); }
+    for(y=0;y<=bh;y++){ put(b,bx,y,'|'); put(b,bx+bw,y,'|'); }
+    put(b,bx,0,'+'); put(b,bx+bw,0,'+'); put(b,bx,bh,'+'); put(b,bx+bw,bh,'+');
+
+    /* the whole skeleton drifts — a tracker locking on, not a static glyph */
+    var cx=bx+bw/2+Math.sin(t*0.9)*bw*0.13+Math.sin(t*2.7)*0.4;
+    var palmY=bh-2, sp=Math.max(2,Math.round(bw/9));
+    var lens=[3,4,4.4,3.6];
+    for(var f=0;f<4;f++){
+      var fxp=cx+(f-1.5)*sp;
+      var flex=Math.sin(t*2.1+f*0.8)*0.5+0.5;
+      var L=Math.max(1,Math.round(lens[f]*(0.38+0.62*flex)*(bh/8)));
+      for(i=1;i<=L;i++) put(b,fxp,palmY-i, i===L?'o':'|');
+    }
+    var tl=Math.max(1,Math.round(2.6*(0.5+0.5*(Math.sin(t*1.7)*0.5+0.5))));
+    for(i=1;i<=tl;i++) put(b, cx-1.5*sp-i, palmY-Math.round(i*0.6), i===tl?'o':'\\');
+    for(x=Math.round(cx-1.6*sp);x<=Math.round(cx+1.6*sp);x++) put(b,x,palmY,'#');
+    put(b,cx,palmY+1,'|');
+
+    var hx=bx+bw+2;
+    if(W-hx>10){
+      txt(b,hx,1,'LANDMARK 21');
+      txt(b,hx,3,'CONF 0.9'+(Math.floor(t*3)%5));
+      txt(b,hx,5,'LOCAL ONLY');
+    }
+  }
+
+  /* hero rail — a travelling waveform, the Y2K dither rail with a pulse */
+  function artWave(b,W,H,t){
+    for(var x=0;x<W;x++){
+      var v=Math.sin(x*0.17-t*2.3)*0.55+Math.sin(x*0.06+t*1.2)*0.45;
+      var yy=(H-1)/2+v*(H-1)/2*0.95;
+      for(var y=0;y<H;y++){
+        var d=Math.abs(y-yy);
+        b[y][x]= d<0.42?'#':(d<0.95?'=':' ');
+      }
+    }
+  }
+
+  var ARTS={grid:artGrid,matrix:artMatrix,attn:artAttn,galaxy:artGalaxy,hand:artHand,wave:artWave};
+  var fields=[];
+
+  function charWidth(el){
+    var cs=getComputedStyle(el), probe=document.createElement('span');
+    probe.style.cssText='position:absolute;left:-9999px;top:0;white-space:pre;visibility:hidden';
+    probe.style.fontFamily=cs.fontFamily;
+    probe.style.fontSize=cs.fontSize;
+    probe.style.letterSpacing=cs.letterSpacing;
+    probe.textContent=new Array(101).join('M');
+    document.body.appendChild(probe);
+    var w=probe.getBoundingClientRect().width/100;
+    probe.parentNode.removeChild(probe);
+    return w>0.5 ? w : 6;
+  }
+  function drawField(f,t){
+    var b=mkbuf(f.cols,f.rows);
+    f.fn(b,f.cols,f.rows,t);
+    var out=[];
+    for(var y=0;y<f.rows;y++) out.push(b[y].join(''));
+    f.el.textContent=out.join('\n');
+  }
+
+  [].forEach.call(document.querySelectorAll('.ascii'), function(el){
+    var fn=ARTS[el.getAttribute('data-art')];
+    if(!fn) return;
+    var f={
+      el:el, fn:fn, vis:true,
+      rows:parseInt(el.getAttribute('data-rows'),10)||7,
+      cw:charWidth(el), cols:20
+    };
+    f.fit=function(){
+      var w=el.clientWidth || (el.parentNode && el.parentNode.clientWidth) || 240;
+      f.cols=Math.max(16, Math.floor(w/f.cw));
+    };
+    f.fit();
+    fields.push(f);
+    drawField(f,0);
+  });
+
+  if(fields.length){
+    var fio=new IntersectionObserver(function(en){
+      en.forEach(function(e){
+        for(var i=0;i<fields.length;i++) if(fields[i].el===e.target) fields[i].vis=e.isIntersecting;
+      });
+    },{rootMargin:'140px'});
+    fields.forEach(function(f){ fio.observe(f.el); });
+
+    window.addEventListener('resize', function(){
+      fields.forEach(function(f){ f.cw=charWidth(f.el); f.fit(); drawField(f,0); });
+    });
+
+    if(!reduce){
+      var fT0=performance.now(), fLast=0;
+      requestAnimationFrame(function fstep(now){
+        requestAnimationFrame(fstep);
+        if(now-fLast < 80) return;          /* ~12fps, same mechanical cadence as the rain */
+        fLast=now;
+        var t=(now-fT0)/1000;
+        for(var i=0;i<fields.length;i++) if(fields[i].vis) drawField(fields[i],t);
+      });
+    }
   }
 
   /* ---------- ctOS card scan overlay ---------- */
