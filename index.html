@@ -249,7 +249,7 @@ section{padding:56px 0;scroll-margin-top:110px}
    ============================================================ */
 .name{position:relative;margin:0 0 6px}
 .name pre{
-  margin:0;font-size:clamp(4.5px,2.1vw,25px);line-height:1.02;
+  margin:0;font-size:clamp(3.6px,1.68vw,20px);line-height:1.02;
   font-weight:700;color:var(--primary);
   text-shadow:0 0 18px rgba(53,224,240,.28);
 }
@@ -553,27 +553,14 @@ footer pre{
 @keyframes cardscan{from{top:0}to{top:100%}}
 
 /* ============================================================
-   ASCII FIELDS — per-project art, drawn character by character
+   ASCII RAIL — the hero waveform, still drawn character by character
    ============================================================ */
-.ascii-box{
-  position:relative;overflow:hidden;
-  border:1px solid rgba(18,113,140,.28);
-  background:rgba(4,6,11,.55);
-  padding:7px 8px;
-}
-/* corner ticks — same beveled register as the cards */
-.ascii-box::before,.ascii-box::after{
-  content:"";position:absolute;width:6px;height:6px;
-  border:1px solid rgba(255,179,71,.45);pointer-events:none;
-}
-.ascii-box::before{top:3px;left:3px;border-right:0;border-bottom:0}
-.ascii-box::after{bottom:3px;right:3px;border-left:0;border-top:0}
 .ascii{
   margin:0;font-family:var(--hud);font-size:9px;line-height:1.05;
   letter-spacing:.5px;white-space:pre;overflow:hidden;
   color:var(--muted);
 }
-.ascii.rail{opacity:.8;font-size:9px}
+.ascii.rail{opacity:.8}
 /* Y2K chrome: a specular band travelling across the glyphs.
    Guarded — without background-clip:text the fill would go transparent. */
 @supports ((-webkit-background-clip:text) or (background-clip:text)){
@@ -587,9 +574,18 @@ footer pre{
     -webkit-text-fill-color:transparent;
     animation:asciisweep 8s linear infinite;
   }
-  .card:hover .ascii{animation-duration:2.6s}
 }
 @keyframes asciisweep{0%{background-position:100% 0}100%{background-position:-60% 0}}
+
+/* ============================================================
+   PROJECT VISUALISERS — one canvas per project, drawing its own subject
+   ============================================================ */
+.viz{
+  display:block;width:100%;height:104px;
+  border:1px solid rgba(18,113,140,.28);
+  background:rgba(4,6,11,.6);
+}
+.card:hover .viz{border-color:rgba(255,179,71,.4)}
 
 /* ============================================================
    NEOW LAUNCH BAY — the one-click route to the tracker
@@ -812,10 +808,10 @@ footer pre{
         </ul>
       </div>
       <div>
-        <h4 class="sub">What the project actually contributes</h4>
+        <h4 class="sub">What the project contributes</h4>
         <ol class="find">
-          <li><b>Label-quality audit</b> across all three tasks and every split. Many fires lack ground-truth annotations entirely. <span class="datum" tabindex="0" data-src="SOURCE: label-completeness audit, DeepFire-Forecaster manuscript abstract.">18 training fires and 2 test fires</span> are excluded for active fire — and the two unannotated test fires cannot be scored by any model, not just this one. Training on audited data raised active fire recall from <span class="datum" tabindex="0" data-src="SOURCE: before/after audit training runs, DeepFire-Forecaster.">~0.80 to 0.86</span>. The benchmark's own scoring procedure is documented too: it differs from ours in ways that make the two sets of figures incomparable.</li>
-          <li><b>Burned area label encoding.</b> The paper never specified the encoding. Band 8 finite values turn out to be Julian-day or perimeter-ID codes in the range <span class="datum" tabindex="0" data-src="SOURCE: band-8 value inspection across the TS-SatFire splits.">2,119–908,660</span>, so correct label extraction is a finiteness mask, not a value threshold. The burned area task is audited only — modelling was deliberately deferred and the finding released as a standalone data-quality result.</li>
+          <li><b>SpaSE-UNet3D.</b> A spatial squeeze-and-excitation 3D U-Net built for the shape of this data. Spatial-only <span class="datum" tabindex="0" data-src="SOURCE: ResBlock3D definition, DeepFire-Forecaster.">(1, 3, 3)</span> convolutions refuse to mix across time, because the observation windows are too short for temporal mixing to pay for itself; squeeze-and-excitation attention reweights the VIIRS spectral bands dynamically instead. It reaches <span class="datum" tabindex="0" data-src="SOURCE: micro-averaged over all test pixels, mean ± std. DeepFire-Forecaster manuscript.">F1 0.8549 ± 0.0005</span> on active fire and <span class="datum" tabindex="0" data-src="SOURCE: micro-averaged over all test pixels, mean ± std, TS = 2. DeepFire-Forecaster manuscript.">0.3845 ± 0.0221</span> on fire progression — matching or exceeding the strongest published baselines on their respective terms, using one third of their temporal context at <span class="datum" tabindex="0" data-src="SOURCE: DeepFire-Forecaster manuscript abstract.">2.72× fewer parameters</span>.</li>
+          <li><b>Label-quality audit.</b> Many fires lack ground-truth annotations entirely. <span class="datum" tabindex="0" data-src="SOURCE: label-completeness audit, DeepFire-Forecaster manuscript.">18 training fires and 2 test fires</span> are excluded for active fire — and the two unannotated test fires cannot be scored by any model, not just this one. Training on audited data raised active fire recall from <span class="datum" tabindex="0" data-src="SOURCE: before/after audit training runs, DeepFire-Forecaster.">~0.80 to 0.86</span>. The benchmark's own scoring procedure is documented too: it differs from ours in ways that make the two sets of figures incomparable.</li>
         </ol>
       </div>
     </div>
@@ -885,7 +881,7 @@ footer pre{
       <h3>GridSense</h3>
       <p class="stack" style="margin:0">FastAPI<span>/</span>Docker Compose</p>
       <p>Polyglot-persistence smart grid analytics prototype. Cassandra for time-series sensor readings, Neo4j for network topology and fault-impact and restoration-path queries, MongoDB for equipment metadata, PostgreSQL for ACID billing, Redis for dashboard cache and pub/sub alerts — all behind one REST gateway.</p>
-      <div class="ascii-box" aria-hidden="true"><pre class="ascii" data-art="grid" data-rows="7"></pre></div>
+      <canvas class="viz" data-viz="gridsense" aria-hidden="true"></canvas>
       <div class="meta">
         <span class="kv">Endpoints <b>14</b></span>
         <span class="kv">Setup <b>one docker compose up</b></span>
@@ -897,7 +893,7 @@ footer pre{
       <h3>NCF Reproduction</h3>
       <p class="stack" style="margin:0">PyTorch<span>/</span>ECE480</p>
       <p>Reproduction of Neural Collaborative Filtering (He et al., WWW 2017) on MovieLens-100K. Every experiment repeated ten times with independent seeds, all results reported as mean ± standard deviation. MLP depth and GMF+MLP pretraining show no mean benefit at this dataset size, contradicting the paper's MovieLens-1M finding.</p>
-      <div class="ascii-box" aria-hidden="true"><pre class="ascii" data-art="matrix" data-rows="7"></pre></div>
+      <canvas class="viz" data-viz="ncf" aria-hidden="true"></canvas>
       <div class="meta">
         <span class="kv">NeuMF best <b><span class="datum" tabindex="0" data-src="SOURCE: 10 seeds, mean ± std. 107,761 parameters.">HR@10 0.649 ± 0.011</span></b></span>
         <span class="kv">KD student <b><span class="datum" tabindex="0" data-src="SOURCE: response-based knowledge distillation, 53,177 parameters — matches the teacher on 50.7% fewer.">HR@10 0.655 ± 0.010</span></b></span>
@@ -910,7 +906,7 @@ footer pre{
       <h3>vit-gradient-flow</h3>
       <p class="stack" style="margin:0">Julia<span>/</span>ECE452</p>
       <p>Derives the explicit Jacobian of the self-attention mechanism using matrix calculus, then verifies it numerically with ForwardDiff.jl. Compares orthogonal initialisation (WᵀW = I) against Xavier/Glorot on Jacobian conditioning and feature saliency, using MNIST as sequential patches.</p>
-      <div class="ascii-box" aria-hidden="true"><pre class="ascii" data-art="attn" data-rows="7"></pre></div>
+      <canvas class="viz" data-viz="vit" aria-hidden="true"></canvas>
       <div class="meta">
         <span class="kv">Commits <b>52</b></span>
         <span class="kv">Verification <b>numerical vs analytic</b></span>
@@ -922,7 +918,7 @@ footer pre{
       <h3>Galaxy-Morphology-CNN</h3>
       <p class="stack" style="margin:0">TensorFlow</p>
       <p>Custom VGG-style CNN predicting 37 probabilistic morphological features on Galaxy Zoo, through a five-phase experimental pipeline that isolates each architectural decision one at a time. Includes an IEEE-formatted report.</p>
-      <div class="ascii-box" aria-hidden="true"><pre class="ascii" data-art="galaxy" data-rows="9"></pre></div>
+      <canvas class="viz" data-viz="galaxy" aria-hidden="true"></canvas>
       <div class="meta">
         <span class="kv">Blind test <b><span class="datum" tabindex="0" data-src="SOURCE: blind test split, Galaxy Zoo. ~2.6M parameters, 64×64 input.">0.109 RMSE</span></b></span>
         <span class="kv">Parameters <b>~2.6M</b></span>
@@ -934,11 +930,23 @@ footer pre{
       <h3>KinetiCore</h3>
       <p class="stack" style="margin:0">Python<span>/</span>OpenCV<span>/</span>MediaPipe</p>
       <p>Real-time bare-hand computer vision sandbox. Webcam gesture and face tracking, biometric mapping, and standalone demo scripts. Runs entirely locally — no network, no API.</p>
-      <div class="ascii-box" aria-hidden="true"><pre class="ascii" data-art="hand" data-rows="9"></pre></div>
+      <canvas class="viz" data-viz="kineticore" aria-hidden="true"></canvas>
       <div class="meta">
         <span class="kv">Input <b>webcam only</b></span>
         <span class="kv">Network <b>none</b></span>
         <a class="go" href="https://github.com/mavroul1s/KinetiCore" target="_blank" rel="noopener">Open repository</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <h3>GMM Music Genre Recognition</h3>
+      <p class="stack" style="margin:0">MATLAB<span>/</span>MFCC</p>
+      <p>Audio genre classifier built on MFCC features with cepstral mean subtraction, k-means initialisation, and Expectation-Maximization written from scratch rather than called from a toolbox.</p>
+      <canvas class="viz" data-viz="gmm" aria-hidden="true"></canvas>
+      <div class="meta">
+        <span class="kv">Test set <b><span class="datum" tabindex="0" data-src="SOURCE: three-genre coursework test set — blues, reggae, classical.">100% on three genres</span></b></span>
+        <span class="kv">EM <b>implemented from scratch</b></span>
+        <a class="go" href="https://github.com/mavroul1s/GMM-Music-Genre-Recognition" target="_blank" rel="noopener">Open repository</a>
       </div>
     </article>
 
@@ -981,14 +989,6 @@ footer pre{
         <h4>Computer Vision</h4>
         <p>Otsu thresholding, spatial filter comparison by PSNR (Gaussian 26.31 dB versus Box 25.80 dB), Sobel / Prewitt / Laplacian / Canny compared by edge density, frequency-domain edge detection. Python, NumPy, OpenCV.</p>
         <a class="go" href="https://github.com/mavroul1s/ECE457-Coursework" target="_blank" rel="noopener">Open repository</a>
-      </div>
-    </li>
-    <li>
-      <span class="code">GMM</span>
-      <div>
-        <h4>Music Genre Recognition</h4>
-        <p>MFCC features with cepstral mean subtraction, k-means initialisation, Expectation-Maximization implemented from scratch rather than called from a toolbox. 100% accuracy on a three-genre coursework test set — blues, reggae, classical. MATLAB.</p>
-        <a class="go" href="https://github.com/mavroul1s/GMM-Music-Genre-Recognition" target="_blank" rel="noopener">Open repository</a>
       </div>
     </li>
   </ul>
@@ -1229,120 +1229,14 @@ footer pre{
     })(0);
   }
 
-  /* ---------- ASCII fields ----------
-     Each project draws its own subject into a character buffer: the
-     datastore fan-in for GridSense, a factorised matrix for NCF, an
-     attention diagonal for the ViT work, a differentially-rotating
-     spiral for Galaxy Zoo, a tracked hand for KinetiCore. */
-  var RAMP = ' .:;+=*x#';
+  /* ---------- ASCII rail ----------
+     Only the hero waveform is drawn as characters now; each project
+     card renders its own subject on a canvas instead. */
   function mkbuf(W,H){
     var b=[],y,x;
     for(y=0;y<H;y++){ var r=[]; for(x=0;x<W;x++) r.push(' '); b.push(r); }
     return b;
   }
-  function put(b,x,y,ch){
-    x=Math.round(x); y=Math.round(y);
-    if(y>=0 && y<b.length && x>=0 && x<b[0].length) b[y][x]=ch;
-  }
-  function txt(b,x,y,s){ for(var i=0;i<s.length;i++) put(b,x+i,y,s.charAt(i)); }
-  function seg(b,x0,y0,x1,y1,ch){
-    var n=Math.round(Math.max(Math.abs(x1-x0), Math.abs(y1-y0)*2));
-    if(n<1) n=1;
-    for(var i=0;i<=n;i++) put(b, x0+(x1-x0)*i/n, y0+(y1-y0)*i/n, ch);
-  }
-  function ramp(v){
-    var i=Math.floor(v*RAMP.length);
-    if(i<0) i=0; if(i>=RAMP.length) i=RAMP.length-1;
-    return RAMP.charAt(i);
-  }
-
-  /* GridSense — five datastores fanning into one gateway, packets in flight */
-  function artGrid(b,W,H,t){
-    var names=['CAS','NEO','MON','PGS','RDS'];
-    var rows=Math.min(5,H), top=Math.floor((H-rows)/2);
-    var x0=5, gx=W-11;
-    if(gx<=x0+4) gx=W-1;
-    for(var i=0;i<rows;i++){
-      var y=top+i, x;
-      txt(b,0,y,names[i]);
-      for(x=x0;x<gx;x++) put(b,x,y,'-');
-      put(b,gx,y, i===0?',':(i===rows-1?'\'':'|'));
-      var span=gx-x0;
-      if(span>3){
-        var p=x0+1+Math.floor((t*(11+i*2.6)+i*9)%(span-1));
-        put(b,p,y,'#'); put(b,p-1,y,'=');
-      }
-      put(b,x0-1,y,'o');            /* node last — a pulse must not eat it */
-    }
-    var my=top+Math.floor(rows/2);
-    if(W-gx>=10) txt(b,gx+1,my,'-> [GW] ->');
-  }
-
-  /* NCF — latent factors interfering across a user x item matrix */
-  function artMatrix(b,W,H,t){
-    for(var y=0;y<H;y++) for(var x=0;x<W;x++){
-      var v=(Math.sin(x*0.35+t*1.2)+Math.sin(y*0.9-t*0.8)+Math.sin((x+y)*0.22+t*0.5))/3;
-      b[y][x]=ramp(Math.pow(v*0.5+0.5,1.7));
-    }
-  }
-
-  /* vit-gradient-flow — attention mass on the diagonal, gradient washing along it */
-  function artAttn(b,W,H,t){
-    for(var y=0;y<H;y++) for(var x=0;x<W;x++){
-      var u=W>1?x/(W-1):0, w=H>1?y/(H-1):0;
-      var d=u-w;
-      var band=Math.exp(-d*d*16);
-      var flow=Math.sin(u*6.5-t*2.2+w*3)*0.5+0.5;
-      b[y][x]=ramp(band*(0.4+0.6*flow));
-    }
-  }
-
-  /* Galaxy Zoo — two arms, inner radii rotating faster than outer */
-  function artGalaxy(b,W,H,t){
-    /* elliptical, not circular — character cells are about twice as tall as wide,
-       so the arms have to be stretched in x to fill the panel */
-    var cx=(W-1)/2, cy=(H-1)/2, rx=cx*0.95, ry=cy*0.95;
-    for(var a=0;a<2;a++) for(var s=1;s<=300;s++){
-      var r=s/300;
-      var th=a*Math.PI + r*4.3 + t*0.55/(0.32+r);
-      put(b, cx+Math.cos(th)*r*rx, cy+Math.sin(th)*r*ry,
-            r<0.28?'#':(r<0.58?'*':(r<0.82?'+':'.')));
-    }
-    put(b,cx,cy,'@');
-  }
-
-  /* KinetiCore — a tracked hand, fingers flexing inside a reticle */
-  function artHand(b,W,H,t){
-    var bw=Math.min(W-16,26); if(bw<14) bw=Math.max(10,W-3);
-    var bh=H-1, bx=1, x, y, i;
-    for(x=bx;x<=bx+bw;x++){ put(b,x,0,'-'); put(b,x,bh,'-'); }
-    for(y=0;y<=bh;y++){ put(b,bx,y,'|'); put(b,bx+bw,y,'|'); }
-    put(b,bx,0,'+'); put(b,bx+bw,0,'+'); put(b,bx,bh,'+'); put(b,bx+bw,bh,'+');
-
-    /* the whole skeleton drifts — a tracker locking on, not a static glyph */
-    var cx=bx+bw/2+Math.sin(t*0.9)*bw*0.13+Math.sin(t*2.7)*0.4;
-    var palmY=bh-2, sp=Math.max(2,Math.round(bw/9));
-    var lens=[3,4,4.4,3.6];
-    for(var f=0;f<4;f++){
-      var fxp=cx+(f-1.5)*sp;
-      var flex=Math.sin(t*2.1+f*0.8)*0.5+0.5;
-      var L=Math.max(1,Math.round(lens[f]*(0.38+0.62*flex)*(bh/8)));
-      for(i=1;i<=L;i++) put(b,fxp,palmY-i, i===L?'o':'|');
-    }
-    var tl=Math.max(1,Math.round(2.6*(0.5+0.5*(Math.sin(t*1.7)*0.5+0.5))));
-    for(i=1;i<=tl;i++) put(b, cx-1.5*sp-i, palmY-Math.round(i*0.6), i===tl?'o':'\\');
-    for(x=Math.round(cx-1.6*sp);x<=Math.round(cx+1.6*sp);x++) put(b,x,palmY,'#');
-    put(b,cx,palmY+1,'|');
-
-    var hx=bx+bw+2;
-    if(W-hx>10){
-      txt(b,hx,1,'LANDMARK 21');
-      txt(b,hx,3,'CONF 0.9'+(Math.floor(t*3)%5));
-      txt(b,hx,5,'LOCAL ONLY');
-    }
-  }
-
-  /* hero rail — a travelling waveform, the Y2K dither rail with a pulse */
   function artWave(b,W,H,t){
     for(var x=0;x<W;x++){
       var v=Math.sin(x*0.17-t*2.3)*0.55+Math.sin(x*0.06+t*1.2)*0.45;
@@ -1353,8 +1247,7 @@ footer pre{
       }
     }
   }
-
-  var ARTS={grid:artGrid,matrix:artMatrix,attn:artAttn,galaxy:artGalaxy,hand:artHand,wave:artWave};
+  var ARTS={wave:artWave};
   var fields=[];
 
   function charWidth(el){
@@ -1414,6 +1307,252 @@ footer pre{
         fLast=now;
         var t=(now-fT0)/1000;
         for(var i=0;i<fields.length;i++) if(fields[i].vis) drawField(fields[i],t);
+      });
+    }
+  }
+
+  /* ---------- project visualisers ----------
+     One canvas per card, each drawing the thing the project actually does. */
+  var C_DIM='rgba(18,113,140,.45)', C_MID='rgba(63,125,140,.9)',
+      C_HI='#35e0f0', C_ACC='#ffb347', C_RED='#ff3d5a';
+
+  /* GridSense — five stores feeding one gateway, requests in flight */
+  var GS=['CASSANDRA','NEO4J','MONGO','POSTGRES','REDIS'];
+  function vizGridsense(g,W,H,t){
+    var lx=Math.min(74,W*0.34), gx=W-30, cy=H/2;
+    g.font='7px "Share Tech Mono",monospace'; g.textBaseline='middle';
+    for(var i=0;i<5;i++){
+      var y=H*0.16+i*(H*0.68/4);
+      g.strokeStyle=C_DIM; g.lineWidth=1;
+      g.beginPath(); g.moveTo(lx,y); g.lineTo(gx-8,y); g.lineTo(gx-8,cy); g.stroke();
+      g.fillStyle=C_MID; g.textAlign='right'; g.fillText(GS[i],lx-7,y);
+      g.beginPath(); g.arc(lx-3,y,2,0,7); g.fillStyle=C_HI; g.fill();
+      var span=(gx-8)-lx, ph=(t*(0.30+i*0.055)+i*0.21)%1, px=lx+span*ph;
+      var grd=g.createLinearGradient(px-14,0,px,0);
+      grd.addColorStop(0,'rgba(53,224,240,0)'); grd.addColorStop(1,C_HI);
+      g.strokeStyle=grd; g.lineWidth=1.6;
+      g.beginPath(); g.moveTo(Math.max(lx,px-14),y); g.lineTo(px,y); g.stroke();
+      g.fillStyle=C_HI; g.beginPath(); g.arc(px,y,1.7,0,7); g.fill();
+    }
+    var pulse=0.5+0.5*Math.sin(t*3.1);
+    g.strokeStyle=C_ACC; g.lineWidth=1;
+    g.strokeRect(gx-8,cy-11,20,22);
+    g.fillStyle='rgba(255,179,71,'+(0.10+0.20*pulse)+')';
+    g.fillRect(gx-8,cy-11,20,22);
+    g.fillStyle=C_ACC; g.textAlign='left';
+    g.fillText('REST',gx+16,cy-4); g.fillText('14 EP',gx+16,cy+5);
+  }
+
+  /* NCF — a rank-k reconstruction of the user x item matrix */
+  function vizNcf(g,W,H,t){
+    var cols=26, rows=9, cw=(W-58)/cols, ch=(H-16)/rows, ox=8, oy=8;
+    for(var i=0;i<rows;i++) for(var j=0;j<cols;j++){
+      var v=0;
+      for(var k=0;k<3;k++)
+        v+=Math.sin(i*0.7+k*2.1+t*(0.5+k*0.2))*Math.sin(j*0.45+k*1.3-t*(0.4+k*0.15));
+      v=v/3*0.5+0.5;
+      g.fillStyle='rgba(53,224,240,'+(0.06+v*v*0.8)+')';
+      g.fillRect(ox+j*cw,oy+i*ch,Math.max(1,cw-1),Math.max(1,ch-1));
+    }
+    g.font='7px "Share Tech Mono",monospace'; g.textBaseline='middle'; g.textAlign='left';
+    var bx=W-46;
+    g.fillStyle=C_MID; g.fillText('HR@10',bx,10);
+    var vals=[0.649,0.655,0.582], labs=['NeuMF','KD','FitN'];
+    for(var b=0;b<3;b++){
+      var y=24+b*13, w=(vals[b]/0.7)*34;
+      g.fillStyle=C_DIM; g.fillRect(bx,y,34,5);
+      g.fillStyle=b===1?C_ACC:C_HI; g.fillRect(bx,y,w,5);
+      g.fillStyle=C_MID; g.fillText(labs[b],bx,y+11);
+    }
+  }
+
+  /* vit-gradient-flow — attention map with a query row sweeping down it */
+  function vizVit(g,W,H,t){
+    var n=16, s=Math.min((W-56)/n,(H-14)/n), ox=10, oy=(H-n*s)/2;
+    var q=(t*0.55)%n;
+    for(var i=0;i<n;i++) for(var j=0;j<n;j++){
+      var d=i-j, a=Math.exp(-d*d*0.22)*(0.55+0.45*Math.sin(j*0.5-t*1.6+i*0.3));
+      if(Math.abs(i-q)<1.4) a=Math.min(1,a*1.9+0.12);
+      g.fillStyle='rgba(53,224,240,'+(0.05+a*0.8)+')';
+      g.fillRect(ox+j*s,oy+i*s,Math.max(1,s-0.6),Math.max(1,s-0.6));
+    }
+    g.strokeStyle=C_ACC; g.lineWidth=1;
+    g.strokeRect(ox-0.5,oy+Math.round(q)*s-0.5,n*s,s);
+    g.font='7px "Share Tech Mono",monospace'; g.textBaseline='middle'; g.textAlign='left';
+    g.fillStyle=C_MID;
+    var tx=ox+n*s+9;
+    g.fillText('softmax(QKᵀ/√d)',tx,oy+7);
+    g.fillStyle=C_ACC; g.fillText('query '+(Math.floor(q)+1)+'/'+n,tx,oy+20);
+    g.fillStyle=C_MID; g.fillText('WᵀW = I',tx,oy+33);
+  }
+
+  /* Galaxy Zoo — two arms under differential rotation */
+  var GSTARS=null;
+  function vizGalaxy(g,W,H,t){
+    if(!GSTARS){
+      GSTARS=[];
+      for(var i=0;i<300;i++){
+        var r=Math.pow(Math.random(),0.62);
+        GSTARS.push({r:r,arm:i%2,off:(Math.random()-0.5)*0.42*(0.25+r),
+                     s:Math.random()*0.9+0.35});
+      }
+    }
+    var cx=W/2, cy=H/2, R=Math.min(W*0.44,H*0.9);
+    for(var i=0;i<GSTARS.length;i++){
+      var st=GSTARS[i], r=st.r;
+      var th=st.arm*Math.PI + r*4.2 + st.off + t*0.62/(0.30+r);
+      var x=cx+Math.cos(th)*r*R, y=cy+Math.sin(th)*r*R*0.40;
+      var a=(1-r*0.72)*st.s;
+      g.fillStyle='rgba('+(r<0.35?'234,252,255':'125,239,255')+','+a.toFixed(3)+')';
+      g.fillRect(x,y,1.4,1.4);
+    }
+    var cg=g.createRadialGradient(cx,cy,0,cx,cy,R*0.30);
+    cg.addColorStop(0,'rgba(255,240,214,.95)');
+    cg.addColorStop(0.45,'rgba(255,179,71,.30)');
+    cg.addColorStop(1,'rgba(255,179,71,0)');
+    g.fillStyle=cg; g.beginPath(); g.arc(cx,cy,R*0.30,0,7); g.fill();
+    g.font='7px "Share Tech Mono",monospace'; g.textBaseline='middle'; g.textAlign='left';
+    g.fillStyle=C_MID; g.fillText('37 MORPH FEATURES',6,10);
+    g.fillStyle=C_ACC; g.fillText('RMSE 0.109',6,H-9);
+  }
+
+  /* KinetiCore — 21 hand landmarks, flexing and drifting like a real tracker */
+  function vizKineticore(g,W,H,t){
+    var drift=Math.sin(t*0.62)*W*0.055+Math.sin(t*1.9)*1.6;
+    var cx=W*0.40+drift, wy=H-12, u=Math.min(W/210,H/104)*1.55;
+    var spread=[-0.95,-0.34,0,0.34,0.72], len=[30,42,46,40,32];
+    var pts=[];
+    g.lineWidth=1; g.strokeStyle=C_HI;
+    for(var f=0;f<5;f++){
+      var flex=0.62+0.38*Math.sin(t*2.0+f*0.8);
+      var ang=-Math.PI/2+spread[f]*(f===0?1.25:0.62);
+      var px=cx, py=wy, seg3=len[f]*flex*u/3;
+      g.beginPath(); g.moveTo(px,py);
+      for(var j=1;j<=3;j++){
+        var a2=ang+(j-1)*0.16*(1-flex)*(f===0?-1:1);
+        px+=Math.cos(a2)*seg3; py+=Math.sin(a2)*seg3;
+        g.lineTo(px,py); pts.push([px,py,j===3]);
+      }
+      g.stroke();
+    }
+    g.strokeStyle=C_DIM;
+    g.beginPath(); g.moveTo(cx-13*u,wy); g.lineTo(cx+13*u,wy); g.stroke();
+    for(var i=0;i<pts.length;i++){
+      g.fillStyle=pts[i][2]?C_ACC:C_HI;
+      g.beginPath(); g.arc(pts[i][0],pts[i][1],pts[i][2]?2.2:1.5,0,7); g.fill();
+    }
+    g.fillStyle=C_HI; g.beginPath(); g.arc(cx,wy,2.6,0,7); g.fill();
+    var bx=cx-15*u, bw=30*u, by=wy-52*u, bh=58*u;
+    g.strokeStyle='rgba(255,179,71,.75)'; g.lineWidth=1;
+    var c=7;
+    [[bx,by,1,1],[bx+bw,by,-1,1],[bx,by+bh,1,-1],[bx+bw,by+bh,-1,-1]].forEach(function(k){
+      g.beginPath(); g.moveTo(k[0]+c*k[2],k[1]); g.lineTo(k[0],k[1]);
+      g.lineTo(k[0],k[1]+c*k[3]); g.stroke();
+    });
+    g.font='7px "Share Tech Mono",monospace'; g.textBaseline='middle'; g.textAlign='left';
+    g.fillStyle=C_ACC; g.fillText('21 LANDMARKS',W-72,10);
+    g.fillStyle=C_MID; g.fillText('NO NETWORK',W-72,H-9);
+  }
+
+  /* GMM — MFCC frames scrolling past, with the genre posterior settling */
+  var GCOLS=null;
+  function vizGmm(g,W,H,t){
+    var nb=13, sw=3, plotW=W-56;
+    var ncol=Math.ceil(plotW/sw);
+    if(!GCOLS||GCOLS.n!==ncol){
+      GCOLS={n:ncol,d:[],head:0,last:-1};
+      for(var i=0;i<ncol;i++) GCOLS.d.push(new Array(nb).fill(0));
+    }
+    var step=Math.floor(t*26);
+    if(step!==GCOLS.last){
+      GCOLS.last=step;
+      var col=[];
+      for(var b=0;b<nb;b++){
+        var e=Math.sin(b*0.8+step*0.11)*0.5+0.5;
+        e*=Math.exp(-b*0.14)*(0.55+0.45*Math.sin(step*0.07+b*0.3));
+        col.push(Math.max(0,Math.min(1,e*1.5)));
+      }
+      GCOLS.d[GCOLS.head]=col;
+      GCOLS.head=(GCOLS.head+1)%ncol;
+    }
+    var bh=(H-14)/nb;
+    for(var i=0;i<ncol;i++){
+      var c=GCOLS.d[(GCOLS.head+i)%ncol];
+      for(var b2=0;b2<nb;b2++){
+        var v=c[b2];
+        g.fillStyle='rgba('+(v>0.6?'255,179,71':'53,224,240')+','+(0.05+v*0.85)+')';
+        g.fillRect(6+i*sw,7+b2*bh,sw-0.5,Math.max(1,bh-0.5));
+      }
+    }
+    g.font='7px "Share Tech Mono",monospace'; g.textBaseline='middle'; g.textAlign='left';
+    g.fillStyle=C_MID; g.fillText('13 MFCC',6,H-4);
+    var bx=W-46, labs=['BLUES','REGGAE','CLASSIC'];
+    var win=Math.floor(t/4)%3;
+    for(var k=0;k<3;k++){
+      var target=k===win?0.88:0.06;
+      var p=target+Math.sin(t*2.4+k)*0.04;
+      var y=14+k*17;
+      g.fillStyle=C_MID; g.fillText(labs[k],bx,y-6);
+      g.fillStyle=C_DIM; g.fillRect(bx,y,38,4);
+      g.fillStyle=k===win?C_ACC:C_HI; g.fillRect(bx,y,38*Math.max(0,p),4);
+    }
+  }
+
+  var VIZ={gridsense:vizGridsense,ncf:vizNcf,vit:vizVit,
+           galaxy:vizGalaxy,kineticore:vizKineticore,gmm:vizGmm};
+  var vizzes=[];
+  var vdpr=Math.min(window.devicePixelRatio||1,2);
+
+  [].forEach.call(document.querySelectorAll('.viz'), function(cv){
+    var fn=VIZ[cv.getAttribute('data-viz')];
+    if(!fn || !cv.getContext) return;
+    var v={el:cv, fn:fn, g:cv.getContext('2d'), vis:true, w:0, h:0};
+    v.size=function(){
+      var w=cv.clientWidth, h=cv.clientHeight;
+      if(w===v.w && h===v.h) return;          /* resizing clears the canvas — only when it really changed */
+      v.w=w; v.h=h;
+      cv.width=Math.round(w*vdpr); cv.height=Math.round(h*vdpr);
+      v.g.setTransform(vdpr,0,0,vdpr,0,0);
+    };
+    v.size();
+    vizzes.push(v);
+  });
+
+  function drawViz(v,t){
+    if(!v.w || !v.h) return;
+    v.g.clearRect(0,0,v.w,v.h);
+    v.g.save(); v.fn(v.g,v.w,v.h,t); v.g.restore();
+  }
+
+  if(vizzes.length){
+    vizzes.forEach(function(v){ drawViz(v,0); });
+    var vio=new IntersectionObserver(function(en){
+      en.forEach(function(e){
+        for(var i=0;i<vizzes.length;i++) if(vizzes[i].el===e.target) vizzes[i].vis=e.isIntersecting;
+      });
+    },{rootMargin:'160px'});
+    vizzes.forEach(function(v){ vio.observe(v.el); });
+
+    /* the cards reflow independently of the window — watch the boxes, not just resize */
+    if(window.ResizeObserver){
+      var vro=new ResizeObserver(function(){
+        vizzes.forEach(function(v){ v.size(); drawViz(v,0); });
+      });
+      vizzes.forEach(function(v){ vro.observe(v.el); });
+    }
+    window.addEventListener('resize', function(){
+      vizzes.forEach(function(v){ v.size(); drawViz(v,0); });
+    });
+    window.addEventListener('load', function(){
+      vizzes.forEach(function(v){ v.size(); drawViz(v,0); });
+    });
+
+    if(!reduce){
+      var vT0=performance.now();
+      requestAnimationFrame(function vstep(now){
+        requestAnimationFrame(vstep);
+        var t=(now-vT0)/1000;
+        for(var i=0;i<vizzes.length;i++) if(vizzes[i].vis) drawViz(vizzes[i],t);
       });
     }
   }
