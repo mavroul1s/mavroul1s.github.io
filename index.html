@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NIKOS MAVROS // ECE // UNIVERSITY OF THESSALY</title>
+<meta name="description" content="Nikos Mavros — fifth-year Electrical and Computer Engineering student at the University of Thessaly. Deep learning for remote sensing, computer vision, orbital mechanics.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root{
+  --bg:#04060b;
+  --surface:#0b1620;
+  --primary:#35e0f0;
+  --primary-lo:#7defff;
+  --accent:#ffb347;
+  --alert:#ff3d5a;
+  --muted:#3f7d8c;
+  --grid:#12718c;
+  --fg:#c4dee6;
+
+  --mono:"JetBrains Mono","IBM Plex Mono","SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace;
+
+  --gut:clamp(18px,4vw,48px);
+  --maxw:1180px;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--fg);
+  font-family:var(--mono);
+  font-size:15px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+a{color:var(--primary);text-decoration:none;border-bottom:1px solid rgba(53,224,240,.3)}
+a:hover{color:var(--primary-lo);border-bottom-color:var(--primary-lo);background:rgba(53,224,240,.07)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+::selection{background:var(--primary);color:var(--bg)}
+
+/* ============================================================
+   AMBIENT CHROME — grid, scanlines, sweep, vignette
+   ============================================================ */
+.bg-grid,.crt,.sweep,.vig{position:fixed;inset:0;pointer-events:none;z-index:2}
+.bg-grid{
+  z-index:0;
+  background-image:
+    linear-gradient(rgba(18,113,140,.11) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(18,113,140,.11) 1px,transparent 1px);
+  background-size:52px 52px;
+  mask-image:radial-gradient(ellipse 100% 70% at 50% 0%,#000 10%,transparent 78%);
+  -webkit-mask-image:radial-gradient(ellipse 100% 70% at 50% 0%,#000 10%,transparent 78%);
+}
+.crt{
+  background:repeating-linear-gradient(to bottom,rgba(0,0,0,.28) 0 1px,transparent 1px 3px);
+  opacity:.5;mix-blend-mode:multiply;
+}
+.sweep{overflow:hidden}
+.sweep::after{
+  content:"";position:absolute;left:0;right:0;height:120px;
+  background:linear-gradient(to bottom,transparent,rgba(53,224,240,.055),transparent);
+  animation:sweep 7.5s linear infinite;
+}
+@keyframes sweep{from{transform:translateY(-140px)}to{transform:translateY(105vh)}}
+.vig{box-shadow:inset 0 0 240px 40px rgba(0,0,0,.85);z-index:3}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+#boot{
+  position:fixed;inset:0;z-index:120;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  padding:var(--gut);
+}
+#boot pre{
+  margin:0;font-size:clamp(10px,2.4vw,13px);color:var(--primary);
+  line-height:1.75;white-space:pre-wrap;
+}
+#boot .ok{color:var(--muted)}
+#boot.done{opacity:0;visibility:hidden;transition:opacity .45s steps(6),visibility 0s .45s}
+
+/* ============================================================
+   TOP BAR
+   ============================================================ */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:40;
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:7px var(--gut);
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+  background:rgba(4,6,11,.9);border-bottom:1px solid rgba(18,113,140,.32);
+  backdrop-filter:blur(6px);
+}
+.topbar b{color:var(--primary);font-weight:500}
+.dot{color:var(--accent);animation:blink 1.6s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.topbar .right{display:flex;gap:16px;align-items:center}
+@media(max-width:640px){.topbar .hide-s{display:none}}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+.nav{
+  position:fixed;top:31px;left:0;right:0;z-index:39;
+  background:rgba(4,6,11,.88);border-bottom:1px solid rgba(18,113,140,.22);
+  backdrop-filter:blur(6px);
+  overflow-x:auto;scrollbar-width:none;
+}
+.nav::-webkit-scrollbar{display:none}
+.nav ul{
+  display:flex;gap:4px;list-style:none;margin:0;
+  padding:0 var(--gut);white-space:nowrap;
+}
+.nav a{
+  display:block;padding:8px 12px;font-size:11.5px;letter-spacing:.1em;
+  color:var(--muted);border:0;border-bottom:2px solid transparent;
+}
+.nav a:hover{color:var(--primary-lo);background:transparent}
+.nav a.on{color:var(--primary);border-bottom-color:var(--primary)}
+
+/* ============================================================
+   TICKER
+   ============================================================ */
+.ticker{
+  position:fixed;top:70px;left:0;right:0;z-index:38;
+  border-bottom:1px solid rgba(18,113,140,.18);
+  background:rgba(11,22,32,.7);overflow:hidden;
+  font-size:10.5px;letter-spacing:.14em;color:var(--muted);
+  padding:4px 0;
+}
+.ticker-track{display:inline-flex;white-space:nowrap;animation:roll 58s linear infinite}
+.ticker-track span{padding:0 26px}
+.ticker-track i{color:var(--grid);font-style:normal}
+@keyframes roll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+main{position:relative;z-index:5;max-width:var(--maxw);margin:0 auto;padding:0 var(--gut)}
+section{padding:56px 0;scroll-margin-top:110px}
+#hero{padding-top:132px}
+
+/* section headers — path register, not fake sequence numbers */
+.sec-h{
+  display:flex;align-items:center;gap:14px;margin:0 0 26px;
+  font-size:13px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--primary-lo);
+}
+.sec-h .path{color:var(--muted);font-weight:400}
+.sec-h .rule{position:relative;flex:1;height:1px;background:rgba(18,113,140,.45);overflow:hidden}
+.sec-h .rule::after{
+  content:"";position:absolute;top:-1px;left:0;width:26px;height:3px;
+  background:linear-gradient(90deg,transparent,var(--primary-lo));
+  animation:pulse 9s linear infinite;
+}
+@keyframes pulse{0%{left:-8%}70%,100%{left:104%}}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.name{position:relative;margin:0 0 6px}
+.name pre{
+  margin:0;font-size:clamp(3.6px,1.68vw,19px);line-height:1.02;
+  font-weight:700;color:var(--primary);
+  text-shadow:0 0 18px rgba(53,224,240,.28);
+}
+.name .lay{position:absolute;inset:0;opacity:0}
+.name .lay.r pre{color:var(--alert)}
+.name .lay.b pre{color:var(--accent)}
+.name.glitch .lay.r{opacity:.85;animation:gr .42s steps(2) 1}
+.name.glitch .lay.b{opacity:.7;animation:gb .42s steps(2) 1}
+@keyframes gr{
+  0%{transform:translate(0,0);clip-path:inset(0 0 72% 0)}
+  25%{transform:translate(-5px,1px);clip-path:inset(38% 0 30% 0)}
+  50%{transform:translate(4px,-2px);clip-path:inset(65% 0 8% 0)}
+  75%{transform:translate(-3px,0);clip-path:inset(12% 0 58% 0)}
+  100%{transform:translate(0,0);clip-path:inset(0 0 100% 0)}
+}
+@keyframes gb{
+  0%{transform:translate(0,0);clip-path:inset(55% 0 20% 0)}
+  40%{transform:translate(5px,2px);clip-path:inset(10% 0 66% 0)}
+  80%{transform:translate(-4px,-1px);clip-path:inset(70% 0 4% 0)}
+  100%{transform:translate(0,0);clip-path:inset(0 0 100% 0)}
+}
+
+.hero-grid{display:grid;grid-template-columns:1.55fr .95fr;gap:34px;align-items:start;margin-top:26px}
+@media(max-width:860px){.hero-grid{grid-template-columns:1fr;gap:26px}}
+
+.lede{font-size:clamp(15px,1.9vw,19px);line-height:1.55;color:var(--primary-lo);margin:0 0 18px;min-height:3.2em}
+.cursor{display:inline-block;width:.6em;height:1.05em;background:var(--primary);vertical-align:-2px;animation:blink 1.05s steps(1) infinite}
+.hero-sub{color:var(--fg);margin:0 0 22px;max-width:60ch}
+
+.rail{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  font-size:11px;letter-spacing:.13em;text-transform:uppercase;
+  padding:5px 10px;border:1px solid rgba(18,113,140,.5);color:var(--muted);
+}
+.chip.live{color:var(--accent);border-color:rgba(255,179,71,.5)}
+
+/* profiler panel */
+.profiler{border:1px solid rgba(18,113,140,.55);background:linear-gradient(180deg,rgba(11,22,32,.9),rgba(4,6,11,.9));position:relative}
+.profiler::before,.profiler::after{
+  content:"";position:absolute;width:11px;height:11px;border:2px solid var(--primary);
+}
+.profiler::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+.profiler::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+.profiler h3{
+  margin:0;padding:8px 14px;font-size:11px;letter-spacing:.2em;font-weight:500;
+  color:var(--bg);background:var(--primary);text-transform:uppercase;
+}
+.profiler dl{margin:0;padding:14px;display:grid;grid-template-columns:auto 1fr;gap:7px 16px;font-size:12.5px}
+.profiler dt{color:var(--muted);letter-spacing:.1em;text-transform:uppercase;font-size:11px;padding-top:1px}
+.profiler dd{margin:0;color:var(--fg)}
+.profiler dd b{color:var(--primary-lo);font-weight:500}
+.ok-dot{color:var(--accent)}
+
+/* ============================================================
+   SIGNATURE: audit tags + provenance on every number
+   ============================================================ */
+.datum{
+  position:relative;color:var(--primary-lo);border-bottom:1px dotted rgba(125,239,255,.45);
+  cursor:help;
+}
+.datum::after{
+  content:attr(data-src);
+  position:absolute;left:0;bottom:calc(100% + 8px);z-index:30;
+  min-width:190px;max-width:290px;
+  padding:7px 9px;font-size:10.5px;line-height:1.45;letter-spacing:.04em;
+  color:var(--fg);background:#071019;border:1px solid var(--grid);
+  text-transform:none;white-space:normal;
+  opacity:0;visibility:hidden;transform:translateY(3px);
+  transition:opacity .12s,transform .12s,visibility 0s .12s;
+}
+.datum:hover::after,.datum:focus::after{opacity:1;visibility:visible;transform:translateY(0);transition-delay:0s}
+
+.tag{
+  display:inline-block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  padding:2px 7px;border:1px solid currentColor;vertical-align:2px;
+}
+.tag.rev{color:var(--accent)}
+.tag.ver{color:var(--muted)}
+.tag.course{color:var(--grid)}
+
+/* ============================================================
+   PANELS / CARDS
+   ============================================================ */
+.panel{
+  border:1px solid rgba(18,113,140,.42);background:rgba(11,22,32,.55);
+  padding:22px;position:relative;
+}
+.panel.flag{border-left:2px solid var(--accent)}
+.panel-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin:0 0 4px}
+.panel-h h3{margin:0;font-size:clamp(17px,2.4vw,22px);font-weight:700;color:var(--primary-lo);letter-spacing:.02em}
+.stack{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 16px}
+.stack span{color:var(--grid);padding:0 4px}
+
+.notice{
+  display:flex;gap:10px;align-items:flex-start;
+  border:1px solid rgba(255,179,71,.4);background:rgba(255,179,71,.06);
+  padding:10px 12px;font-size:12.5px;color:var(--accent);margin:0 0 20px;
+}
+.notice b{font-weight:700;letter-spacing:.1em;white-space:nowrap}
+
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+@media(max-width:820px){.cols{grid-template-columns:1fr;gap:20px}}
+
+h4.sub{
+  margin:0 0 10px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--muted);font-weight:500;
+}
+ul.spec{list-style:none;margin:0;padding:0;font-size:13.5px}
+ul.spec li{padding:4px 0 4px 18px;position:relative}
+ul.spec li::before{content:"▸";position:absolute;left:0;color:var(--grid)}
+
+ol.find{list-style:none;counter-reset:f;margin:0;padding:0;font-size:13.5px}
+ol.find li{counter-increment:f;padding:0 0 14px 30px;position:relative}
+ol.find li::before{
+  content:counter(f,decimal-leading-zero);position:absolute;left:0;top:1px;
+  font-size:11px;color:var(--accent);letter-spacing:.1em;
+}
+ol.find b{color:var(--primary-lo);font-weight:500}
+
+/* table */
+.tbl-wrap{overflow-x:auto;margin:0 0 6px}
+table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:520px}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid rgba(18,113,140,.25)}
+thead th{
+  font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+  border-bottom:1px solid var(--grid);font-weight:500;
+}
+tbody tr:hover{background:rgba(53,224,240,.05)}
+td.num{color:var(--primary-lo);text-align:right}
+td.win{color:var(--accent);text-align:right}
+caption{caption-side:bottom;text-align:left;font-size:11px;color:var(--muted);padding-top:10px;letter-spacing:.06em}
+
+/* project grid */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.card{
+  border:1px solid rgba(18,113,140,.35);background:rgba(11,22,32,.45);
+  padding:18px;display:flex;flex-direction:column;gap:10px;
+  transition:border-color .15s,background .15s;
+}
+.card:hover{border-color:var(--primary);background:rgba(11,22,32,.8)}
+.card h3{margin:0;font-size:16px;color:var(--primary-lo);font-weight:700}
+.card p{margin:0;font-size:13px;color:var(--fg)}
+.card .meta{margin-top:auto;display:flex;flex-direction:column;gap:5px;font-size:11.5px}
+.kv{display:flex;gap:10px;color:var(--muted);letter-spacing:.06em}
+.kv b{color:var(--primary-lo);font-weight:500;margin-left:auto;text-align:right}
+.card .go{font-size:11px;letter-spacing:.14em;text-transform:uppercase;border:0}
+.card .go::after{content:" →"}
+
+/* NEOW preview canvas */
+.orbit-wrap{position:relative;border:1px solid rgba(18,113,140,.35);background:#05080e;margin:2px 0 4px}
+#orbit{display:block;width:100%;height:170px}
+.orbit-cap{
+  position:absolute;left:8px;bottom:6px;font-size:9.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--grid);
+}
+
+/* archive list */
+.archive{list-style:none;margin:0;padding:0;border-top:1px solid rgba(18,113,140,.25)}
+.archive li{
+  display:grid;grid-template-columns:96px 1fr;gap:16px;
+  padding:14px 0;border-bottom:1px solid rgba(18,113,140,.25);
+}
+.archive .code{color:var(--accent);font-size:12px;letter-spacing:.1em}
+.archive h4{margin:0 0 4px;font-size:14px;color:var(--primary-lo);font-weight:500}
+.archive p{margin:0;font-size:12.5px;color:var(--fg)}
+@media(max-width:600px){.archive li{grid-template-columns:1fr;gap:4px}}
+
+/* toolchain */
+.term{
+  border:1px solid rgba(18,113,140,.42);background:rgba(11,22,32,.6);
+}
+.term-bar{
+  display:flex;gap:8px;align-items:center;padding:6px 12px;
+  border-bottom:1px solid rgba(18,113,140,.32);
+  font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+}
+.term-bar em{color:var(--grid);font-style:normal;margin-left:auto}
+.term dl{margin:0;padding:16px;display:grid;grid-template-columns:130px 1fr;gap:10px 18px;font-size:13px}
+.term dt{color:var(--accent);letter-spacing:.12em;text-transform:uppercase;font-size:11px;padding-top:2px}
+.term dd{margin:0;color:var(--fg)}
+@media(max-width:620px){.term dl{grid-template-columns:1fr;gap:2px 0}.term dd{padding-bottom:10px}}
+
+/* credentials */
+.creds{list-style:none;margin:0;padding:0;font-size:13.5px}
+.creds li{display:flex;flex-wrap:wrap;gap:10px;padding:9px 0;border-bottom:1px dashed rgba(18,113,140,.28)}
+.creds .when{margin-left:auto;color:var(--muted);font-size:12px;letter-spacing:.08em}
+.creds .who{color:var(--muted)}
+
+/* contact */
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:20px}
+.link-box{
+  border:1px solid rgba(18,113,140,.4);padding:14px 16px;display:block;
+  border-bottom:1px solid rgba(18,113,140,.4);
+}
+.link-box:hover{border-color:var(--primary);background:rgba(53,224,240,.05)}
+.link-box .lbl{display:block;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.link-box .val{display:block;color:var(--primary-lo);font-size:14px;word-break:break-all}
+
+footer{
+  position:relative;z-index:5;max-width:var(--maxw);margin:0 auto;
+  padding:34px var(--gut) 60px;border-top:1px solid rgba(18,113,140,.28);
+}
+footer pre{
+  margin:0 0 14px;font-size:clamp(4.5px,1.05vw,11px);line-height:1.15;color:var(--grid);
+  overflow:hidden;
+}
+.foot-line{display:flex;flex-wrap:wrap;gap:10px 22px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+  .ticker-track{transform:none}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="crt" aria-hidden="true"></div>
+<div class="sweep" aria-hidden="true"></div>
+<div class="vig" aria-hidden="true"></div>
+
+<!-- ===================== BOOT ===================== -->
+<div id="boot" aria-hidden="true"><pre id="bootlog"></pre></div>
+
+<!-- ===================== TOP BAR ===================== -->
+<header class="topbar">
+  <div><span class="dot">●</span> <b>MAVROS.N</b> <span class="hide-s">// ELECTRICAL &amp; COMPUTER ENGINEERING</span></div>
+  <div class="right">
+    <span class="hide-s">VOLOS · GR</span>
+    <span id="clock">--:--:--</span>
+  </div>
+</header>
+
+<nav class="nav" aria-label="Sections">
+  <ul>
+    <li><a href="#hero">~/</a></li>
+    <li><a href="#current">~/current</a></li>
+    <li><a href="#projects">~/projects</a></li>
+    <li><a href="#archive">~/archive</a></li>
+    <li><a href="#toolchain">~/toolchain</a></li>
+    <li><a href="#credentials">~/credentials</a></li>
+    <li><a href="#contact">~/contact</a></li>
+  </ul>
+</nav>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track" id="tick"></div>
+</div>
+
+<main>
+
+<!-- ===================== HERO ===================== -->
+<section id="hero">
+  <div class="name" id="nameplate">
+    <pre aria-label="Nikos Mavros">███╗   ██╗██╗██╗  ██╗ ██████╗ ███████╗
+████╗  ██║██║██║ ██╔╝██╔═══██╗██╔════╝
+██╔██╗ ██║██║█████╔╝ ██║   ██║███████╗
+██║╚██╗██║██║██╔═██╗ ██║   ██║╚════██║
+██║ ╚████║██║██║  ██╗╚██████╔╝███████║
+╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
+███╗   ███╗ █████╗ ██╗   ██╗██████╗  ██████╗ ███████╗
+████╗ ████║██╔══██╗██║   ██║██╔══██╗██╔═══██╗██╔════╝
+██╔████╔██║███████║██║   ██║██████╔╝██║   ██║███████╗
+██║╚██╔╝██║██╔══██║╚██╗ ██╔╝██╔══██╗██║   ██║╚════██║
+██║ ╚═╝ ██║██║  ██║ ╚████╔╝ ██║  ██║╚██████╔╝███████║
+╚═╝     ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝  ╚═╝ ╚═════╝ ╚══════╝</pre>
+    <div class="lay r" aria-hidden="true"><pre>███╗   ██╗██╗██╗  ██╗ ██████╗ ███████╗
+████╗  ██║██║██║ ██╔╝██╔═══██╗██╔════╝
+██╔██╗ ██║██║█████╔╝ ██║   ██║███████╗
+██║╚██╗██║██║██╔═██╗ ██║   ██║╚════██║
+██║ ╚████║██║██║  ██╗╚██████╔╝███████║
+╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
+███╗   ███╗ █████╗ ██╗   ██╗██████╗  ██████╗ ███████╗
+████╗ ████║██╔══██╗██║   ██║██╔══██╗██╔═══██╗██╔════╝
+██╔████╔██║███████║██║   ██║██████╔╝██║   ██║███████╗
+██║╚██╔╝██║██╔══██║╚██╗ ██╔╝██╔══██╗██║   ██║╚════██║
+██║ ╚═╝ ██║██║  ██║ ╚████╔╝ ██║  ██║╚██████╔╝███████║
+╚═╝     ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝  ╚═╝ ╚═════╝ ╚══════╝</pre></div>
+    <div class="lay b" aria-hidden="true"><pre>███╗   ██╗██╗██╗  ██╗ ██████╗ ███████╗
+████╗  ██║██║██║ ██╔╝██╔═══██╗██╔════╝
+██╔██╗ ██║██║█████╔╝ ██║   ██║███████╗
+██║╚██╗██║██║██╔═██╗ ██║   ██║╚════██║
+██║ ╚████║██║██║  ██╗╚██████╔╝███████║
+╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
+███╗   ███╗ █████╗ ██╗   ██╗██████╗  ██████╗ ███████╗
+████╗ ████║██╔══██╗██║   ██║██╔══██╗██╔═══██╗██╔════╝
+██╔████╔██║███████║██║   ██║██████╔╝██║   ██║███████╗
+██║╚██╔╝██║██╔══██║╚██╗ ██╔╝██╔══██╗██║   ██║╚════██║
+██║ ╚═╝ ██║██║  ██║ ╚████╔╝ ██║  ██║╚██████╔╝███████║
+╚═╝     ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝  ╚═╝ ╚═════╝ ╚══════╝</pre></div>
+  </div>
+
+  <div class="hero-grid">
+    <div>
+      <p class="lede"><span id="typed"></span><span class="cursor" aria-hidden="true"></span></p>
+      <p class="hero-sub">Fifth-year Electrical and Computer Engineering at the University of Thessaly. I work on deep learning for remote sensing, computer vision, and the applied mathematics underneath them. The recurring theme is not the model — it is auditing the data everyone else trusted.</p>
+      <div class="rail">
+        <span class="chip">UTH · VOLOS · GR</span>
+        <span class="chip">EL NATIVE · EN ECCE B2</span>
+        <span class="chip live">● OPEN TO RESEARCH &amp; INTERNSHIPS</span>
+      </div>
+    </div>
+
+    <aside class="profiler">
+      <h3>Profile</h3>
+      <dl>
+        <dt>Name</dt><dd><b>Nikolaos Mavros</b> — Νίκος Μαύρος</dd>
+        <dt>Role</dt><dd>ECE student, year 5</dd>
+        <dt>Node</dt><dd>Univ. of Thessaly, Volos</dd>
+        <dt>Focus</dt><dd>Deep learning · remote sensing · computer vision</dd>
+        <dt>Repos</dt><dd><span class="datum" tabindex="0" data-src="SOURCE: github.com/mavroul1s — public repository count.">16 public</span></dd>
+        <dt>Status</dt><dd><span class="ok-dot">●</span> Available</dd>
+      </dl>
+    </aside>
+  </div>
+</section>
+
+<!-- ===================== CURRENT ===================== -->
+<section id="current">
+  <h2 class="sec-h"><span class="path">~/</span>current work <span class="rule"></span></h2>
+
+  <div class="panel flag">
+    <div class="panel-h">
+      <h3>DeepFire-Forecaster</h3>
+      <span class="tag rev">Under review</span>
+    </div>
+    <p class="stack">BurnBench<span>/</span>Jupyter + PyTorch<span>/</span>156 commits<span>/</span>MIT</p>
+
+    <div class="notice">
+      <b>NOTICE</b>
+      <span>Manuscript under review at MDPI <em>Sensors</em>. Not accepted, not published, no DOI. Results below are from the repository.</span>
+    </div>
+
+    <p style="margin:0 0 20px;max-width:78ch">Wildfire remote sensing on the TS-SatFire dataset (Zhao et al., <em>Scientific Data</em>, 2025), across three tasks: active fire detection, burned area mapping, and fire progression prediction.</p>
+
+    <div class="cols">
+      <div>
+        <h4 class="sub">Architecture — SpaSE-UNet3D</h4>
+        <ul class="spec">
+          <li>Spatial squeeze-and-excitation 3D U-Net, encoder channels [64, 128, 256, 512], <span class="datum" tabindex="0" data-src="SOURCE: model definition in DeepFire-Forecaster.">~32.9M parameters</span></li>
+          <li>ResBlock3D with spatial-only (1,3,3) convolutions — no temporal mixing across days</li>
+          <li>Squeeze-and-excitation channel attention at every encoder stage</li>
+          <li>ASPP bottleneck, dilation rates [1, 6, 12]</li>
+          <li>Deep supervision on decoder outputs; combined Dice + Focal loss</li>
+          <li>OneCycleLR, 80–100 epochs</li>
+          <li>One config switch (<code>TS_LENGTH = 1</code> or <code>2</code>) for a clean ablation</li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="sub">What the project actually contributes</h4>
+        <ol class="find">
+          <li><b>Label-quality audit</b> across all three tasks and every split. The source paper documents no label completeness. Substantial missing labels were found as all-NaN label bands and excluded. Training on audited data raised active fire recall from <span class="datum" tabindex="0" data-src="SOURCE: before/after audit training runs, DeepFire-Forecaster.">~0.80 to 0.86</span>.</li>
+          <li><b>Burned area label encoding.</b> The paper never specified the encoding. Band 8 finite values turn out to be Julian-day or perimeter-ID codes in the range <span class="datum" tabindex="0" data-src="SOURCE: band-8 value inspection across the TS-SatFire splits.">2,119–908,660</span>, so correct label extraction is a finiteness mask, not a value threshold. Burned area modelling was deliberately deferred and the finding released as a standalone data-quality result.</li>
+        </ol>
+      </div>
+    </div>
+
+    <h4 class="sub" style="margin-top:24px">Results</h4>
+    <div class="tbl-wrap">
+      <table>
+        <caption>Test set of 15 verified fires. Optimal inference threshold 0.20–0.22. Active fire precision 0.848, recall 0.861.</caption>
+        <thead>
+          <tr><th>Task</th><th>Configuration</th><th style="text-align:right">F1</th><th style="text-align:right">IoU</th><th>Baseline</th><th style="text-align:right">Δ</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Active fire</td><td>SpaSE-UNet3D · TS=2</td><td class="num">0.855</td><td class="num">0.746</td><td>SwinUNETR-3D 0.823</td><td class="win">+3.2%</td></tr>
+          <tr><td>Active fire</td><td>SpaSE-UNet3D · TS=1</td><td class="num">0.854</td><td class="num">0.745</td><td>SwinUNETR-3D 0.823</td><td class="win">+3.1%</td></tr>
+          <tr><td>Fire progression</td><td>SpaSE-UNet3D · TS=2</td><td class="num">0.424</td><td class="num">0.269</td><td>U-Net-3D 0.375</td><td class="win">+4.9%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p style="margin:18px 0 0;font-size:13px;color:var(--muted)">Everything reproduces on a Kaggle T4 inside the 12-hour session limit. No local setup.</p>
+    <p style="margin:14px 0 0"><a href="https://github.com/mavroul1s/DeepFire-Forecaster" target="_blank" rel="noopener">github.com/mavroul1s/DeepFire-Forecaster →</a></p>
+  </div>
+</section>
+
+<!-- ===================== PROJECTS ===================== -->
+<section id="projects">
+  <h2 class="sec-h"><span class="path">~/</span>selected projects <span class="rule"></span></h2>
+
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-h"><h3>NEOW / neo_tracker</h3><span class="tag ver">Verified</span></div>
+    <p class="stack">three.js<span>/</span>single HTML file<span>/</span>no build step</p>
+
+    <div class="orbit-wrap">
+      <canvas id="orbit" aria-hidden="true"></canvas>
+      <span class="orbit-cap">Decorative schematic — launch the real viewer below</span>
+    </div>
+
+    <div class="cols" style="margin-top:16px">
+      <div>
+        <p style="margin:0 0 12px">Heliocentric solar system viewer built on NASA's NeoWs near-Earth object feed. It propagates eight planets, fifteen moons, and every tracked NEO from published osculating elements through a Kepler solver.</p>
+        <p style="margin:0;color:var(--muted);font-size:13px">Publishes its own scale factors rather than faking scale, shows JPL orbit uncertainty codes, and explicitly corrects the "potentially hazardous means close now" misconception. Bilingual English / Ελληνικά. No dependencies beyond three.js.</p>
+      </div>
+      <div>
+        <h4 class="sub">Checked against independent ground truth</h4>
+        <ul class="spec">
+          <li>Earth perihelion <span class="datum" tabindex="0" data-src="SOURCE: NEOW verification pass against published values.">0.98329 AU</span>, aphelion <span class="datum" tabindex="0" data-src="SOURCE: NEOW verification pass against published values.">1.01671 AU</span></li>
+          <li>Equinox and solstice solar longitudes within 0.4°</li>
+          <li>Kepler solver converges to machine precision through e = 0.99</li>
+          <li>Earth computed twice by unrelated routes, agreeing to 44,000 km and 59 arcseconds</li>
+        </ul>
+        <p style="margin:14px 0 0"><a href="https://github.com/mavroul1s/neo_tracker" target="_blank" rel="noopener">github.com/mavroul1s/neo_tracker →</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cards">
+
+    <article class="card">
+      <h3>GridSense</h3>
+      <p class="stack" style="margin:0">FastAPI<span>/</span>Docker Compose</p>
+      <p>Polyglot-persistence smart grid analytics prototype. Cassandra for time-series sensor readings, Neo4j for network topology and fault-impact and restoration-path queries, MongoDB for equipment metadata, PostgreSQL for ACID billing, Redis for dashboard cache and pub/sub alerts — all behind one REST gateway.</p>
+      <div class="meta">
+        <span class="kv">Endpoints <b>14</b></span>
+        <span class="kv">Setup <b>one docker compose up</b></span>
+        <a class="go" href="https://github.com/mavroul1s/gridsense" target="_blank" rel="noopener">Open repository</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <h3>NCF Reproduction</h3>
+      <p class="stack" style="margin:0">PyTorch<span>/</span>ECE480</p>
+      <p>Reproduction of Neural Collaborative Filtering (He et al., WWW 2017) on MovieLens-100K. Every experiment repeated ten times with independent seeds, all results reported as mean ± standard deviation. MLP depth and GMF+MLP pretraining show no mean benefit at this dataset size, contradicting the paper's MovieLens-1M finding.</p>
+      <div class="meta">
+        <span class="kv">NeuMF best <b><span class="datum" tabindex="0" data-src="SOURCE: 10 seeds, mean ± std. 107,761 parameters.">HR@10 0.649 ± 0.011</span></b></span>
+        <span class="kv">KD student <b><span class="datum" tabindex="0" data-src="SOURCE: response-based knowledge distillation, 53,177 parameters — matches the teacher on 50.7% fewer.">HR@10 0.655 ± 0.010</span></b></span>
+        <span class="kv">FitNets-style <b>0.582</b></span>
+        <a class="go" href="https://github.com/mavroul1s/ncf-assignment" target="_blank" rel="noopener">Open repository</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <h3>vit-gradient-flow</h3>
+      <p class="stack" style="margin:0">Julia<span>/</span>ECE452</p>
+      <p>Derives the explicit Jacobian of the self-attention mechanism using matrix calculus, then verifies it numerically with ForwardDiff.jl. Compares orthogonal initialisation (WᵀW = I) against Xavier/Glorot on Jacobian conditioning and feature saliency, using MNIST as sequential patches.</p>
+      <div class="meta">
+        <span class="kv">Commits <b>52</b></span>
+        <span class="kv">Verification <b>numerical vs analytic</b></span>
+        <a class="go" href="https://github.com/mavroul1s/vit-gradient-flow" target="_blank" rel="noopener">Open repository</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <h3>Galaxy-Morphology-CNN</h3>
+      <p class="stack" style="margin:0">TensorFlow</p>
+      <p>Custom VGG-style CNN predicting 37 probabilistic morphological features on Galaxy Zoo, through a five-phase experimental pipeline that isolates each architectural decision one at a time. Includes an IEEE-formatted report.</p>
+      <div class="meta">
+        <span class="kv">Blind test <b><span class="datum" tabindex="0" data-src="SOURCE: blind test split, Galaxy Zoo. ~2.6M parameters, 64×64 input.">0.109 RMSE</span></b></span>
+        <span class="kv">Parameters <b>~2.6M</b></span>
+        <a class="go" href="https://github.com/mavroul1s/Galaxy-Morphology-CNN" target="_blank" rel="noopener">Open repository</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <h3>KinetiCore</h3>
+      <p class="stack" style="margin:0">Python<span>/</span>OpenCV<span>/</span>MediaPipe</p>
+      <p>Real-time bare-hand computer vision sandbox. Webcam gesture and face tracking, biometric mapping, and standalone demo scripts. Runs entirely locally — no network, no API.</p>
+      <div class="meta">
+        <span class="kv">Input <b>webcam only</b></span>
+        <span class="kv">Network <b>none</b></span>
+        <a class="go" href="https://github.com/mavroul1s/KinetiCore" target="_blank" rel="noopener">Open repository</a>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ===================== ARCHIVE ===================== -->
+<section id="archive">
+  <h2 class="sec-h"><span class="path">~/</span>archive <span class="rule"></span> <span class="tag course">Coursework</span></h2>
+  <p style="margin:-12px 0 20px;color:var(--muted);font-size:13px">University coursework repositories. Listed for completeness, not presented as research.</p>
+
+  <ul class="archive">
+    <li>
+      <span class="code">ECE328</span>
+      <div>
+        <h4>Information Retrieval</h4>
+        <p>PageRank and HITS via eigenvalue analysis, Zipf's law on Project Gutenberg text, BPR recommendation on Last.FM and MovieLens-1M. Ten repetitions with mean ± std, seeded, results committed so the report rebuilds without re-running.</p>
+      </div>
+    </li>
+    <li>
+      <span class="code">ECE418</span>
+      <div>
+        <h4>Neuro-Fuzzy Computing</h4>
+        <p>Optimisation landscapes, ADALINE and LMS weight trajectories over MSE performance surfaces, matrix-form backpropagation, conjugate gradient, Adadelta on standard versus rotated loss surfaces, convolution as Toeplitz matrix multiplication with benchmarking, GRU and LSTM on autoregressive series. MATLAB and Python.</p>
+      </div>
+    </li>
+    <li>
+      <span class="code">ECE443</span>
+      <div>
+        <h4>Speech and Audio Processing</h4>
+        <p>Narrowband and wideband spectrograms, F0 and formant estimation, LPC analysis-synthesis producing robot and whisper voices. MATLAB.</p>
+      </div>
+    </li>
+    <li>
+      <span class="code">ECE457</span>
+      <div>
+        <h4>Computer Vision</h4>
+        <p>Otsu thresholding, spatial filter comparison by PSNR (Gaussian 26.31 dB versus Box 25.80 dB), Sobel / Prewitt / Laplacian / Canny compared by edge density, frequency-domain edge detection. Python, NumPy, OpenCV.</p>
+      </div>
+    </li>
+    <li>
+      <span class="code">GMM</span>
+      <div>
+        <h4>Music Genre Recognition</h4>
+        <p>MFCC features with cepstral mean subtraction, k-means initialisation, Expectation-Maximization implemented from scratch rather than called from a toolbox. 100% accuracy on a three-genre coursework test set — blues, reggae, classical. MATLAB.</p>
+      </div>
+    </li>
+  </ul>
+</section>
+
+<!-- ===================== TOOLCHAIN ===================== -->
+<section id="toolchain">
+  <h2 class="sec-h"><span class="path">~/</span>toolchain <span class="rule"></span></h2>
+  <div class="term">
+    <div class="term-bar"><span>mavros@uth</span><span>:~$ cat toolchain.txt</span><em>read only</em></div>
+    <dl>
+      <dt>Languages</dt><dd>Python · MATLAB · Julia · JavaScript</dd>
+      <dt>Machine learning</dt><dd>PyTorch · TensorFlow · scikit-learn · 3D segmentation · CNNs · ViTs · knowledge distillation · recommender systems</dd>
+      <dt>Data / backend</dt><dd>FastAPI · Docker Compose · Cassandra · Neo4j · MongoDB · PostgreSQL · Redis</dd>
+      <dt>CV / DSP</dt><dd>OpenCV · MediaPipe · MFCC and LPC · spectral analysis · classical filtering</dd>
+      <dt>Other</dt><dd>three.js · LaTeX · Git · Kaggle GPU workflows · rasterio and geospatial rasters</dd>
+      <dt>Domains</dt><dd>Wildfire remote sensing · orbital mechanics · astronomy imaging · information retrieval · speech and audio</dd>
+    </dl>
+  </div>
+</section>
+
+<!-- ===================== CREDENTIALS ===================== -->
+<section id="credentials">
+  <h2 class="sec-h"><span class="path">~/</span>credentials <span class="rule"></span></h2>
+
+  <div class="cols">
+    <div>
+      <h4 class="sub">Certifications</h4>
+      <ul class="creds">
+        <li><span>5G Introductory-Level Certification</span> <span class="who">Qualcomm Wireless Academy</span> <span class="when">Dec 2024</span></li>
+        <li><span>Machine Learning Onramp</span> <span class="who">MathWorks</span> <span class="when">Dec 2025</span></li>
+        <li><span>MATLAB Fundamentals</span> <span class="who">MathWorks</span> <span class="when">Mar 2025</span></li>
+        <li><span>MATLAB Onramp</span> <span class="who">MathWorks</span> <span class="when">Mar 2024</span></li>
+        <li><span>ECCE, Competency in English — level B2</span> <span class="who">Michigan Language Assessment</span> <span class="when">2019</span></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="sub">Conferences attended</h4>
+      <ul class="creds">
+        <li><span>3rd Emerging Tech Conference: Edge Intelligence</span> <span class="who">UTh, Volos</span> <span class="when">Oct 2024</span></li>
+        <li><span>ECESCON 14</span> <span class="who">Univ. of Thessaly, Volos</span> <span class="when">Apr 2023</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CONTACT ===================== -->
+<section id="contact">
+  <h2 class="sec-h"><span class="path">~/</span>contact <span class="rule"></span></h2>
+  <p style="margin:0;max-width:64ch">Open to research collaborations and internships in machine learning and computer vision. The fastest route is email; code is on GitHub.</p>
+
+  <div class="contact-grid">
+    <a class="link-box" href="mailto:nick.black.4416@gmail.com">
+      <span class="lbl">Email</span><span class="val">nick.black.4416@gmail.com</span>
+    </a>
+    <a class="link-box" href="https://github.com/mavroul1s" target="_blank" rel="noopener">
+      <span class="lbl">GitHub</span><span class="val">mavroul1s</span>
+    </a>
+    <a class="link-box" href="https://www.linkedin.com/in/nikos-mavros-37a94a259/" target="_blank" rel="noopener">
+      <span class="lbl">LinkedIn</span><span class="val">nikos-mavros</span>
+    </a>
+    <a class="link-box" href="https://www.kaggle.com/nmavros" target="_blank" rel="noopener">
+      <span class="lbl">Kaggle</span><span class="val">nmavros</span>
+    </a>
+    <a class="link-box" href="https://www.instagram.com/mavroul1s/" target="_blank" rel="noopener">
+      <span class="lbl">Instagram</span><span class="val">mavroul1s</span>
+    </a>
+  </div>
+</section>
+
+</main>
+
+<footer>
+<pre aria-hidden="true">╔══════════════════════════════════════════════════════════════════════════════════════════╗
+║  N. MAVROS  ·  ELECTRICAL &amp; COMPUTER ENGINEERING  ·  UNIVERSITY OF THESSALY  ·  VOLOS GR  ║
+╚══════════════════════════════════════════════════════════════════════════════════════════╝</pre>
+  <div class="foot-line">
+    <span>© <span id="yr">2026</span> Nikos Mavros</span>
+    <span>Built as a single HTML file</span>
+    <span>Every figure on this page links to its source</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- clock ---------- */
+  var clock = document.getElementById('clock');
+  function tick(){
+    var d = new Date();
+    clock.textContent = String(d.getHours()).padStart(2,'0')+':'+
+                        String(d.getMinutes()).padStart(2,'0')+':'+
+                        String(d.getSeconds()).padStart(2,'0');
+  }
+  tick(); setInterval(tick,1000);
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  /* ---------- ticker ---------- */
+  var items = [
+    'DEEPFIRE-FORECASTER :: ACTIVE FIRE F1 0.855 / IOU 0.746',
+    'MANUSCRIPT :: UNDER REVIEW AT MDPI SENSORS — NOT PUBLISHED',
+    'LABEL AUDIT :: ACTIVE FIRE RECALL 0.80 → 0.86',
+    'BURNED AREA :: BAND 8 IS AN ID CODE, NOT A THRESHOLD',
+    'NEOW :: KEPLER SOLVER CONVERGES TO MACHINE PRECISION THROUGH e = 0.99',
+    'NCF :: HR@10 0.655 ± 0.010 AT 53,177 PARAMETERS',
+    'GALAXY ZOO :: 0.109 RMSE ON BLIND TEST',
+    'GRIDSENSE :: 14 ENDPOINTS, FIVE DATASTORES, ONE GATEWAY'
+  ];
+  var line = items.map(function(t){ return '<span>'+t+' <i>//</i></span>'; }).join('');
+  document.getElementById('tick').innerHTML = line + line;
+
+  /* ---------- boot ---------- */
+  var boot = document.getElementById('boot'), log = document.getElementById('bootlog');
+  var lines = [
+    '> ctOS_LOCAL  v2.0   INIT',
+    '> mount /dev/portfolio ............ <span class="ok">OK</span>',
+    '> load identity.dat .............. <span class="ok">OK</span>',
+    '> load projects.idx  [16 REPOS] .. <span class="ok">OK</span>',
+    '> verify checksums ............... <span class="ok">OK</span>',
+    '> render'
+  ];
+  function finishBoot(){ boot.classList.add('done'); startHero(); }
+  if(reduce){ boot.style.display='none'; startHero(); }
+  else {
+    var i = 0;
+    (function next(){
+      if(i >= lines.length){ setTimeout(finishBoot, 330); return; }
+      log.innerHTML += lines[i++] + '\n';
+      setTimeout(next, 165);
+    })();
+    setTimeout(function(){ if(!boot.classList.contains('done')) finishBoot(); }, 3200);
+    boot.addEventListener('click', finishBoot);
+  }
+
+  /* ---------- hero typing + glitch ---------- */
+  var typedEl = document.getElementById('typed');
+  var LEDE = 'Deep learning for remote sensing. A result that survives an audit, or it does not count.';
+  var started = false;
+  function startHero(){
+    if(started) return; started = true;
+    if(reduce){ typedEl.textContent = LEDE; return; }
+    var n = 0;
+    (function type(){
+      typedEl.textContent = LEDE.slice(0, ++n);
+      if(n < LEDE.length) setTimeout(type, 21);
+    })();
+    var plate = document.getElementById('nameplate');
+    (function burst(){
+      setTimeout(function(){
+        plate.classList.add('glitch');
+        setTimeout(function(){ plate.classList.remove('glitch'); }, 430);
+        burst();
+      }, 5200 + Math.random()*6000);
+    })();
+  }
+
+  /* ---------- nav active state ---------- */
+  var links = [].slice.call(document.querySelectorAll('.nav a'));
+  var map = {};
+  links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(a){ a.classList.remove('on'); });
+        if(map[e.target.id]) map[e.target.id].classList.add('on');
+      }
+    });
+  }, {rootMargin:'-45% 0px -50% 0px'});
+  document.querySelectorAll('section').forEach(function(s){ obs.observe(s); });
+
+  /* ---------- section rules draw in ---------- */
+  if(!reduce){
+    var rules = document.querySelectorAll('.sec-h .rule');
+    rules.forEach(function(r){ r.style.transform='scaleX(0)'; r.style.transformOrigin='left'; });
+    var ro = new IntersectionObserver(function(en){
+      en.forEach(function(e){
+        if(e.isIntersecting){
+          e.target.style.transition = 'transform .5s cubic-bezier(.2,.7,.3,1)';
+          e.target.style.transform = 'scaleX(1)';
+          ro.unobserve(e.target);
+        }
+      });
+    }, {threshold:.4});
+    rules.forEach(function(r){ ro.observe(r); });
+  }
+
+  /* ---------- NEOW schematic ---------- */
+  var cv = document.getElementById('orbit');
+  if(cv && cv.getContext){
+    var ctx = cv.getContext('2d'), W=0, H=0, dpr = Math.min(window.devicePixelRatio||1, 2);
+    function size(){
+      W = cv.clientWidth; H = cv.clientHeight;
+      cv.width = W*dpr; cv.height = H*dpr;
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    size();
+    window.addEventListener('resize', size);
+
+    var bodies = [
+      {a:0.30, e:0.10, s:1.62, r:1.6, c:'#3f7d8c'},
+      {a:0.45, e:0.05, s:1.18, r:2.0, c:'#3f7d8c'},
+      {a:0.60, e:0.06, s:1.00, r:2.4, c:'#35e0f0'},
+      {a:0.76, e:0.11, s:0.79, r:2.0, c:'#ffb347'},
+      {a:0.93, e:0.34, s:0.55, r:1.6, c:'#ff3d5a'}
+    ];
+    var t0 = performance.now();
+    function draw(now){
+      var t = (now - t0)/1000;
+      ctx.clearRect(0,0,W,H);
+      var cx = W*0.5, cy = H*0.5, R = Math.min(W*0.44, H*0.44);
+
+      // crosshair reticle
+      ctx.strokeStyle = 'rgba(18,113,140,.35)'; ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(cx-R-14, cy); ctx.lineTo(cx-R+2, cy);
+      ctx.moveTo(cx+R-2, cy); ctx.lineTo(cx+R+14, cy);
+      ctx.stroke();
+
+      // sun
+      ctx.fillStyle = '#ffb347';
+      ctx.beginPath(); ctx.arc(cx, cy, 3, 0, Math.PI*2); ctx.fill();
+
+      bodies.forEach(function(b){
+        var ax = R*b.a, by = R*b.a*(1-b.e*0.55), fx = cx - R*b.a*b.e*0.6;
+        ctx.strokeStyle = 'rgba(18,113,140,.5)';
+        ctx.beginPath(); ctx.ellipse(fx, cy, ax, by, 0, 0, Math.PI*2); ctx.stroke();
+        var th = t*b.s*0.45;
+        var px = fx + ax*Math.cos(th), py = cy + by*Math.sin(th);
+        ctx.fillStyle = b.c;
+        ctx.beginPath(); ctx.arc(px, py, b.r, 0, Math.PI*2); ctx.fill();
+      });
+
+      if(!reduce) requestAnimationFrame(draw);
+    }
+    if(reduce) draw(performance.now()); else requestAnimationFrame(draw);
+  }
+})();
+</script>
+</body>
+</html>
