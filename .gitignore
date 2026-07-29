@@ -1,2 +1,10 @@
 # Internal context doc — kept local, not published with the site
 nikos-mavros-brief.md
+
+# Local tooling config — this repo publishes its root, keep it out
+.claude/
+
+# Identity document — NEVER publish. This repo is a public website;
+# anything committed here is world-readable and stays in git history.
+certs/ΑΣΤΥΝΟΜΙΚΗ ΤΑΥΤΌΤΗΤΑ.pdf
+certs/desktop.ini

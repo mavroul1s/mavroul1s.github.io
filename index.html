@@ -249,7 +249,7 @@ section{padding:56px 0;scroll-margin-top:110px}
    ============================================================ */
 .name{position:relative;margin:0 0 6px}
 .name pre{
-  margin:0;font-size:clamp(3.6px,1.68vw,19px);line-height:1.02;
+  margin:0;font-size:clamp(4.5px,2.1vw,25px);line-height:1.02;
   font-weight:700;color:var(--primary);
   text-shadow:0 0 18px rgba(53,224,240,.28);
 }
@@ -419,6 +419,11 @@ caption{caption-side:bottom;text-align:left;font-size:11px;color:var(--muted);pa
 .archive .code{color:var(--accent);font-size:12px;letter-spacing:.1em}
 .archive h4{margin:0 0 4px;font-size:14px;color:var(--primary-lo);font-weight:500}
 .archive p{margin:0;font-size:12.5px;color:var(--fg)}
+.archive .go{
+  display:inline-block;margin-top:8px;border:0;
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+}
+.archive .go::after{content:" →"}
 @media(max-width:600px){.archive li{grid-template-columns:1fr;gap:4px}}
 
 /* toolchain */
@@ -441,6 +446,26 @@ caption{caption-side:bottom;text-align:left;font-size:11px;color:var(--muted);pa
 .creds li{display:flex;flex-wrap:wrap;gap:10px;padding:9px 0;border-bottom:1px dashed rgba(18,113,140,.28)}
 .creds .when{margin-left:auto;color:var(--muted);font-size:12px;letter-spacing:.08em}
 .creds .who{color:var(--muted)}
+/* certificate rows resolve to the scanned PDF in /certs */
+.creds li:has(> .cert){padding:0}
+.cert{
+  display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;
+  width:100%;padding:9px 8px 9px 22px;margin:0 -8px 0 -22px;border:0;
+  position:relative;transition:background .15s;
+}
+.cert::before{
+  content:"▸";position:absolute;left:6px;top:9px;
+  color:var(--accent);font-size:11px;opacity:0;transition:opacity .15s,transform .15s;
+}
+.cert:hover,.cert:focus-visible{background:rgba(255,179,71,.07)}
+.cert:hover::before,.cert:focus-visible::before{opacity:1}
+.cert:hover .doc,.cert:focus-visible .doc{color:var(--accent);border-color:var(--accent)}
+/* .when keeps its original margin-left:auto, so date + badge ride the right edge together */
+.cert .doc{
+  flex:0 0 auto;font-size:9.5px;letter-spacing:.16em;
+  color:var(--muted);border:1px solid rgba(18,113,140,.45);
+  padding:1px 5px;transition:color .15s,border-color .15s;
+}
 
 /* contact */
 .contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:20px}
@@ -631,7 +656,7 @@ footer pre{
 <header class="topbar">
   <div><span class="dot">●</span> <b>MAVROS.N</b> <span class="hide-s">// ELECTRICAL &amp; COMPUTER ENGINEERING</span></div>
   <div class="right">
-    <a class="launch-mini" href="neo-tracker.html"><span class="rad" aria-hidden="true"></span> NEOW TRACKER</a>
+    <a class="launch-mini" href="https://mavroul1s.github.io/neo_tracker/neo-tracker.html" target="_blank" rel="noopener"><span class="rad" aria-hidden="true"></span> NEOW TRACKER</a>
     <span class="hide-s">VOLOS · GR</span>
     <span id="clock">--:--:--</span>
   </div>
@@ -646,7 +671,7 @@ footer pre{
     <li><a href="#toolchain">~/toolchain</a></li>
     <li><a href="#credentials">~/credentials</a></li>
     <li><a href="#contact">~/contact</a></li>
-    <li><a class="ext" href="neo-tracker.html">~/neow</a></li>
+    <li><a class="ext" href="https://mavroul1s.github.io/neo_tracker/neo-tracker.html" target="_blank" rel="noopener">~/neow</a></li>
   </ul>
 </nav>
 
@@ -659,42 +684,24 @@ footer pre{
 <!-- ===================== HERO ===================== -->
 <section id="hero">
   <div class="name" id="nameplate">
-    <pre aria-label="Nikos Mavros">███╗   ██╗██╗██╗  ██╗ ██████╗ ███████╗
-████╗  ██║██║██║ ██╔╝██╔═══██╗██╔════╝
-██╔██╗ ██║██║█████╔╝ ██║   ██║███████╗
-██║╚██╗██║██║██╔═██╗ ██║   ██║╚════██║
-██║ ╚████║██║██║  ██╗╚██████╔╝███████║
-╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
-███╗   ███╗ █████╗ ██╗   ██╗██████╗  ██████╗ ███████╗
-████╗ ████║██╔══██╗██║   ██║██╔══██╗██╔═══██╗██╔════╝
-██╔████╔██║███████║██║   ██║██████╔╝██║   ██║███████╗
-██║╚██╔╝██║██╔══██║╚██╗ ██╔╝██╔══██╗██║   ██║╚════██║
-██║ ╚═╝ ██║██║  ██║ ╚████╔╝ ██║  ██║╚██████╔╝███████║
-╚═╝     ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝  ╚═╝ ╚═════╝ ╚══════╝</pre>
-    <div class="lay r" aria-hidden="true"><pre>███╗   ██╗██╗██╗  ██╗ ██████╗ ███████╗
-████╗  ██║██║██║ ██╔╝██╔═══██╗██╔════╝
-██╔██╗ ██║██║█████╔╝ ██║   ██║███████╗
-██║╚██╗██║██║██╔═██╗ ██║   ██║╚════██║
-██║ ╚████║██║██║  ██╗╚██████╔╝███████║
-╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
-███╗   ███╗ █████╗ ██╗   ██╗██████╗  ██████╗ ███████╗
-████╗ ████║██╔══██╗██║   ██║██╔══██╗██╔═══██╗██╔════╝
-██╔████╔██║███████║██║   ██║██████╔╝██║   ██║███████╗
-██║╚██╔╝██║██╔══██║╚██╗ ██╔╝██╔══██╗██║   ██║╚════██║
-██║ ╚═╝ ██║██║  ██║ ╚████╔╝ ██║  ██║╚██████╔╝███████║
-╚═╝     ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝  ╚═╝ ╚═════╝ ╚══════╝</pre></div>
-    <div class="lay b" aria-hidden="true"><pre>███╗   ██╗██╗██╗  ██╗ ██████╗ ███████╗
-████╗  ██║██║██║ ██╔╝██╔═══██╗██╔════╝
-██╔██╗ ██║██║█████╔╝ ██║   ██║███████╗
-██║╚██╗██║██║██╔═██╗ ██║   ██║╚════██║
-██║ ╚████║██║██║  ██╗╚██████╔╝███████║
-╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
-███╗   ███╗ █████╗ ██╗   ██╗██████╗  ██████╗ ███████╗
-████╗ ████║██╔══██╗██║   ██║██╔══██╗██╔═══██╗██╔════╝
-██╔████╔██║███████║██║   ██║██████╔╝██║   ██║███████╗
-██║╚██╔╝██║██╔══██║╚██╗ ██╔╝██╔══██╗██║   ██║╚════██║
-██║ ╚═╝ ██║██║  ██║ ╚████╔╝ ██║  ██║╚██████╔╝███████║
-╚═╝     ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝  ╚═╝ ╚═════╝ ╚══════╝</pre></div>
+    <pre aria-label="mavroul1s">███╗   ███╗ █████╗ ██╗   ██╗██████╗  ██████╗ ██╗   ██╗██╗      ██╗███████╗
+████╗ ████║██╔══██╗██║   ██║██╔══██╗██╔═══██╗██║   ██║██║     ███║██╔════╝
+██╔████╔██║███████║██║   ██║██████╔╝██║   ██║██║   ██║██║     ╚██║███████╗
+██║╚██╔╝██║██╔══██║╚██╗ ██╔╝██╔══██╗██║   ██║██║   ██║██║      ██║╚════██║
+██║ ╚═╝ ██║██║  ██║ ╚████╔╝ ██║  ██║╚██████╔╝╚██████╔╝███████╗ ██║███████║
+╚═╝     ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚══════╝ ╚═╝╚══════╝</pre>
+    <div class="lay r" aria-hidden="true"><pre>███╗   ███╗ █████╗ ██╗   ██╗██████╗  ██████╗ ██╗   ██╗██╗      ██╗███████╗
+████╗ ████║██╔══██╗██║   ██║██╔══██╗██╔═══██╗██║   ██║██║     ███║██╔════╝
+██╔████╔██║███████║██║   ██║██████╔╝██║   ██║██║   ██║██║     ╚██║███████╗
+██║╚██╔╝██║██╔══██║╚██╗ ██╔╝██╔══██╗██║   ██║██║   ██║██║      ██║╚════██║
+██║ ╚═╝ ██║██║  ██║ ╚████╔╝ ██║  ██║╚██████╔╝╚██████╔╝███████╗ ██║███████║
+╚═╝     ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚══════╝ ╚═╝╚══════╝</pre></div>
+    <div class="lay b" aria-hidden="true"><pre>███╗   ███╗ █████╗ ██╗   ██╗██████╗  ██████╗ ██╗   ██╗██╗      ██╗███████╗
+████╗ ████║██╔══██╗██║   ██║██╔══██╗██╔═══██╗██║   ██║██║     ███║██╔════╝
+██╔████╔██║███████║██║   ██║██████╔╝██║   ██║██║   ██║██║     ╚██║███████╗
+██║╚██╔╝██║██╔══██║╚██╗ ██╔╝██╔══██╗██║   ██║██║   ██║██║      ██║╚════██║
+██║ ╚═╝ ██║██║  ██║ ╚████╔╝ ██║  ██║╚██████╔╝╚██████╔╝███████╗ ██║███████║
+╚═╝     ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚══════╝ ╚═╝╚══════╝</pre></div>
   </div>
 
   <div class="hero-grid">
@@ -703,7 +710,7 @@ footer pre{
       <p class="hero-sub">Fifth-year Electrical and Computer Engineering at the University of Thessaly. I work on deep learning for remote sensing, computer vision, and the applied mathematics underneath them. The recurring theme is not the model — it is auditing the data everyone else trusted.</p>
 
       <div class="actions">
-        <a class="btn primary" href="neo-tracker.html"><span class="k">▸</span><span>Launch NEOW tracker</span></a>
+        <a class="btn primary" href="https://mavroul1s.github.io/neo_tracker/neo-tracker.html" target="_blank" rel="noopener"><span class="k">▸</span><span>Launch NEOW tracker</span></a>
         <a class="btn" href="#current"><span class="k">▸</span><span>Current work</span></a>
         <a class="btn ghost" href="https://github.com/mavroul1s" target="_blank" rel="noopener"><span class="k">▸</span><span>GitHub</span></a>
       </div>
@@ -800,10 +807,10 @@ footer pre{
   <h2 class="sec-h"><span class="path">~/</span>selected projects <span class="rule"></span></h2>
 
   <div class="panel flag" style="margin-bottom:16px;border-left-color:var(--accent)">
-    <div class="panel-h"><h3>NEOW / neo_tracker</h3><span class="tag ver">Verified</span> <span class="tag rev">Live on this site</span></div>
+    <div class="panel-h"><h3>NEOW / neo_tracker</h3><span class="tag ver">Verified</span> <span class="tag rev">Live</span></div>
     <p class="stack">three.js<span>/</span>single HTML file<span>/</span>no build step</p>
 
-    <a class="bay" href="neo-tracker.html" aria-label="Launch the NEOW orbital tracker">
+    <a class="bay" href="https://mavroul1s.github.io/neo_tracker/neo-tracker.html" target="_blank" rel="noopener" aria-label="Launch the NEOW orbital tracker">
       <canvas id="orbit" aria-hidden="true"></canvas>
       <span class="hexmask" aria-hidden="true"></span>
       <span class="reticle" aria-hidden="true"></span>
@@ -827,7 +834,7 @@ footer pre{
           <li>Earth computed twice by unrelated routes, agreeing to 44,000 km and 59 arcseconds</li>
         </ul>
         <div class="actions" style="margin:16px 0 0">
-          <a class="btn primary" href="neo-tracker.html"><span class="k">▸</span><span>Open tracker</span></a>
+          <a class="btn primary" href="https://mavroul1s.github.io/neo_tracker/neo-tracker.html" target="_blank" rel="noopener"><span class="k">▸</span><span>Open tracker</span></a>
           <a class="btn ghost" href="https://github.com/mavroul1s/neo_tracker" target="_blank" rel="noopener"><span class="k">▸</span><span>Source</span></a>
         </div>
       </div>
@@ -906,6 +913,7 @@ footer pre{
       <div>
         <h4>Information Retrieval</h4>
         <p>PageRank and HITS via eigenvalue analysis, Zipf's law on Project Gutenberg text, BPR recommendation on Last.FM and MovieLens-1M. Ten repetitions with mean ± std, seeded, results committed so the report rebuilds without re-running.</p>
+        <a class="go" href="https://github.com/mavroul1s/ir-assignment-2026" target="_blank" rel="noopener">Open repository</a>
       </div>
     </li>
     <li>
@@ -913,6 +921,7 @@ footer pre{
       <div>
         <h4>Neuro-Fuzzy Computing</h4>
         <p>Optimisation landscapes, ADALINE and LMS weight trajectories over MSE performance surfaces, matrix-form backpropagation, conjugate gradient, Adadelta on standard versus rotated loss surfaces, convolution as Toeplitz matrix multiplication with benchmarking, GRU and LSTM on autoregressive series. MATLAB and Python.</p>
+        <a class="go" href="https://github.com/mavroul1s/ECE418-Coursework" target="_blank" rel="noopener">Open repository</a>
       </div>
     </li>
     <li>
@@ -920,6 +929,7 @@ footer pre{
       <div>
         <h4>Speech and Audio Processing</h4>
         <p>Narrowband and wideband spectrograms, F0 and formant estimation, LPC analysis-synthesis producing robot and whisper voices. MATLAB.</p>
+        <a class="go" href="https://github.com/mavroul1s/ECE443-Coursework" target="_blank" rel="noopener">Open repository</a>
       </div>
     </li>
     <li>
@@ -927,6 +937,7 @@ footer pre{
       <div>
         <h4>Computer Vision</h4>
         <p>Otsu thresholding, spatial filter comparison by PSNR (Gaussian 26.31 dB versus Box 25.80 dB), Sobel / Prewitt / Laplacian / Canny compared by edge density, frequency-domain edge detection. Python, NumPy, OpenCV.</p>
+        <a class="go" href="https://github.com/mavroul1s/ECE457-Coursework" target="_blank" rel="noopener">Open repository</a>
       </div>
     </li>
     <li>
@@ -934,6 +945,7 @@ footer pre{
       <div>
         <h4>Music Genre Recognition</h4>
         <p>MFCC features with cepstral mean subtraction, k-means initialisation, Expectation-Maximization implemented from scratch rather than called from a toolbox. 100% accuracy on a three-genre coursework test set — blues, reggae, classical. MATLAB.</p>
+        <a class="go" href="https://github.com/mavroul1s/GMM-Music-Genre-Recognition" target="_blank" rel="noopener">Open repository</a>
       </div>
     </li>
   </ul>
@@ -963,18 +975,18 @@ footer pre{
     <div>
       <h4 class="sub">Certifications</h4>
       <ul class="creds">
-        <li><span>5G Introductory-Level Certification</span> <span class="who">Qualcomm Wireless Academy</span> <span class="when">Dec 2024</span></li>
-        <li><span>Machine Learning Onramp</span> <span class="who">MathWorks</span> <span class="when">Dec 2025</span></li>
-        <li><span>MATLAB Fundamentals</span> <span class="who">MathWorks</span> <span class="when">Mar 2025</span></li>
-        <li><span>MATLAB Onramp</span> <span class="who">MathWorks</span> <span class="when">Mar 2024</span></li>
-        <li><span>ECCE, Competency in English — level B2</span> <span class="who">Michigan Language Assessment</span> <span class="when">2019</span></li>
+        <li><a class="cert" href="certs/qualcomm-5g-introductory.pdf" target="_blank" rel="noopener"><span>5G Introductory-Level Certification</span> <span class="who">Qualcomm Wireless Academy</span> <span class="when">Dec 2024</span> <span class="doc">PDF</span></a></li>
+        <li><a class="cert" href="certs/mathworks-machine-learning-onramp.pdf" target="_blank" rel="noopener"><span>Machine Learning Onramp</span> <span class="who">MathWorks</span> <span class="when">Dec 2025</span> <span class="doc">PDF</span></a></li>
+        <li><a class="cert" href="certs/mathworks-matlab-fundamentals.pdf" target="_blank" rel="noopener"><span>MATLAB Fundamentals</span> <span class="who">MathWorks</span> <span class="when">Mar 2025</span> <span class="doc">PDF</span></a></li>
+        <li><a class="cert" href="certs/mathworks-matlab-onramp.pdf" target="_blank" rel="noopener"><span>MATLAB Onramp</span> <span class="who">MathWorks</span> <span class="when">Mar 2024</span> <span class="doc">PDF</span></a></li>
+        <li><a class="cert" href="certs/ecce-b2-english.pdf" target="_blank" rel="noopener"><span>ECCE, Competency in English — level B2</span> <span class="who">Michigan Language Assessment</span> <span class="when">2019</span> <span class="doc">PDF</span></a></li>
       </ul>
     </div>
     <div>
       <h4 class="sub">Conferences attended</h4>
       <ul class="creds">
-        <li><span>3rd Emerging Tech Conference: Edge Intelligence</span> <span class="who">UTh, Volos</span> <span class="when">Oct 2024</span></li>
-        <li><span>ECESCON 14</span> <span class="who">Univ. of Thessaly, Volos</span> <span class="when">Apr 2023</span></li>
+        <li><a class="cert" href="certs/etc-2024-edge-intelligence.pdf" target="_blank" rel="noopener"><span>3rd Emerging Tech Conference: Edge Intelligence</span> <span class="who">UTh, Volos</span> <span class="when">Oct 2024</span> <span class="doc">PDF</span></a></li>
+        <li><a class="cert" href="certs/ecescon-14.pdf" target="_blank" rel="noopener"><span>ECESCON 14</span> <span class="who">Univ. of Thessaly, Volos</span> <span class="when">Apr 2023</span> <span class="doc">PDF</span></a></li>
       </ul>
     </div>
   </div>
@@ -1014,7 +1026,7 @@ footer pre{
     <span>© <span id="yr">2026</span> Nikos Mavros</span>
     <span>Built as a single HTML file</span>
     <span>Every figure on this page links to its source</span>
-    <a href="neo-tracker.html" style="border:0;color:var(--accent);letter-spacing:.14em">NEOW tracker ▸</a>
+    <a href="https://mavroul1s.github.io/neo_tracker/neo-tracker.html" target="_blank" rel="noopener" style="border:0;color:var(--accent);letter-spacing:.14em">NEOW tracker ▸</a>
   </div>
   <div class="foot-line" style="margin-top:14px;color:var(--grid);font-size:10px">
     <span>Present day. Present time.</span>
