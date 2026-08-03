@@ -644,8 +644,8 @@ footer pre{
   opacity:.45;transition:opacity .15s,inset .15s;
 }
 .bay:hover .reticle{opacity:1;top:6px;left:6px;right:6px;bottom:6px}
-#orbit{display:block;width:100%;height:230px}
-@media(max-width:620px){#orbit{height:180px}}
+#orbit,#sector{display:block;width:100%;height:230px}
+@media(max-width:620px){#orbit,#sector{height:180px}}
 
 /* ============================================================
    Y2K — beveled terminal chrome + dither rails
@@ -889,6 +889,43 @@ footer pre{
     </div>
   </div>
 
+  <div class="panel flag" style="margin-bottom:16px;border-left-color:var(--accent)">
+    <div class="panel-h"><h3>Sector 07 — Grid Expansion</h3><span class="tag rev">Playable</span> <span class="tag ver">Single file</span></div>
+    <p class="stack">three.js<span>/</span>WebGL2<span>/</span>Web Audio<span>/</span>single HTML file<span>/</span>no build step</p>
+
+    <a class="bay" href="https://mavroul1s.github.io/Isometric-Cyberpunk-Megastructure-Defense-Grid/" target="_blank" rel="noopener" aria-label="Play Sector 07, the isometric defence grid">
+      <canvas id="sector" aria-hidden="true"></canvas>
+      <span class="hexmask" aria-hidden="true"></span>
+      <span class="reticle" aria-hidden="true"></span>
+      <span class="cta">
+        <strong>▸ Enter the grid</strong>
+        <em>Isometric defence grid · runs in this browser</em>
+      </span>
+    </a>
+
+    <div class="cols" style="margin-top:16px">
+      <div>
+        <p style="margin:0 0 12px">Isometric cyberpunk city-builder and defence game. You hold one megacity sector: build nodes onto empty pads, let them link into a network, and purge intrusions before their timers run out — six rings deep around a central spire.</p>
+        <p style="margin:0;color:var(--muted);font-size:13px">The whole thing is one HTML file. Geometry, icons and audio are generated at runtime rather than loaded, and every balance number — costs, yields, steal rates, drone stats — sits in a single object at the top of the file.</p>
+      </div>
+      <div>
+        <h4 class="sub">What is actually in there</h4>
+        <ul class="spec">
+          <li><span class="datum" tabindex="0" data-src="SOURCE: repository README — six rings, claiming every plot wins the game.">117 plots across six rings</span>, claimed outward from the core</li>
+          <li>Eight node classes over five tiers; each link pays +8%, an isolated node loses 25%</li>
+          <li>Six breach classes unlock as threat climbs <span class="datum" tabindex="0" data-src="SOURCE: repository README — seven threat levels; reaching 100 triggers lockdown and seizes 18% of credits.">SECURE → OVERRUN</span></li>
+          <li>Every building merges to <span class="datum" tabindex="0" data-src="SOURCE: repository README — merged geometry, roughly three draw calls per building regardless of detail.">~3 draw calls</span>, which is what makes tier-5 towers affordable</li>
+          <li>1,400 citizens, 260 vehicles and ~1,100 data packets drawn as points</li>
+          <li>Audio is synthesised through the Web Audio API — no sound files</li>
+        </ul>
+        <div class="actions" style="margin:16px 0 0">
+          <a class="btn primary" href="https://mavroul1s.github.io/Isometric-Cyberpunk-Megastructure-Defense-Grid/" target="_blank" rel="noopener"><span class="k">▸</span><span>Play in browser</span></a>
+          <a class="btn ghost" href="https://github.com/mavroul1s/Isometric-Cyberpunk-Megastructure-Defense-Grid" target="_blank" rel="noopener"><span class="k">▸</span><span>Source</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="cards">
 
     <article class="card">
@@ -1113,6 +1150,7 @@ footer pre{
   var items = [
     ['DeepFire-Forecaster',        'https://github.com/mavroul1s/DeepFire-Forecaster'],
     ['NEOW / neo_tracker',         'https://github.com/mavroul1s/neo_tracker'],
+    ['Sector 07 — Grid Expansion', 'https://github.com/mavroul1s/Isometric-Cyberpunk-Megastructure-Defense-Grid'],
     ['GridSense',                  'https://github.com/mavroul1s/gridsense'],
     ['NCF Reproduction',           'https://github.com/mavroul1s/ncf-assignment'],
     ['vit-gradient-flow',          'https://github.com/mavroul1s/vit-gradient-flow'],
@@ -1691,6 +1729,181 @@ footer pre{
       if(!reduce) requestAnimationFrame(draw);
     }
     if(reduce) draw(performance.now()); else requestAnimationFrame(draw);
+  }
+
+  /* ---------- Sector 07 schematic ----------
+     The layout the game is actually won on: 117 plots over six rings around
+     the core spire. It builds itself outward on arrival, then keeps running —
+     packets along the links, an ICE pulse sweeping out, breaches to purge. */
+  var sv = document.getElementById('sector');
+  if(sv && sv.getContext){
+    var sg = sv.getContext('2d'), SW=0, SH=0, sdpr = Math.min(window.devicePixelRatio||1, 2);
+    function ssize(){
+      SW = sv.clientWidth; SH = sv.clientHeight;
+      sv.width = SW*sdpr; sv.height = SH*sdpr;
+      sg.setTransform(sdpr,0,0,sdpr,0,0);
+    }
+    ssize();
+    window.addEventListener('resize', ssize);
+
+    /* fixed seed — the sector looks the same on every visit */
+    var RINGS=[7,12,17,22,27,32], plots=[], links=[], rings=[], sseed=70831;
+    function srnd(){ sseed=(sseed*1103515245+12345)&0x7fffffff; return sseed/0x7fffffff; }
+    RINGS.forEach(function(n,r){
+      var ring=[];
+      for(var i=0;i<n;i++){
+        var a=(i/n)*6.2832 + r*0.42 + (srnd()-0.5)*0.18;
+        var rad=(r+1.3)*0.60 + (srnd()-0.5)*0.10;
+        var k=srnd();
+        var p={x:Math.cos(a)*rad, y:Math.sin(a)*rad, ring:r,
+               role:(k<0.09?2:(k<0.32?1:0)),      /* reactor / monolith / hab-stack */
+               h:0.20+srnd()*0.46, ph:srnd()*6.2832,
+               seq:r+i/n};                        /* claimed centre outward */
+        plots.push(p); ring.push(p);
+      }
+      /* nodes auto-connect to their neighbours; every third one also reaches inward */
+      for(var j=0;j<n;j++) links.push([ring[j],ring[(j+1)%n]]);
+      if(r){
+        var prev=rings[r-1];
+        for(var m=0;m<n;m+=3) links.push([ring[m],prev[Math.floor(m*prev.length/n)]]);
+      }
+      rings.push(ring);
+    });
+    var order=plots.slice().sort(function(a,b){ return (a.x+a.y)-(b.x+b.y); });
+
+    var ROLE=[['rgba(63,125,140,.20)','rgba(99,160,175,.95)'],
+              ['rgba(53,224,240,.16)','#35e0f0'],
+              ['rgba(255,179,71,.18)','#ffb347']];
+    var THREAT=['SECURE','WATCH','ELEVATED','HOSTILE','CRITICAL','SEVERE','OVERRUN'];
+
+    var st0=performance.now(), svis=true;
+    if(window.IntersectionObserver){
+      new IntersectionObserver(function(en){ svis=en[0].isIntersecting; },{rootMargin:'160px'})
+        .observe(sv);
+    }
+
+    /* w is the pad half-width; hy follows from the camera, not a fixed 2:1 guess */
+    function sbox(X,Y,w,hy,h,col,lit,a){
+      sg.globalAlpha=a;
+      sg.fillStyle='rgba(4,6,11,.92)';                       /* opaque body */
+      sg.beginPath();
+      sg.moveTo(X-w,Y-h); sg.lineTo(X,Y-h-hy); sg.lineTo(X+w,Y-h);
+      sg.lineTo(X+w,Y); sg.lineTo(X,Y+hy); sg.lineTo(X-w,Y); sg.closePath(); sg.fill();
+      sg.fillStyle=col[0];                                    /* the two lit faces */
+      sg.beginPath();
+      sg.moveTo(X-w,Y-h); sg.lineTo(X,Y-h+hy); sg.lineTo(X,Y+hy); sg.lineTo(X-w,Y);
+      sg.closePath(); sg.fill();
+      sg.beginPath();
+      sg.moveTo(X+w,Y-h); sg.lineTo(X,Y-h+hy); sg.lineTo(X,Y+hy); sg.lineTo(X+w,Y);
+      sg.closePath(); sg.fill();
+      sg.strokeStyle=col[1]; sg.lineWidth=1;                  /* wireframe over it */
+      sg.globalAlpha=a*(0.38+0.55*lit);
+      sg.beginPath();
+      sg.moveTo(X,Y-h-hy); sg.lineTo(X+w,Y-h); sg.lineTo(X,Y-h+hy); sg.lineTo(X-w,Y-h); sg.closePath();
+      sg.moveTo(X-w,Y-h); sg.lineTo(X-w,Y); sg.lineTo(X,Y+hy); sg.lineTo(X+w,Y); sg.lineTo(X+w,Y-h);
+      sg.moveTo(X,Y-h+hy); sg.lineTo(X,Y+hy);
+      sg.stroke();
+      sg.globalAlpha=a*(0.45+0.55*lit);                       /* roof light */
+      sg.fillStyle=col[1]; sg.fillRect(X-1,Y-h-hy*0.4-1,2,2);
+      sg.globalAlpha=1;
+    }
+
+    function sdraw(now){
+      if(!reduce) requestAnimationFrame(sdraw);
+      if(!SW || !svis) return;
+      var t=(now-st0)/1000;
+      sg.clearRect(0,0,SW,SH);
+
+      /* a shallow camera: the bay is far wider than it is tall */
+      var s=Math.min(SW*0.088,SH*0.128), cx=SW*0.5, cy=SH*0.58,
+          KX=s*0.866, KY=s*0.40, ISO=KY/KX;
+      var built=Math.min(7.4,t*2.2);              /* claims each ring in turn, once */
+      var sweep=(t*0.22%1)*8.6;                   /* ICE pulse travelling outward */
+
+      /* ring boundaries, flattened into the isometric plane */
+      sg.lineWidth=1;
+      for(var r=0;r<7;r++){
+        var rad=(r+0.78)*0.60;
+        sg.strokeStyle='rgba(18,113,140,'+(r<built?0.34:0.10)+')';
+        sg.beginPath();
+        sg.ellipse(cx,cy,rad*1.2247*s,rad*0.5657*s,0,0,6.2832);
+        sg.stroke();
+      }
+
+      /* links, with data packets riding the transit tubes */
+      for(var i=0;i<links.length;i++){
+        var A=links[i][0], B=links[i][1];
+        var lv=Math.min(Math.max(0,Math.min(1,(built-A.seq)*1.5)),
+                        Math.max(0,Math.min(1,(built-B.seq)*1.5)));
+        if(lv<=0.02) continue;
+        var ax=cx+(A.x-A.y)*KX, ay=cy+(A.x+A.y)*KY,
+            bx=cx+(B.x-B.y)*KX, by=cy+(B.x+B.y)*KY;
+        sg.strokeStyle='rgba(18,113,140,'+(0.55*lv)+')';
+        sg.beginPath(); sg.moveTo(ax,ay); sg.lineTo(bx,by); sg.stroke();
+        if(i%3===0){
+          var ph=(t*0.42+i*0.137)%1;
+          sg.fillStyle='rgba(53,224,240,'+(0.9*lv)+')';
+          sg.fillRect(ax+(bx-ax)*ph-1,ay+(by-ay)*ph-1,2,2);
+        }
+      }
+
+      /* the core spire, harvested from the centre */
+      var beat=0.5+0.5*Math.sin(t*1.9);
+      sg.strokeStyle='rgba(255,179,71,'+(0.10+0.16*beat)+')';
+      sg.beginPath(); sg.ellipse(cx,cy,s*1.5,s*0.69,0,0,6.2832); sg.stroke();
+      sbox(cx,cy,s*0.36,s*0.36*ISO,s*(2.0+0.10*beat),ROLE[2],0.75+0.25*beat,1);
+      sg.fillStyle='rgba(255,179,71,'+(0.45+0.55*beat)+')';
+      sg.beginPath(); sg.arc(cx,cy-s*2.30,2.2+beat,0,6.2832); sg.fill();
+
+      /* the sector itself, drawn back to front */
+      for(var k=0;k<order.length;k++){
+        var p=order[k];
+        var b=Math.max(0,Math.min(1,(built-p.seq)*1.5));
+        var X=cx+(p.x-p.y)*KX, Y=cy+(p.x+p.y)*KY, w=s*0.27, hy=w*ISO;
+        sg.strokeStyle='rgba(18,113,140,'+(0.16+0.26*b)+')';
+        sg.beginPath();
+        sg.moveTo(X,Y-hy); sg.lineTo(X+w,Y); sg.lineTo(X,Y+hy); sg.lineTo(X-w,Y);
+        sg.closePath(); sg.stroke();
+        if(b<=0.03) continue;
+        var lit=Math.max(0,1-Math.abs(p.ring+1-sweep)*1.7);
+        sbox(X,Y,w,hy,p.h*s*1.7*b*(1+0.05*Math.sin(t*1.6+p.ph)),ROLE[p.role],lit,b);
+      }
+
+      /* one breach at a time: it lands, the timer closes, it is purged */
+      if(built>3){
+        var slot=Math.floor(t/4.2), life=t%4.2;
+        var bp=order[(slot*53)%order.length];
+        var BX=cx+(bp.x-bp.y)*KX, BY=cy+(bp.x+bp.y)*KY-bp.h*s*1.7-8;
+        if(life<3.0){
+          var q=1-life/3.0;
+          sg.strokeStyle='rgba(255,61,90,.9)'; sg.lineWidth=1.4;
+          sg.beginPath(); sg.arc(BX,BY,7,-1.5708,-1.5708+6.2832*q); sg.stroke();
+          sg.fillStyle='rgba(255,61,90,'+(0.55+0.45*Math.sin(t*11))+')';
+          sg.beginPath();
+          sg.moveTo(BX,BY-3.6); sg.lineTo(BX+3.6,BY); sg.lineTo(BX,BY+3.6); sg.lineTo(BX-3.6,BY);
+          sg.closePath(); sg.fill();
+        } else {
+          var pr=(life-3.0)/1.2;                 /* purge flash */
+          sg.strokeStyle='rgba(53,224,240,'+(1-pr)+')'; sg.lineWidth=1.2;
+          sg.beginPath(); sg.arc(BX,BY,7+pr*16,0,6.2832); sg.stroke();
+        }
+      }
+
+      /* HUD */
+      sg.font='8px "Share Tech Mono",monospace'; sg.textBaseline='middle';
+      sg.textAlign='left';
+      sg.fillStyle='rgba(53,224,240,.75)'; sg.fillText('SECTOR 07',10,12);
+      sg.fillStyle='rgba(99,160,175,.85)';
+      sg.fillText('⌁ '+Math.floor(4200+t*137).toLocaleString()+' CR',10,SH-11);
+      sg.textAlign='right';
+      sg.fillStyle='rgba(99,160,175,.85)';
+      sg.fillText('6 RINGS · 117 PLOTS',SW-10,12);
+      var lvl=Math.min(6,Math.floor(built));
+      sg.fillStyle=lvl>3?'rgba(255,61,90,.9)':'rgba(255,179,71,.85)';
+      sg.fillText('THREAT '+THREAT[lvl],SW-10,SH-11);
+    }
+    if(reduce){ st0=performance.now()-6000; sdraw(performance.now()); }
+    else requestAnimationFrame(sdraw);
   }
 })();
 </script>
