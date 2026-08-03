@@ -780,7 +780,7 @@ footer pre{
         <dt>Role</dt><dd>ECE student, year 5</dd>
         <dt>Node</dt><dd>Univ. of Thessaly, Volos</dd>
         <dt>Focus</dt><dd>Deep learning · remote sensing · computer vision</dd>
-        <dt>Repos</dt><dd><span class="datum" tabindex="0" data-src="SOURCE: github.com/mavroul1s — public repository count.">16 public</span></dd>
+        <dt>Repos</dt><dd><span class="datum" tabindex="0" data-src="SOURCE: counted live from the GitHub REST API — api.github.com/users/mavroul1s. Falls back to the printed number if the API is unreachable."><span data-repo-count="19">19</span> public</span></dd>
         <dt>Status</dt><dd><span class="ok-dot">●</span> Available</dd>
       </dl>
       <div class="foot">
@@ -855,7 +855,7 @@ footer pre{
   <h2 class="sec-h"><span class="path">~/</span>selected projects <span class="rule"></span></h2>
 
   <div class="panel flag" style="margin-bottom:16px;border-left-color:var(--accent)">
-    <div class="panel-h"><h3>NEOW / neo_tracker</h3><span class="tag rev">Live</span></div>
+    <div class="panel-h"><h3>NEOW / neo_tracker</h3></div>
     <p class="stack">three.js<span>/</span>single HTML file<span>/</span>no build step</p>
 
     <a class="bay" href="https://mavroul1s.github.io/neo_tracker/neo-tracker.html" target="_blank" rel="noopener" aria-label="Launch the NEOW orbital tracker">
@@ -890,7 +890,7 @@ footer pre{
   </div>
 
   <div class="panel flag" style="margin-bottom:16px;border-left-color:var(--accent)">
-    <div class="panel-h"><h3>Sector 07 — Grid Expansion</h3><span class="tag rev">Playable</span></div>
+    <div class="panel-h"><h3>Sector 07 — Grid Expansion</h3></div>
     <p class="stack">three.js<span>/</span>WebGL2<span>/</span>Web Audio<span>/</span>single HTML file<span>/</span>no build step</p>
 
     <a class="bay" href="https://mavroul1s.github.io/Isometric-Cyberpunk-Megastructure-Defense-Grid/" target="_blank" rel="noopener" aria-label="Play Sector 07, the isometric defence grid">
@@ -1168,6 +1168,37 @@ footer pre{
   }
   document.getElementById('tick').innerHTML = belt(false) + belt(true);
 
+  /* ---------- public repo count ----------
+     Asked for rather than typed in: every place the page prints the number
+     counts up to whatever the GitHub API currently reports. The number in the
+     markup is the fallback, used when the API is rate-limited or unreachable. */
+  var REPOS = null;
+  function paintRepos(){
+    [].forEach.call(document.querySelectorAll('[data-repo-count]'), function(el){
+      var n = REPOS === null ? parseInt(el.getAttribute('data-repo-count'),10) : REPOS;
+      if(isNaN(n) || el.getAttribute('data-shown') === String(n)) return;
+      el.setAttribute('data-shown', n);
+      if(reduce){ el.textContent = n; return; }
+      var t0 = performance.now();
+      requestAnimationFrame(function step(now){
+        var k = Math.min(1,(now-t0)/700);
+        el.textContent = Math.round(n*(1-Math.pow(1-k,3)));
+        if(k<1) requestAnimationFrame(step);
+      });
+    });
+  }
+  paintRepos();
+  if(window.fetch){
+    fetch('https://api.github.com/users/mavroul1s')
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){
+        if(!d || typeof d.public_repos !== 'number') return;
+        REPOS = d.public_repos;
+        paintRepos();
+      })
+      .catch(function(){});                 /* offline or rate-limited: fallback stands */
+  }
+
   /* ---------- boot ---------- */
   var boot = document.getElementById('boot'), log = document.getElementById('bootlog');
   var bar = document.getElementById('bootbar');
@@ -1175,7 +1206,7 @@ footer pre{
     '> ctOS_LOCAL  v2.0   INIT',
     '> mount /dev/portfolio ............ <span class="ok">OK</span>',
     '> load identity.dat .............. <span class="ok">OK</span>',
-    '> load projects.idx  [16 REPOS] .. <span class="ok">OK</span>',
+    '> load projects.idx  [<span data-repo-count="19">19</span> REPOS] .. <span class="ok">OK</span>',
     '> link neow.orbital .............. <span class="ok">READY</span>',
     '> verify checksums ............... <span class="ok">OK</span>',
     '> render'
@@ -1192,6 +1223,7 @@ footer pre{
         return;
       }
       log.innerHTML += lines[i++] + '\n';
+      paintRepos();                          /* the log is rebuilt on each line */
       bar.style.width = Math.round(i/lines.length*100) + '%';
       setTimeout(next, 155);
     })();
