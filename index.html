@@ -218,9 +218,23 @@ main.slip,footer.slip{animation:slip .34s steps(3) 1}
   padding:4px 0;
 }
 .ticker-track{display:inline-flex;white-space:nowrap;animation:roll 58s linear infinite}
-.ticker-track span{padding:0 26px}
-.ticker-track i{color:var(--grid);font-style:normal}
 @keyframes roll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+/* hold the belt still while it is being read or clicked */
+.ticker:hover .ticker-track,.ticker:focus-within .ticker-track{animation-play-state:paused}
+.tick-link{
+  display:inline-flex;align-items:center;gap:7px;margin:0 6px;padding:3px 13px;
+  border:1px solid rgba(18,113,140,.34);border-radius:2px;background:transparent;
+  color:var(--muted);letter-spacing:.14em;text-transform:uppercase;
+}
+.tick-link::before{content:"▸";color:var(--grid)}
+.tick-link:hover,.tick-link:focus-visible{
+  color:var(--primary);border-color:var(--primary);background:rgba(53,224,240,.09)
+}
+.tick-link:hover::before{color:var(--primary)}
+@media(prefers-reduced-motion:reduce){
+  .ticker{overflow-x:auto}
+  .ticker-track{animation:none}
+}
 
 /* ============================================================
    LAYOUT
@@ -709,8 +723,8 @@ footer pre{
   </ul>
 </nav>
 
-<div class="ticker" aria-hidden="true">
-  <div class="ticker-track" id="tick"></div>
+<div class="ticker">
+  <nav class="ticker-track" id="tick" aria-label="Project repositories"></nav>
 </div>
 
 <main>
@@ -1019,9 +1033,9 @@ footer pre{
     <div>
       <h4 class="sub">Certifications</h4>
       <ul class="creds">
-        <li><a class="cert" href="certs/qualcomm-5g-introductory.pdf" target="_blank" rel="noopener"><span>5G Introductory-Level Certification</span> <span class="who">Qualcomm Wireless Academy</span> <span class="when">Dec 2024</span> <span class="doc">PDF</span></a></li>
         <li><a class="cert" href="certs/mathworks-machine-learning-onramp.pdf" target="_blank" rel="noopener"><span>Machine Learning Onramp</span> <span class="who">MathWorks</span> <span class="when">Dec 2025</span> <span class="doc">PDF</span></a></li>
         <li><a class="cert" href="certs/mathworks-matlab-fundamentals.pdf" target="_blank" rel="noopener"><span>MATLAB Fundamentals</span> <span class="who">MathWorks</span> <span class="when">Mar 2025</span> <span class="doc">PDF</span></a></li>
+        <li><a class="cert" href="certs/qualcomm-5g-introductory.pdf" target="_blank" rel="noopener"><span>5G Introductory-Level Certification</span> <span class="who">Qualcomm Wireless Academy</span> <span class="when">Dec 2024</span> <span class="doc">PDF</span></a></li>
         <li><a class="cert" href="certs/mathworks-matlab-onramp.pdf" target="_blank" rel="noopener"><span>MATLAB Onramp</span> <span class="who">MathWorks</span> <span class="when">Mar 2024</span> <span class="doc">PDF</span></a></li>
         <li><a class="cert" href="certs/ecce-b2-english.pdf" target="_blank" rel="noopener"><span>ECCE, Competency in English — level B2</span> <span class="who">Michigan Language Assessment</span> <span class="when">2019</span> <span class="doc">PDF</span></a></li>
       </ul>
@@ -1095,18 +1109,26 @@ footer pre{
   document.getElementById('yr').textContent = new Date().getFullYear();
 
   /* ---------- ticker ---------- */
+  /* each project name is its own button through to the repository */
   var items = [
-    'DEEPFIRE-FORECASTER :: ACTIVE FIRE F1 0.8549 ± 0.0005 MICRO',
-    'NEOW / NEO_TRACKER :: EIGHT PLANETS, FIFTEEN MOONS, EVERY TRACKED NEO',
-    'GRIDSENSE :: 14 ENDPOINTS, FIVE DATASTORES, ONE GATEWAY',
-    'NCF REPRODUCTION :: KD STUDENT HR@10 0.655 ± 0.010 AT 53,177 PARAMETERS',
-    'VIT-GRADIENT-FLOW :: SELF-ATTENTION JACOBIAN, VERIFIED AGAINST FORWARDDIFF.JL',
-    'GALAXY-MORPHOLOGY-CNN :: 0.109 RMSE ON THE BLIND TEST, ~2.6M PARAMETERS',
-    'KINETICORE :: HAND AND FACE TRACKING, WEBCAM ONLY — NO NETWORK, NO API',
-    'GMM MUSIC GENRE RECOGNITION :: EXPECTATION-MAXIMIZATION FROM SCRATCH'
+    ['DeepFire-Forecaster',        'https://github.com/mavroul1s/DeepFire-Forecaster'],
+    ['NEOW / neo_tracker',         'https://github.com/mavroul1s/neo_tracker'],
+    ['GridSense',                  'https://github.com/mavroul1s/gridsense'],
+    ['NCF Reproduction',           'https://github.com/mavroul1s/ncf-assignment'],
+    ['vit-gradient-flow',          'https://github.com/mavroul1s/vit-gradient-flow'],
+    ['Galaxy-Morphology-CNN',      'https://github.com/mavroul1s/Galaxy-Morphology-CNN'],
+    ['KinetiCore',                 'https://github.com/mavroul1s/KinetiCore'],
+    ['GMM Music Genre Recognition','https://github.com/mavroul1s/GMM-Music-Genre-Recognition']
   ];
-  var line = items.map(function(t){ return '<span>'+t+' <i>//</i></span>'; }).join('');
-  document.getElementById('tick').innerHTML = line + line;
+  /* the belt is one list rendered twice; the second pass is scenery, so it is
+     hidden from assistive tech and taken out of the tab order */
+  function belt(dup){
+    return items.map(function(p){
+      return '<a class="tick-link" href="'+p[1]+'" target="_blank" rel="noopener"'+
+             (dup ? ' tabindex="-1" aria-hidden="true"' : '')+'>'+p[0]+'</a>';
+    }).join('');
+  }
+  document.getElementById('tick').innerHTML = belt(false) + belt(true);
 
   /* ---------- boot ---------- */
   var boot = document.getElementById('boot'), log = document.getElementById('bootlog');
