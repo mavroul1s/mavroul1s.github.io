@@ -1073,7 +1073,6 @@ footer pre{
     <span>© <span id="yr">2026</span> Nikos Mavros</span>
     <span>Built as a single HTML file</span>
     <span>Every figure on this page links to its source</span>
-    <a href="https://mavroul1s.github.io/neo_tracker/neo-tracker.html" target="_blank" rel="noopener" style="border:0;color:var(--accent);letter-spacing:.14em">NEOW tracker ▸</a>
   </div>
   <div class="foot-line" style="margin-top:14px;color:var(--grid);font-size:10px">
     <span>Present day. Present time.</span>
@@ -1098,15 +1097,13 @@ footer pre{
   /* ---------- ticker ---------- */
   var items = [
     'DEEPFIRE-FORECASTER :: ACTIVE FIRE F1 0.8549 ± 0.0005 MICRO',
-    'MANUSCRIPT :: UNDER REVIEW AT MDPI SENSORS — NOT PUBLISHED',
-    'ONE ACQUISITION :: 0.8520 VS 0.8549 — BASELINES USE UP TO SIX DAYS',
-    'LABEL AUDIT :: 18 TRAINING FIRES AND 2 TEST FIRES EXCLUDED',
-    'LABEL AUDIT :: ACTIVE FIRE RECALL 0.80 → 0.86',
-    'BURNED AREA :: BAND 8 IS AN ID CODE, NOT A THRESHOLD',
-    'NEOW :: KEPLER SOLVER CONVERGES TO MACHINE PRECISION THROUGH e = 0.99',
-    'NCF :: HR@10 0.655 ± 0.010 AT 53,177 PARAMETERS',
-    'GALAXY ZOO :: 0.109 RMSE ON BLIND TEST',
-    'GRIDSENSE :: 14 ENDPOINTS, FIVE DATASTORES, ONE GATEWAY'
+    'NEOW / NEO_TRACKER :: EIGHT PLANETS, FIFTEEN MOONS, EVERY TRACKED NEO',
+    'GRIDSENSE :: 14 ENDPOINTS, FIVE DATASTORES, ONE GATEWAY',
+    'NCF REPRODUCTION :: KD STUDENT HR@10 0.655 ± 0.010 AT 53,177 PARAMETERS',
+    'VIT-GRADIENT-FLOW :: SELF-ATTENTION JACOBIAN, VERIFIED AGAINST FORWARDDIFF.JL',
+    'GALAXY-MORPHOLOGY-CNN :: 0.109 RMSE ON THE BLIND TEST, ~2.6M PARAMETERS',
+    'KINETICORE :: HAND AND FACE TRACKING, WEBCAM ONLY — NO NETWORK, NO API',
+    'GMM MUSIC GENRE RECOGNITION :: EXPECTATION-MAXIMIZATION FROM SCRATCH'
   ];
   var line = items.map(function(t){ return '<span>'+t+' <i>//</i></span>'; }).join('');
   document.getElementById('tick').innerHTML = line + line;
