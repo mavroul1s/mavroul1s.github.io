@@ -185,9 +185,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-off
 
 /* --- LAIN: glyph drift, edges only, centre stays legible --- */
 #glyphs{
-  position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.5;
-  mask-image:linear-gradient(90deg,#000 0%,transparent 26%,transparent 74%,#000 100%);
-  -webkit-mask-image:linear-gradient(90deg,#000 0%,transparent 26%,transparent 74%,#000 100%);
+  position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.42;
 }
 
 /* --- horizontal-hold slip: rare, brief, mechanical --- */
@@ -1460,20 +1458,33 @@ footer pre{
     boot.addEventListener('click', finishBoot);
   }
 
-  /* ---------- glyph field: dim characters drifting down the margins ---------- */
+  /* ---------- glyph rain: columns pouring the full width, behind the grid ----
+     Each column keeps its own characters so the trail holds still while it
+     falls, rather than every glyph reshuffling on every frame. The canvas is
+     cleared each pass instead of being faded down with a filled rectangle, so
+     the wire grid underneath stays visible through the rain. */
   var gc = document.getElementById('glyphs');
   if(gc && gc.getContext){
     var g = gc.getContext('2d');
     var GLYPHS = 'アカサタナハマヤラワヲンイキシチニヒミリΑΒΓΔΘΛΞΠΣΦΨΩ0123456789ABCDEF<>/\\[]{}=+*·';
-    var cols = [], CW = 15, GW = 0, GH = 0;
+    var cols = [], CW = 14, CH = 16, GW = 0, GH = 0, ROWS = 0;
+    function newCol(onscreen){
+      var c = {
+        sp: 0.22 + Math.random()*0.5,          /* cells per tick */
+        len: 7 + ((Math.random()*11)|0),       /* trail length */
+        ch: []
+      };
+      c.y = onscreen ? Math.random()*ROWS : -Math.random()*20;
+      c.row = c.y|0;
+      return c;
+    }
     function gsize(){
       GW = gc.width = window.innerWidth;
       GH = gc.height = window.innerHeight;
-      var n = Math.ceil(GW / CW);
+      ROWS = Math.ceil(GH/CH) + 2;
+      var n = Math.ceil(GW/CW);
       cols = [];
-      for(var c = 0; c < n; c++){
-        cols.push({ y: Math.random() * GH, sp: 0.25 + Math.random() * 0.7, ch: '' });
-      }
+      for(var c = 0; c < n; c++) cols.push(newCol(true));
     }
     gsize();
     window.addEventListener('resize', gsize);
@@ -1482,19 +1493,29 @@ footer pre{
     function rain(now){
       if(!MOTION){ g.clearRect(0,0,GW,GH); return; }
       requestAnimationFrame(rain);
-      if(now - last < 66) return;            /* ~15fps, deliberately mechanical */
+      if(now - last < 62) return;            /* ~16fps, deliberately mechanical */
       last = now;
-      g.clearRect(0, 0, GW, GH);
-      g.font = '12px "Share Tech Mono", monospace';
+      g.clearRect(0,0,GW,GH);
+      g.font = '13px "Share Tech Mono", monospace';
+      g.textBaseline = 'top';
       for(var c = 0; c < cols.length; c++){
-        var col = cols[c];
-        col.y += col.sp * 12;
-        if(col.y > GH + 40){ col.y = -40; col.sp = 0.25 + Math.random() * 0.7; }
-        if(Math.random() < 0.35) col.ch = GLYPHS[(Math.random() * GLYPHS.length) | 0];
-        g.fillStyle = 'rgba('+C_MUTED_RGB+',.34)';
-        g.fillText(col.ch, c * CW, col.y);
-        g.fillStyle = 'rgba('+C_PLO_RGB+',.22)';
-        g.fillText(col.ch, c * CW, col.y - 14);
+        var col = cols[c], x = c*CW;
+        col.y += col.sp;
+        var row = col.y|0;
+        if(row !== col.row){                 /* a new glyph only when it moves a cell */
+          col.row = row;
+          col.ch.unshift(GLYPHS[(Math.random()*GLYPHS.length)|0]);
+          if(col.ch.length > col.len) col.ch.pop();
+        }
+        for(var k = 0; k < col.ch.length; k++){
+          var yy = (row-k)*CH;
+          if(yy < -CH || yy > GH) continue;
+          var f = 1 - k/col.len;
+          if(k === 0) g.fillStyle = 'rgba('+C_PLO_RGB+',.6)';          /* the head */
+          else        g.fillStyle = 'rgba('+C_MUTED_RGB+','+(0.30*f*f).toFixed(3)+')';
+          g.fillText(col.ch[k], x, yy);
+        }
+        if((row - col.ch.length)*CH > GH) cols[c] = newCol(false);     /* recycle */
       }
     }
     onMotion(function(){ requestAnimationFrame(rain); });
@@ -2040,11 +2061,11 @@ footer pre{
       /* one sector cycle: claim it ring by ring, hold it, hand it back, repeat.
          `built` runs up and then down again, so the same threshold that raises
          each node also lowers it, outer rings first. */
-      var CYC=44, BUILD=5.2, TEAR=4.4, MAXB=7.4, cyc=t%CYC, built;
+      var CYC=26, BUILD=3.6, TEAR=3.0, MAXB=7.4, cyc=t%CYC, built;
       if(cyc<BUILD)            built=MAXB*(cyc/BUILD);
       else if(cyc<CYC-TEAR)    built=MAXB;
       else                     built=MAXB*(1-(cyc-(CYC-TEAR))/TEAR);
-      var sweep=(t*0.15%1)*8.6;                   /* ICE pulse travelling outward */
+      var sweep=(t*0.20%1)*8.6;                   /* ICE pulse travelling outward */
 
       /* ring boundaries, flattened into the isometric plane */
       sg.lineWidth=1;
@@ -2067,14 +2088,14 @@ footer pre{
         sg.strokeStyle='rgba('+C_GRID_RGB+','+(0.55*lv)+')';
         sg.beginPath(); sg.moveTo(ax,ay); sg.lineTo(bx,by); sg.stroke();
         if(i%3===0){
-          var ph=(t*0.30+i*0.137)%1;
+          var ph=(t*0.40+i*0.137)%1;
           sg.fillStyle='rgba('+C_PRIM_RGB+','+(0.9*lv)+')';
           sg.fillRect(ax+(bx-ax)*ph-1,ay+(by-ay)*ph-1,2,2);
         }
       }
 
       /* the core spire, harvested from the centre */
-      var beat=0.5+0.5*Math.sin(t*1.35);
+      var beat=0.5+0.5*Math.sin(t*1.7);
       sg.strokeStyle='rgba('+C_ACC_RGB+','+(0.10+0.16*beat)+')';
       sg.beginPath(); sg.ellipse(cx,cy,s*1.5,s*0.69,0,0,6.2832); sg.stroke();
       sbox(cx,cy,s*0.36,s*0.36*ISO,s*(2.0+0.10*beat),ROLE[2],0.75+0.25*beat,1);
@@ -2092,16 +2113,16 @@ footer pre{
         sg.closePath(); sg.stroke();
         if(b<=0.03) continue;
         var lit=Math.max(0,1-Math.abs(p.ring+1-sweep)*1.7);
-        sbox(X,Y,w,hy,p.h*s*1.7*b*(1+0.05*Math.sin(t*1.1+p.ph)),ROLE[p.role],lit,b);
+        sbox(X,Y,w,hy,p.h*s*1.7*b*(1+0.05*Math.sin(t*1.45+p.ph)),ROLE[p.role],lit,b);
       }
 
       /* one breach at a time: it lands, the timer closes, it is purged */
       if(built>3){
-        var slot=Math.floor(t/5.8), life=t%5.8;
+        var slot=Math.floor(t/4.4), life=t%4.4;
         var bp=order[(slot*53)%order.length];
         var BX=cx+(bp.x-bp.y)*KX, BY=cy+(bp.x+bp.y)*KY-bp.h*s*1.7-8;
-        if(life<4.2){
-          var q=1-life/4.2;
+        if(life<3.2){
+          var q=1-life/3.2;
           sg.strokeStyle='rgba('+C_ALERT_RGB+',.9)'; sg.lineWidth=1.4;
           sg.beginPath(); sg.arc(BX,BY,7,-1.5708,-1.5708+6.2832*q); sg.stroke();
           sg.fillStyle='rgba('+C_ALERT_RGB+','+(0.55+0.45*Math.sin(t*11))+')';
@@ -2109,7 +2130,7 @@ footer pre{
           sg.moveTo(BX,BY-3.6); sg.lineTo(BX+3.6,BY); sg.lineTo(BX,BY+3.6); sg.lineTo(BX-3.6,BY);
           sg.closePath(); sg.fill();
         } else {
-          var pr=(life-4.2)/1.6;                 /* purge flash */
+          var pr=(life-3.2)/1.2;                 /* purge flash */
           sg.strokeStyle='rgba('+C_PRIM_RGB+','+(1-pr)+')'; sg.lineWidth=1.2;
           sg.beginPath(); sg.arc(BX,BY,7+pr*16,0,6.2832); sg.stroke();
         }
@@ -2120,7 +2141,7 @@ footer pre{
       sg.textAlign='left';
       sg.fillStyle='rgba('+C_PRIM_RGB+',.75)'; sg.fillText('SECTOR 07',10,12);
       sg.fillStyle='rgba('+C_HAB_RGB+',.85)';
-      sg.fillText('⌁ '+Math.floor(4200+cyc*118).toLocaleString()+' CR',10,SH-11);
+      sg.fillText('⌁ '+Math.floor(4200+cyc*168).toLocaleString()+' CR',10,SH-11);
       sg.textAlign='right';
       sg.fillStyle='rgba('+C_HAB_RGB+',.85)';
       sg.fillText('6 RINGS · 117 PLOTS',SW-10,12);
