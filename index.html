@@ -786,6 +786,29 @@ footer pre{
 @media(max-width:620px){#orbit,#sector{height:180px}}
 
 /* ============================================================
+   GITHUB STATS
+   ============================================================ */
+.ghgrid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:1px;background:rgba(var(--grid-rgb),.3);border:1px solid rgba(var(--grid-rgb),.3);
+}
+.ghstat{
+  background:var(--bay);padding:14px 16px;display:flex;flex-direction:column;gap:4px;
+}
+.ghstat b{
+  font-family:var(--hud);font-size:clamp(20px,3.4vw,30px);font-weight:400;
+  color:var(--accent);letter-spacing:.04em;line-height:1;
+}
+.ghstat span{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.ghlangs{display:flex;flex-direction:column;gap:7px}
+.lang{display:grid;grid-template-columns:minmax(96px,140px) 1fr 30px;gap:12px;align-items:center}
+.lang .l{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.lang .bar{height:7px;background:rgba(var(--grid-rgb),.25);display:block}
+.lang .bar i{display:block;height:100%;background:var(--primary);opacity:.75}
+.lang:first-child .bar i{background:var(--accent);opacity:.9}
+.lang .n{font-size:11px;color:var(--primary-lo);text-align:right}
+
+/* ============================================================
    Y2K — beveled terminal chrome + dither rails
    ============================================================ */
 .term{box-shadow:inset 1px 1px 0 rgba(var(--primary-rgb),.14),inset -1px -1px 0 rgba(var(--shade-rgb),.6)}
@@ -859,6 +882,7 @@ footer pre{
     <li><a href="#hero">~/</a></li>
     <li><a href="#current">~/current</a></li>
     <li><a href="#projects">~/projects</a></li>
+    <li><a href="#github">~/github</a></li>
     <li><a href="#archive">~/archive</a></li>
     <li><a href="#toolchain">~/toolchain</a></li>
     <li><a href="#credentials">~/credentials</a></li>
@@ -907,7 +931,6 @@ footer pre{
 
       <div class="rail">
         <a class="chip" href="https://www.e-ce.uth.gr/" target="_blank" rel="noopener">ECE · UTH · VOLOS · GR</a>
-        <span class="chip">EL NATIVE · EN ECCE B2</span>
       </div>
       <pre class="ascii rail" data-art="wave" data-rows="5" style="margin-top:22px" aria-hidden="true"></pre>
     </div>
@@ -1194,6 +1217,35 @@ footer pre{
   </div>
 </section>
 
+<!-- ===================== GITHUB ===================== -->
+<section id="github">
+  <h2 class="sec-h"><span class="path">~/</span>github <span class="rule"></span></h2>
+
+  <div class="panel">
+    <div class="panel-h"><h3>github.com/mavroul1s</h3></div>
+    <p class="stack">counted live from the public API<span>/</span>no third-party badge services</p>
+
+    <div class="ghgrid">
+      <div class="ghstat"><b data-gh="repos" data-fb="19">19</b><span>public repositories</span></div>
+      <div class="ghstat"><b data-gh="stars" data-fb="6">6</b><span>stars earned</span></div>
+      <div class="ghstat"><b data-gh="followers" data-fb="9">9</b><span>followers</span></div>
+      <div class="ghstat"><b data-gh="since">Dec 2022</b><span>on GitHub since</span></div>
+      <div class="ghstat"><b data-gh="lastpush">today</b><span>last push</span></div>
+    </div>
+
+    <h4 class="sub" style="margin:22px 0 10px">Languages by repository</h4>
+    <div class="ghlangs" id="ghlangs">
+      <div class="lang"><span class="l">Jupyter Notebook</span><span class="bar"><i style="width:100%"></i></span><span class="n">8</span></div>
+      <div class="lang"><span class="l">HTML</span><span class="bar"><i style="width:37.5%"></i></span><span class="n">3</span></div>
+      <div class="lang"><span class="l">Python</span><span class="bar"><i style="width:37.5%"></i></span><span class="n">3</span></div>
+      <div class="lang"><span class="l">MATLAB</span><span class="bar"><i style="width:25%"></i></span><span class="n">2</span></div>
+      <div class="lang"><span class="l">TeX</span><span class="bar"><i style="width:12.5%"></i></span><span class="n">1</span></div>
+    </div>
+
+    <p style="margin:16px 0 0"><a href="https://github.com/mavroul1s" target="_blank" rel="noopener">github.com/mavroul1s →</a></p>
+  </div>
+</section>
+
 <!-- ===================== ARCHIVE ===================== -->
 <section id="archive">
   <h2 class="sec-h"><span class="path">~/</span>archive <span class="rule"></span> <span class="tag course">Coursework</span></h2>
@@ -1398,15 +1450,89 @@ footer pre{
     });
   }
   paintRepos();
+
+  /* ---------- github stats ----------
+     Same bargain as the repo count: the API is asked, and what is printed in
+     the markup is only the fallback for when it cannot be reached. Two calls,
+     no third-party badge service. */
+  function countTo(el, n){
+    if(el.getAttribute('data-shown') === String(n)) return;
+    el.setAttribute('data-shown', n);
+    if(!MOTION){ el.textContent = n; return; }
+    var t0 = performance.now();
+    requestAnimationFrame(function step(now){
+      var k = Math.min(1,(now-t0)/700);
+      el.textContent = Math.round(n*(1-Math.pow(1-k,3)));
+      if(k<1) requestAnimationFrame(step);
+    });
+  }
+  function gh(k){ return document.querySelector('[data-gh="'+k+'"]'); }
+  function ghNum(k, n){ var el = gh(k); if(el && typeof n === 'number') countTo(el, n); }
+  var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function ghSince(iso){
+    var el = gh('since'); if(!el) return;
+    var d = new Date(iso);
+    if(!isNaN(d)) el.textContent = MONTHS[d.getMonth()] + ' ' + d.getFullYear();
+  }
+  function ghAgo(iso){
+    var el = gh('lastpush'); if(!el) return;
+    var d = new Date(iso); if(isNaN(d)) return;
+    var days = Math.floor((Date.now() - d.getTime()) / 86400000);
+    el.textContent = days <= 0 ? 'today'
+                   : days === 1 ? 'yesterday'
+                   : days < 30  ? days + ' days ago'
+                   : days < 365 ? Math.round(days/30) + ' months ago'
+                                : Math.round(days/365) + ' years ago';
+  }
+  function ghLangs(list){
+    var box = document.getElementById('ghlangs');
+    if(!box) return;
+    var m = {}, k;
+    for(var i=0;i<list.length;i++) if(list[i].language) m[list[i].language] = (m[list[i].language]||0) + 1;
+    var rows = [];
+    for(k in m) if(m.hasOwnProperty(k)) rows.push([k, m[k]]);
+    if(!rows.length) return;                /* nothing to say: leave the printed rows */
+    rows.sort(function(a,b){ return b[1]-a[1]; });
+    rows = rows.slice(0,6);
+    var top = rows[0][1];
+    box.innerHTML = '';
+    rows.forEach(function(r){
+      var row = document.createElement('div'); row.className = 'lang';
+      var l = document.createElement('span'); l.className = 'l'; l.textContent = r[0];
+      var bar = document.createElement('span'); bar.className = 'bar';
+      var fill = document.createElement('i'); fill.style.width = (r[1]/top*100) + '%';
+      bar.appendChild(fill);
+      var n = document.createElement('span'); n.className = 'n'; n.textContent = r[1];
+      row.appendChild(l); row.appendChild(bar); row.appendChild(n);
+      box.appendChild(row);
+    });
+  }
+
   if(window.fetch){
     fetch('https://api.github.com/users/mavroul1s')
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(d){
-        if(!d || typeof d.public_repos !== 'number') return;
-        REPOS = d.public_repos;
-        paintRepos();
+        if(!d) return;
+        if(typeof d.public_repos === 'number'){ REPOS = d.public_repos; paintRepos(); ghNum('repos', REPOS); }
+        ghNum('followers', d.followers);
+        if(d.created_at) ghSince(d.created_at);
       })
       .catch(function(){});                 /* offline or rate-limited: fallback stands */
+
+    fetch('https://api.github.com/users/mavroul1s/repos?per_page=100&sort=pushed')
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(list){
+        if(!list || !list.length) return;
+        var stars = 0, last = '';
+        for(var i=0;i<list.length;i++){
+          stars += list[i].stargazers_count || 0;
+          if(list[i].pushed_at > last) last = list[i].pushed_at;
+        }
+        ghNum('stars', stars);
+        if(last) ghAgo(last);
+        ghLangs(list);
+      })
+      .catch(function(){});
   }
 
   /* ---------- the fixed rails ----------
