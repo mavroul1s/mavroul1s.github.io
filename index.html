@@ -410,6 +410,10 @@ section{padding:56px 0;scroll-margin-top:110px}
   font-size:11px;letter-spacing:.13em;text-transform:uppercase;
   padding:5px 10px;border:1px solid rgba(var(--grid-rgb),.5);color:var(--muted);
 }
+/* a chip that goes somewhere */
+a.chip{border-bottom-width:1px;display:inline-flex;align-items:center;gap:7px}
+a.chip::after{content:"▸";color:var(--accent)}
+a.chip:hover{color:var(--primary);border-color:var(--primary);background:rgba(var(--primary-rgb),.07)}
 
 /* profiler panel */
 .profiler{border:1px solid rgba(var(--grid-rgb),.55);background:linear-gradient(180deg,rgba(var(--surface-rgb),.9),rgba(var(--bg-rgb),.9));position:relative}
@@ -867,7 +871,7 @@ footer pre{
       </div>
 
       <div class="rail">
-        <span class="chip">UTH · VOLOS · GR</span>
+        <a class="chip" href="https://www.e-ce.uth.gr/" target="_blank" rel="noopener">ECE · UTH · VOLOS · GR</a>
         <span class="chip">EL NATIVE · EN ECCE B2</span>
       </div>
       <pre class="ascii rail" data-art="wave" data-rows="5" style="margin-top:22px" aria-hidden="true"></pre>
@@ -1359,13 +1363,18 @@ footer pre{
 
   /* ---------- hero typing + glitch ---------- */
   var typedEl = document.getElementById('typed');
+  /* the coursework the degree is actually built from */
   var LEDES = [
-    'Deep learning for remote sensing.',
-    'Auditing the labels everyone else trusted.',
-    'Ten seeds, reported as mean ± standard deviation.',
-    'Orbital mechanics from published osculating elements.',
-    'Computer vision that runs locally — no network, no API.',
-    'Volos, Greece. Open to research and internships.'
+    'Neuro-Fuzzy Computing',
+    'Computer Vision',
+    'Deep Learning',
+    'Artificial Intelligence',
+    'Information Retrieval',
+    'Advanced Data Management',
+    'Speech and Audio Processing',
+    'Information and Coding Theory',
+    'Image Processing',
+    'Special Topics in Applied Mathematics'
   ];
   var started = false;
   var li = 0, n = 0, typing = false;
