@@ -808,6 +808,27 @@ footer pre{
 .lang:first-child .bar i{background:var(--accent);opacity:.9}
 .lang .n{font-size:11px;color:var(--primary-lo);text-align:right}
 
+/* the stats fold away — they are supporting evidence, not the argument */
+.gh-fold{padding:0}
+.gh-fold summary{
+  list-style:none;cursor:pointer;padding:15px 20px;
+  display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+}
+.gh-fold summary::-webkit-details-marker{display:none}
+.gh-fold summary::before{content:"▸";color:var(--accent);align-self:center}
+.gh-fold[open] summary::before{content:"▾"}
+.gh-fold summary:hover .ghsum-h{color:var(--primary)}
+.gh-fold .ghsum-h{font-size:clamp(15px,2vw,18px);font-weight:700;color:var(--primary-lo);letter-spacing:.02em}
+.gh-fold .ghsum-n{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.gh-fold .ghsum-n b{color:var(--accent);font-weight:500}
+.gh-fold .ghsum-cue{
+  margin-left:auto;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+  border:1px solid rgba(var(--grid-rgb),.5);padding:2px 8px;
+}
+.gh-fold .ghsum-cue::after{content:"show"}
+.gh-fold[open] .ghsum-cue::after{content:"hide"}
+.gh-fold .fold-body{padding:0 20px 20px}
+
 /* ============================================================
    Y2K — beveled terminal chrome + dither rails
    ============================================================ */
@@ -1221,9 +1242,14 @@ footer pre{
 <section id="github">
   <h2 class="sec-h"><span class="path">~/</span>github <span class="rule"></span></h2>
 
-  <div class="panel">
-    <div class="panel-h"><h3>github.com/mavroul1s</h3></div>
-    <p class="stack">counted live from the public API<span>/</span>no third-party badge services</p>
+  <details class="panel gh-fold">
+    <summary>
+      <span class="ghsum-h">github.com/mavroul1s</span>
+      <span class="ghsum-n"><b data-gh="repos" data-fb="19">19</b> repos · <b data-gh="stars" data-fb="6">6</b> stars · <b data-gh="followers" data-fb="9">9</b> followers</span>
+      <span class="ghsum-cue" aria-hidden="true"></span>
+    </summary>
+    <div class="fold-body">
+    <p class="stack" style="margin-top:2px">counted live from the public API<span>/</span>no third-party badge services</p>
 
     <div class="ghgrid">
       <div class="ghstat"><b data-gh="repos" data-fb="19">19</b><span>public repositories</span></div>
@@ -1243,7 +1269,8 @@ footer pre{
     </div>
 
     <p style="margin:16px 0 0"><a href="https://github.com/mavroul1s" target="_blank" rel="noopener">github.com/mavroul1s →</a></p>
-  </div>
+    </div>
+  </details>
 </section>
 
 <!-- ===================== ARCHIVE ===================== -->
@@ -1466,23 +1493,25 @@ footer pre{
       if(k<1) requestAnimationFrame(step);
     });
   }
-  function gh(k){ return document.querySelector('[data-gh="'+k+'"]'); }
-  function ghNum(k, n){ var el = gh(k); if(el && typeof n === 'number') countTo(el, n); }
+  function ghAll(k){ return document.querySelectorAll('[data-gh="'+k+'"]'); }
+  function ghNum(k, n){
+    if(typeof n !== 'number') return;
+    [].forEach.call(ghAll(k), function(el){ countTo(el, n); });
+  }
+  function ghText(k, t){ [].forEach.call(ghAll(k), function(el){ el.textContent = t; }); }
   var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   function ghSince(iso){
-    var el = gh('since'); if(!el) return;
     var d = new Date(iso);
-    if(!isNaN(d)) el.textContent = MONTHS[d.getMonth()] + ' ' + d.getFullYear();
+    if(!isNaN(d)) ghText('since', MONTHS[d.getMonth()] + ' ' + d.getFullYear());
   }
   function ghAgo(iso){
-    var el = gh('lastpush'); if(!el) return;
     var d = new Date(iso); if(isNaN(d)) return;
     var days = Math.floor((Date.now() - d.getTime()) / 86400000);
-    el.textContent = days <= 0 ? 'today'
-                   : days === 1 ? 'yesterday'
-                   : days < 30  ? days + ' days ago'
-                   : days < 365 ? Math.round(days/30) + ' months ago'
-                                : Math.round(days/365) + ' years ago';
+    ghText('lastpush', days <= 0 ? 'today'
+                     : days === 1 ? 'yesterday'
+                     : days < 30  ? days + ' days ago'
+                     : days < 365 ? Math.round(days/30) + ' months ago'
+                                  : Math.round(days/365) + ' years ago');
   }
   function ghLangs(list){
     var box = document.getElementById('ghlangs');
