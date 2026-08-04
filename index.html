@@ -1386,15 +1386,15 @@ footer pre{
     (function type(){
       if(!MOTION){ typing = false; typedEl.textContent = s; n = s.length; return; }
       typedEl.textContent = s.slice(0, ++n);
-      if(n < s.length) return setTimeout(type, 21);
+      if(n < s.length) return setTimeout(type, 15);
       setTimeout(function erase(){
         if(!MOTION){ typing = false; typedEl.textContent = s; n = s.length; return; }
         typedEl.textContent = s.slice(0, --n);
-        if(n > 0) return setTimeout(erase, 11);
+        if(n > 0) return setTimeout(erase, 7);
         li = (li + 1) % LEDES.length;
         typing = false;
-        setTimeout(cycle, 260);
-      }, 3400);
+        setTimeout(cycle, 170);
+      }, 1700);
     })();
   }
   function startHero(){
