@@ -366,26 +366,27 @@ section{padding:56px 0;scroll-margin-top:calc(var(--bar-h,31px) + var(--nav-h,39
 /* ============================================================
    HERO
    ============================================================ */
-.name{position:relative;margin:0 0 6px}
+.name{position:relative;margin:0 0 18px}
 /* the plate cuts in on arrival — base state is visible, so with motion off
    (animation:none) it is simply there */
-.name.in > pre{animation:chrome 9s linear infinite,plate-in .82s steps(14) 1}
-.name.in .lay{animation:plate-lay .82s steps(14) 1}
+.name.in{animation:plate-in 1.08s steps(9,end) 1}
+.name.in .lay{animation:plate-lay 1.08s steps(9,end) 1}
 @keyframes plate-in{
-  0%{clip-path:inset(0 100% 0 0);filter:brightness(2.4)}
-  55%{filter:brightness(1.5)}
-  100%{clip-path:inset(0 0 0 0);filter:none}
+  from{clip-path:inset(0 100% 0 0)}
+  to{clip-path:inset(0 0 0 0)}
 }
 @keyframes plate-lay{
-  0%{opacity:.85;transform:translateX(-9px)}
-  40%{opacity:.5;transform:translateX(6px)}
+  0%{opacity:.9;transform:translateX(-7px)}
+  60%{opacity:.45;transform:translateX(5px)}
   100%{opacity:0;transform:translateX(0)}
 }
 .name pre{
-  margin:0;font-size:clamp(3px,1.36vw,16px);line-height:1.02;
+  margin:0;font-size:clamp(3px,1.02vw,15px);line-height:1.02;
   font-weight:700;color:var(--primary);
   text-shadow:0 0 18px rgba(var(--primary-rgb),.28);
 }
+/* sized against the column it sits in; the clamp above is the fallback */
+@container (min-width:0px){ .name pre{font-size:min(1.94cqw,15px)} }
 /* Y2K chrome: a hard specular band travelling across the plate */
 .name > pre{
   background:linear-gradient(105deg,
@@ -417,7 +418,10 @@ section{padding:56px 0;scroll-margin-top:calc(var(--bar-h,31px) + var(--nav-h,39
   100%{transform:translate(0,0);clip-path:inset(0 0 100% 0)}
 }
 
-.hero-grid{display:grid;grid-template-columns:1.55fr .95fr;gap:34px;align-items:start;margin-top:26px}
+.hero-grid{display:grid;grid-template-columns:1.55fr .95fr;gap:34px;align-items:start;margin-top:0}
+/* the plate is sized against its column, not the window, so it can never
+   outgrow the half it now lives in */
+.hero-main{min-width:0;container-type:inline-size}
 @media(max-width:860px){.hero-grid{grid-template-columns:1fr;gap:26px}}
 
 .lede{font-size:clamp(15px,1.9vw,19px);line-height:1.55;color:var(--primary-lo);margin:0 0 18px;min-height:3.2em}
@@ -866,6 +870,8 @@ footer pre{
 
 <!-- ===================== HERO ===================== -->
 <section id="hero">
+  <div class="hero-grid">
+    <div class="hero-main">
   <div class="name" id="nameplate">
     <pre aria-label="mavroul1s">███╗   ███╗ █████╗ ██╗   ██╗██████╗  ██████╗ ██╗   ██╗██╗      ██╗███████╗
 ████╗ ████║██╔══██╗██║   ██║██╔══██╗██╔═══██╗██║   ██║██║     ███║██╔════╝
@@ -887,8 +893,6 @@ footer pre{
 ╚═╝     ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚══════╝ ╚═╝╚══════╝</pre></div>
   </div>
 
-  <div class="hero-grid">
-    <div>
       <p class="lede"><span id="typed"></span><span class="cursor" aria-hidden="true"></span></p>
       <p class="hero-sub">Neural networks, computer vision, and remote sensing. Fifth-year ECE at the University of Thessaly.</p>
 
@@ -1508,11 +1512,11 @@ footer pre{
     if(!pLines.length) return;
     if(!MOTION){ portraitAll(true); return; }
     portraitAll(false);
-    var i = pLines.length - 1;                 /* last line first: it builds upward */
+    var i = 0;                                 /* top line first: it draws downward */
     (function step(){
-      if(i < 0) return;
+      if(i >= pLines.length) return;
       if(!MOTION){ portraitAll(true); return; }
-      pLines[i--].classList.add('on');
+      pLines[i++].classList.add('on');
       setTimeout(step, 18);
     })();
   }
