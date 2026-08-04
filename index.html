@@ -865,8 +865,7 @@ footer pre{
       <p class="hero-sub">Neural networks, computer vision, and remote sensing. Fifth-year ECE at the University of Thessaly.</p>
 
       <div class="actions">
-        <a class="btn primary" href="https://mavroul1s.github.io/neo_tracker/neo-tracker.html" target="_blank" rel="noopener"><span class="k">▸</span><span>Launch NEOW tracker</span></a>
-        <a class="btn" href="#current"><span class="k">▸</span><span>Current work</span></a>
+        <a class="btn primary" href="#current"><span class="k">▸</span><span>Current work</span></a>
         <a class="btn ghost" href="https://github.com/mavroul1s" target="_blank" rel="noopener"><span class="k">▸</span><span>GitHub</span></a>
       </div>
 
@@ -2038,8 +2037,14 @@ footer pre{
       var ROLE=roles();
       var s=Math.min(SW*0.088,SH*0.128), cx=SW*0.5, cy=SH*0.58,
           KX=s*0.866, KY=s*0.40, ISO=KY/KX;
-      var built=Math.min(7.4,t*2.2);              /* claims each ring in turn, once */
-      var sweep=(t*0.22%1)*8.6;                   /* ICE pulse travelling outward */
+      /* one sector cycle: claim it ring by ring, hold it, hand it back, repeat.
+         `built` runs up and then down again, so the same threshold that raises
+         each node also lowers it, outer rings first. */
+      var CYC=44, BUILD=5.2, TEAR=4.4, MAXB=7.4, cyc=t%CYC, built;
+      if(cyc<BUILD)            built=MAXB*(cyc/BUILD);
+      else if(cyc<CYC-TEAR)    built=MAXB;
+      else                     built=MAXB*(1-(cyc-(CYC-TEAR))/TEAR);
+      var sweep=(t*0.15%1)*8.6;                   /* ICE pulse travelling outward */
 
       /* ring boundaries, flattened into the isometric plane */
       sg.lineWidth=1;
@@ -2062,14 +2067,14 @@ footer pre{
         sg.strokeStyle='rgba('+C_GRID_RGB+','+(0.55*lv)+')';
         sg.beginPath(); sg.moveTo(ax,ay); sg.lineTo(bx,by); sg.stroke();
         if(i%3===0){
-          var ph=(t*0.42+i*0.137)%1;
+          var ph=(t*0.30+i*0.137)%1;
           sg.fillStyle='rgba('+C_PRIM_RGB+','+(0.9*lv)+')';
           sg.fillRect(ax+(bx-ax)*ph-1,ay+(by-ay)*ph-1,2,2);
         }
       }
 
       /* the core spire, harvested from the centre */
-      var beat=0.5+0.5*Math.sin(t*1.9);
+      var beat=0.5+0.5*Math.sin(t*1.35);
       sg.strokeStyle='rgba('+C_ACC_RGB+','+(0.10+0.16*beat)+')';
       sg.beginPath(); sg.ellipse(cx,cy,s*1.5,s*0.69,0,0,6.2832); sg.stroke();
       sbox(cx,cy,s*0.36,s*0.36*ISO,s*(2.0+0.10*beat),ROLE[2],0.75+0.25*beat,1);
@@ -2087,16 +2092,16 @@ footer pre{
         sg.closePath(); sg.stroke();
         if(b<=0.03) continue;
         var lit=Math.max(0,1-Math.abs(p.ring+1-sweep)*1.7);
-        sbox(X,Y,w,hy,p.h*s*1.7*b*(1+0.05*Math.sin(t*1.6+p.ph)),ROLE[p.role],lit,b);
+        sbox(X,Y,w,hy,p.h*s*1.7*b*(1+0.05*Math.sin(t*1.1+p.ph)),ROLE[p.role],lit,b);
       }
 
       /* one breach at a time: it lands, the timer closes, it is purged */
       if(built>3){
-        var slot=Math.floor(t/4.2), life=t%4.2;
+        var slot=Math.floor(t/5.8), life=t%5.8;
         var bp=order[(slot*53)%order.length];
         var BX=cx+(bp.x-bp.y)*KX, BY=cy+(bp.x+bp.y)*KY-bp.h*s*1.7-8;
-        if(life<3.0){
-          var q=1-life/3.0;
+        if(life<4.2){
+          var q=1-life/4.2;
           sg.strokeStyle='rgba('+C_ALERT_RGB+',.9)'; sg.lineWidth=1.4;
           sg.beginPath(); sg.arc(BX,BY,7,-1.5708,-1.5708+6.2832*q); sg.stroke();
           sg.fillStyle='rgba('+C_ALERT_RGB+','+(0.55+0.45*Math.sin(t*11))+')';
@@ -2104,7 +2109,7 @@ footer pre{
           sg.moveTo(BX,BY-3.6); sg.lineTo(BX+3.6,BY); sg.lineTo(BX,BY+3.6); sg.lineTo(BX-3.6,BY);
           sg.closePath(); sg.fill();
         } else {
-          var pr=(life-3.0)/1.2;                 /* purge flash */
+          var pr=(life-4.2)/1.6;                 /* purge flash */
           sg.strokeStyle='rgba('+C_PRIM_RGB+','+(1-pr)+')'; sg.lineWidth=1.2;
           sg.beginPath(); sg.arc(BX,BY,7+pr*16,0,6.2832); sg.stroke();
         }
@@ -2115,7 +2120,7 @@ footer pre{
       sg.textAlign='left';
       sg.fillStyle='rgba('+C_PRIM_RGB+',.75)'; sg.fillText('SECTOR 07',10,12);
       sg.fillStyle='rgba('+C_HAB_RGB+',.85)';
-      sg.fillText('⌁ '+Math.floor(4200+t*137).toLocaleString()+' CR',10,SH-11);
+      sg.fillText('⌁ '+Math.floor(4200+cyc*118).toLocaleString()+' CR',10,SH-11);
       sg.textAlign='right';
       sg.fillStyle='rgba('+C_HAB_RGB+',.85)';
       sg.fillText('6 RINGS · 117 PLOTS',SW-10,12);
