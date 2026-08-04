@@ -45,6 +45,9 @@
   --grid-rgb:18,113,140;
   --hab-rgb:99,160,175;
   --shade-rgb:0,0,0;
+  --rain-rgb:255,179,71;
+  --rain-head-rgb:255,222,170;
+  --rain-a:.42;
   --bay:#05080e;
   --surface-2:#071019;
   --bright:#eafcff;
@@ -88,6 +91,9 @@ html[data-theme="light"]{
   --grid-rgb:138,111,184;
   --hab-rgb:120,95,160;
   --shade-rgb:95,42,158;
+  --rain-rgb:113,190,0;
+  --rain-head-rgb:58,104,0;
+  --rain-a:.6;
   --bay:#f1ecfa;
   --surface-2:#f6f2fd;
   --bright:#8fd400;
@@ -185,7 +191,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-off
 
 /* --- LAIN: glyph drift, edges only, centre stays legible --- */
 #glyphs{
-  position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.42;
+  position:fixed;inset:0;z-index:1;pointer-events:none;opacity:var(--rain-a,.42);
 }
 
 /* --- horizontal-hold slip: rare, brief, mechanical --- */
@@ -1248,7 +1254,7 @@ footer pre{
   /* canvas palette, read from the CSS tokens so it follows the theme */
   var C_HI,C_ACC,C_RED,C_MID,C_DIM,C_MID_S,
       C_PRIM_RGB,C_PLO_RGB,C_GRID_RGB,C_ACC_RGB,C_ALERT_RGB,C_MUTED_RGB,C_HAB_RGB,
-      C_BG_RGB,C_STARA,C_STARB,C_CORE;
+      C_BG_RGB,C_STARA,C_STARB,C_CORE,C_RAIN_RGB,C_RAINH_RGB;
   function readPalette(){
     var cs = getComputedStyle(root);
     function v(n){ return cs.getPropertyValue(n).trim(); }
@@ -1256,6 +1262,7 @@ footer pre{
     C_ALERT_RGB=v('--alert-rgb');  C_MUTED_RGB=v('--muted-rgb'); C_HAB_RGB=v('--hab-rgb');
     C_BG_RGB=v('--bg-rgb'); C_STARA=v('--starA'); C_STARB=v('--starB'); C_CORE=v('--core');
     C_PLO_RGB=v('--primary-lo-rgb');
+    C_RAIN_RGB=v('--rain-rgb'); C_RAINH_RGB=v('--rain-head-rgb');
     C_HI=v('--primary'); C_ACC=v('--accent'); C_RED=v('--alert'); C_MID_S=v('--muted');
     C_DIM='rgba('+C_GRID_RGB+',.45)'; C_MID='rgba('+C_MUTED_RGB+',.9)';
   }
@@ -1529,8 +1536,8 @@ footer pre{
           var yy = (row-k)*CH;
           if(yy < -CH || yy > GH) continue;
           var f = 1 - k/col.len;
-          if(k === 0) g.fillStyle = 'rgba('+C_PLO_RGB+',.6)';          /* the head */
-          else        g.fillStyle = 'rgba('+C_MUTED_RGB+','+(0.30*f*f).toFixed(3)+')';
+          if(k === 0) g.fillStyle = 'rgba('+C_RAINH_RGB+',.75)';       /* the head */
+          else        g.fillStyle = 'rgba('+C_RAIN_RGB+','+(0.34*f*f).toFixed(3)+')';
           g.fillText(col.ch[k], x, yy);
         }
         if((row - col.ch.length)*CH > GH) cols[c] = newCol(false);     /* recycle */
