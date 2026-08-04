@@ -242,7 +242,8 @@ main.slip,footer.slip{animation:slip .34s steps(3) 1}
    ============================================================ */
 .topbar{
   position:fixed;top:0;left:0;right:0;z-index:40;
-  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  display:flex;flex-wrap:nowrap;justify-content:space-between;align-items:center;gap:12px;
+  white-space:nowrap;overflow:hidden;
   padding:7px var(--gut);
   font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
   background:rgba(var(--bg-rgb),.9);border-bottom:1px solid rgba(var(--grid-rgb),.32);
@@ -252,7 +253,7 @@ main.slip,footer.slip{animation:slip .34s steps(3) 1}
 .dot{color:var(--accent);animation:blink 1.6s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
 .topbar .right{display:flex;gap:16px;align-items:center}
-@media(max-width:640px){.topbar .hide-s{display:none}}
+@media(max-width:1120px){.topbar .hide-s{display:none}}
 
 /* NEOW launch control, pinned in the bar — always one click away */
 .launch-mini{
@@ -282,13 +283,13 @@ main.slip,footer.slip{animation:slip .34s steps(3) 1}
 .sw[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
 .sw[aria-pressed="true"] b{color:var(--accent)}
 .sw .k{color:var(--accent)}
-@media(max-width:860px){.sw .lbl{display:none}.sw{padding:3px 7px}}
+@media(max-width:1000px){.sw .lbl{display:none}.sw{padding:3px 7px}}
 
 /* ============================================================
    NAV
    ============================================================ */
 .nav{
-  position:fixed;top:31px;left:0;right:0;z-index:39;
+  position:fixed;top:var(--bar-h,31px);left:0;right:0;z-index:39;
   background:rgba(var(--bg-rgb),.88);border-bottom:1px solid rgba(var(--grid-rgb),.22);
   backdrop-filter:blur(6px);
   overflow-x:auto;scrollbar-width:none;
@@ -309,7 +310,7 @@ main.slip,footer.slip{animation:slip .34s steps(3) 1}
    TICKER
    ============================================================ */
 .ticker{
-  position:fixed;top:70px;left:0;right:0;z-index:38;
+  position:fixed;top:calc(var(--bar-h,31px) + var(--nav-h,39px));left:0;right:0;z-index:38;
   border-bottom:1px solid rgba(var(--grid-rgb),.18);
   background:rgba(var(--surface-rgb),.7);overflow:hidden;
   font-size:10.5px;letter-spacing:.14em;color:var(--muted);
@@ -338,8 +339,8 @@ main.slip,footer.slip{animation:slip .34s steps(3) 1}
    LAYOUT
    ============================================================ */
 main{position:relative;z-index:5;max-width:var(--maxw);margin:0 auto;padding:0 var(--gut)}
-section{padding:56px 0;scroll-margin-top:110px}
-#hero{padding-top:132px}
+section{padding:56px 0;scroll-margin-top:calc(var(--bar-h,31px) + var(--nav-h,39px) + var(--tick-h,33px) + 8px)}
+#hero{padding-top:calc(var(--bar-h,31px) + var(--nav-h,39px) + var(--tick-h,33px) + 30px)}
 
 /* section headers — path register, not fake sequence numbers */
 .sec-h{
@@ -1325,6 +1326,23 @@ footer pre{
       .catch(function(){});                 /* offline or rate-limited: fallback stands */
   }
 
+  /* ---------- the fixed rails ----------
+     Top bar, nav and ticker are all fixed and stack on each other. Their
+     heights change with the viewport and again when the webfonts land, so
+     measure them and let the CSS position from that rather than from three
+     numbers that were only ever right at one width. */
+  function fitBars(){
+    var bar=document.querySelector('.topbar'), nav=document.querySelector('.nav'),
+        tk=document.querySelector('.ticker');
+    if(bar) root.style.setProperty('--bar-h', bar.offsetHeight+'px');
+    if(nav) root.style.setProperty('--nav-h', nav.offsetHeight+'px');
+    if(tk)  root.style.setProperty('--tick-h', tk.offsetHeight+'px');
+  }
+  fitBars();
+  window.addEventListener('resize', fitBars);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitBars);
+  window.addEventListener('load', fitBars);
+
   /* ---------- the two switches ---------- */
   var msw = document.getElementById('motionsw'), tsw = document.getElementById('themesw');
   var running = false;
@@ -1897,8 +1915,12 @@ footer pre{
       cv.width = W*dpr; cv.height = H*dpr;
       ctx.setTransform(dpr,0,0,dpr,0,0);
     }
+    /* resizing a canvas clears it, so always put a frame back; watch the box
+       itself, not just the window — the panel reflows on its own */
+    function orbitBox(){ size(); if(!MOTION) draw(performance.now()); }
     size();
-    window.addEventListener('resize', size);
+    window.addEventListener('resize', orbitBox);
+    if(window.ResizeObserver) new ResizeObserver(orbitBox).observe(cv);
 
     /* colours by name, resolved each frame so a theme change carries through */
     var bodies = [
@@ -1980,8 +2002,10 @@ footer pre{
       sv.width = SW*sdpr; sv.height = SH*sdpr;
       sg.setTransform(sdpr,0,0,sdpr,0,0);
     }
+    function sectorBox(){ ssize(); if(!MOTION) sstatic(); }
     ssize();
-    window.addEventListener('resize', ssize);
+    window.addEventListener('resize', sectorBox);
+    if(window.ResizeObserver) new ResizeObserver(sectorBox).observe(sv);
 
     /* fixed seed — the sector looks the same on every visit */
     var RINGS=[7,12,17,22,27,32], plots=[], links=[], rings=[], sseed=70831;
