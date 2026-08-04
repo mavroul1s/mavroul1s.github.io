@@ -626,8 +626,20 @@ caption{caption-side:bottom;text-align:left;font-size:11px;color:var(--muted);pa
   border-bottom:1px solid rgba(var(--grid-rgb),.4);
 }
 .link-box:hover{border-color:var(--primary);background:rgba(var(--primary-rgb),.05)}
+button.link-box{
+  font:inherit;text-align:left;background:transparent;color:inherit;
+  cursor:pointer;width:100%;position:relative;
+}
+.link-box .cue{
+  position:absolute;top:13px;right:15px;
+  font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+}
+.link-box.done{border-color:var(--accent)}
+.link-box.done .cue{color:var(--accent)}
 .link-box .lbl{display:block;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
 .link-box .val{display:block;color:var(--primary-lo);font-size:14px;word-break:break-all}
+/* so the handle is still selectable by hand if the clipboard is refused */
+button.link-box .val{user-select:text;-webkit-user-select:text}
 
 footer{
   position:relative;z-index:5;max-width:var(--maxw);margin:0 auto;
@@ -1365,6 +1377,10 @@ footer pre{
     <a class="link-box" href="mailto:nick.black.4416@gmail.com">
       <span class="lbl">Email</span><span class="val">nick.black.4416@gmail.com</span>
     </a>
+    <button type="button" class="link-box copy" id="dcopy" data-copy="co_n1los">
+      <span class="lbl">Discord</span><span class="val">co_n1los</span>
+      <span class="cue" aria-hidden="true">copy</span>
+    </button>
     <a class="link-box" href="https://github.com/mavroul1s" target="_blank" rel="noopener">
       <span class="lbl">GitHub</span><span class="val">mavroul1s</span>
     </a>
@@ -1562,6 +1578,35 @@ footer pre{
         ghLangs(list);
       })
       .catch(function(){});
+  }
+
+  /* ---------- discord handle ----------
+     There is no URL that opens a DM to a username, so the tile hands over the
+     handle instead of pretending to be a link. */
+  var dcopy = document.getElementById('dcopy');
+  if(dcopy){
+    var dcue = dcopy.querySelector('.cue');
+    dcopy.addEventListener('click', function(){
+      var handle = dcopy.getAttribute('data-copy');
+      function settled(ok){
+        dcopy.classList.toggle('done', ok);
+        dcue.textContent = ok ? 'copied' : 'select it';
+        setTimeout(function(){ dcopy.classList.remove('done'); dcue.textContent = 'copy'; }, 1800);
+      }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(handle).then(function(){ settled(true); },
+                                                   function(){ settled(false); });
+      } else {
+        var t = document.createElement('textarea');
+        t.value = handle; t.setAttribute('readonly','');
+        t.style.position = 'fixed'; t.style.opacity = '0';
+        document.body.appendChild(t); t.select();
+        var ok = false;
+        try{ ok = document.execCommand('copy'); }catch(e){}
+        document.body.removeChild(t);
+        settled(ok);
+      }
+    });
   }
 
   /* ---------- the fixed rails ----------
