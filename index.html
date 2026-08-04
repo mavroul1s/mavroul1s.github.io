@@ -8,6 +8,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script>
+/* settle theme and motion before the first paint, so neither one flashes */
+(function(){
+  var r=document.documentElement,t=null,m=null;
+  try{ t=localStorage.getItem('theme'); m=localStorage.getItem('motion'); }catch(e){}
+  if(t==='light') r.setAttribute('data-theme','light');
+  if(m==='off' || (m===null && window.matchMedia &&
+     window.matchMedia('(prefers-reduced-motion: reduce)').matches))
+    r.setAttribute('data-motion','off');
+})();
+</script>
 <style>
 /* ============================================================
    TOKENS
@@ -23,12 +34,90 @@
   --grid:#12718c;
   --fg:#c4dee6;
 
+  /* channels, so every translucent rule re-tints with the theme */
+  --bg-rgb:4,6,11;
+  --surface-rgb:11,22,32;
+  --primary-rgb:53,224,240;
+  --primary-lo-rgb:125,239,255;
+  --accent-rgb:255,179,71;
+  --alert-rgb:255,61,90;
+  --muted-rgb:63,125,140;
+  --grid-rgb:18,113,140;
+  --hab-rgb:99,160,175;
+  --shade-rgb:0,0,0;
+  --bay:#05080e;
+  --surface-2:#071019;
+  --bright:#eafcff;
+  --spec:#ffffff;
+  --starA:234,252,255;
+  --starB:125,239,255;
+  --core:255,240,214;
+
   --mono:"JetBrains Mono","IBM Plex Mono","SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace;
   --hud:"Share Tech Mono","JetBrains Mono",ui-monospace,Consolas,monospace;
+
+  --vig-a:.85;
+  --crt-a:.28;
 
   --gut:clamp(18px,4vw,48px);
   --maxw:1180px;
 }
+
+/* ============================================================
+   LIGHT — Unit 01: white plate, purple armour, neon green trim
+   ============================================================ */
+html[data-theme="light"]{
+  color-scheme:light;
+  --bg:#f4f3f0;
+  --surface:#ffffff;
+  --primary:#5f2a9e;
+  --primary-lo:#3e1a69;
+  --accent:#417500;        /* text green, dark enough to read on white */
+  --alert:#c2102f;
+  --muted:#6a5a86;
+  --grid:#8a6fb8;
+  --fg:#1b1226;
+
+  --bg-rgb:244,243,240;
+  --surface-rgb:255,255,255;
+  --primary-rgb:95,42,158;
+  --primary-lo-rgb:62,26,105;
+  --accent-rgb:113,190,0;
+  --alert-rgb:194,16,47;
+  --muted-rgb:106,90,134;
+  --grid-rgb:138,111,184;
+  --hab-rgb:120,95,160;
+  --shade-rgb:95,42,158;
+  --bay:#f1ecfa;
+  --surface-2:#f6f2fd;
+  --bright:#8fd400;
+  --spec:#c9ff5c;
+  --starA:143,212,0;
+  --starB:95,42,158;
+  --core:143,212,0;
+
+  --vig-a:.13;
+  --crt-a:.05;
+}
+
+/* ============================================================
+   MOTION OFF — everything holds still except the ticker, which is
+   the one moving thing that carries content rather than atmosphere
+   ============================================================ */
+html[data-motion="off"] *,
+html[data-motion="off"] *::before,
+html[data-motion="off"] *::after{
+  animation:none!important;
+  transition:none!important;
+  scroll-behavior:auto!important;
+}
+html[data-motion="off"] .ticker-track{animation:roll 58s linear infinite!important}
+html[data-motion="off"] .sweep,
+html[data-motion="off"] .hum,
+html[data-motion="off"] #glyphs,
+html[data-motion="off"] .wires i::after,
+html[data-motion="off"] .scanline,
+html[data-motion="off"] .profiler .scan{display:none}
 
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -42,8 +131,8 @@ body{
   -webkit-font-smoothing:antialiased;
   overflow-x:hidden;
 }
-a{color:var(--primary);text-decoration:none;border-bottom:1px solid rgba(53,224,240,.3)}
-a:hover{color:var(--primary-lo);border-bottom-color:var(--primary-lo);background:rgba(53,224,240,.07)}
+a{color:var(--primary);text-decoration:none;border-bottom:1px solid rgba(var(--primary-rgb),.3)}
+a:hover{color:var(--primary-lo);border-bottom-color:var(--primary-lo);background:rgba(var(--primary-rgb),.07)}
 a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 ::selection{background:var(--primary);color:var(--bg)}
 
@@ -54,30 +143,30 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-off
 .bg-grid{
   z-index:0;
   background-image:
-    linear-gradient(rgba(18,113,140,.11) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(18,113,140,.11) 1px,transparent 1px);
+    linear-gradient(rgba(var(--grid-rgb),.11) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(var(--grid-rgb),.11) 1px,transparent 1px);
   background-size:52px 52px;
   mask-image:radial-gradient(ellipse 100% 70% at 50% 0%,#000 10%,transparent 78%);
   -webkit-mask-image:radial-gradient(ellipse 100% 70% at 50% 0%,#000 10%,transparent 78%);
 }
 .crt{
-  background:repeating-linear-gradient(to bottom,rgba(0,0,0,.28) 0 1px,transparent 1px 3px);
+  background:repeating-linear-gradient(to bottom,rgba(var(--shade-rgb),var(--crt-a)) 0 1px,transparent 1px 3px);
   opacity:.5;mix-blend-mode:multiply;
 }
 .sweep{overflow:hidden}
 .sweep::after{
   content:"";position:absolute;left:0;right:0;height:120px;
-  background:linear-gradient(to bottom,transparent,rgba(53,224,240,.055),transparent);
+  background:linear-gradient(to bottom,transparent,rgba(var(--primary-rgb),.055),transparent);
   animation:sweep 7.5s linear infinite;
 }
 @keyframes sweep{from{transform:translateY(-140px)}to{transform:translateY(105vh)}}
-.vig{box-shadow:inset 0 0 240px 40px rgba(0,0,0,.85);z-index:3}
+.vig{box-shadow:inset 0 0 240px 40px rgba(var(--shade-rgb),var(--vig-a));z-index:3}
 
 /* --- LAIN: power lines with current running down them --- */
 .wires{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden;opacity:.55}
 .wires i{
   position:absolute;top:-10%;bottom:-10%;width:1px;
-  background:linear-gradient(to bottom,transparent,rgba(18,113,140,.55) 12%,rgba(18,113,140,.55) 88%,transparent);
+  background:linear-gradient(to bottom,transparent,rgba(var(--grid-rgb),.55) 12%,rgba(var(--grid-rgb),.55) 88%,transparent);
 }
 .wires i::after{
   content:"";position:absolute;left:-1px;width:3px;height:64px;
@@ -89,7 +178,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-off
 /* the hum bar — Lain's horizontal hold drifting through the frame */
 .hum{
   position:fixed;left:0;right:0;height:88px;z-index:4;pointer-events:none;
-  background:linear-gradient(to bottom,transparent,rgba(53,224,240,.03) 40%,rgba(255,179,71,.035) 60%,transparent);
+  background:linear-gradient(to bottom,transparent,rgba(var(--primary-rgb),.03) 40%,rgba(var(--accent-rgb),.035) 60%,transparent);
   mix-blend-mode:screen;animation:hum 17s linear infinite;
 }
 @keyframes hum{from{top:-100px}to{top:100vh}}
@@ -120,7 +209,7 @@ main.slip,footer.slip{animation:slip .34s steps(3) 1}
 }
 #boot-frame{
   position:relative;width:min(560px,100%);
-  border:1px solid rgba(18,113,140,.55);background:rgba(11,22,32,.6);padding:20px 22px;
+  border:1px solid rgba(var(--grid-rgb),.55);background:rgba(var(--surface-rgb),.6);padding:20px 22px;
 }
 #boot-frame::before,#boot-frame::after{
   content:"";position:absolute;width:14px;height:14px;border:2px solid var(--primary);
@@ -130,14 +219,14 @@ main.slip,footer.slip{animation:slip .34s steps(3) 1}
 #boot .hdr{
   font-family:var(--hud);font-size:11px;letter-spacing:.28em;text-transform:uppercase;
   color:var(--muted);display:flex;justify-content:space-between;gap:12px;
-  border-bottom:1px solid rgba(18,113,140,.4);padding-bottom:8px;margin-bottom:12px;
+  border-bottom:1px solid rgba(var(--grid-rgb),.4);padding-bottom:8px;margin-bottom:12px;
 }
 #boot pre{
   margin:0;font-size:clamp(10px,2.4vw,13px);color:var(--primary);
   line-height:1.75;white-space:pre-wrap;
 }
 #boot .ok{color:var(--muted)}
-#boot .bar{height:6px;margin-top:14px;border:1px solid rgba(18,113,140,.5);padding:1px}
+#boot .bar{height:6px;margin-top:14px;border:1px solid rgba(var(--grid-rgb),.5);padding:1px}
 #boot .bar span{display:block;height:100%;width:0;background:var(--primary);transition:width .16s steps(4)}
 #boot .grant{
   margin-top:12px;font-family:var(--hud);font-size:13px;letter-spacing:.3em;
@@ -158,7 +247,7 @@ main.slip,footer.slip{animation:slip .34s steps(3) 1}
   display:flex;justify-content:space-between;align-items:center;gap:12px;
   padding:7px var(--gut);
   font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
-  background:rgba(4,6,11,.9);border-bottom:1px solid rgba(18,113,140,.32);
+  background:rgba(var(--bg-rgb),.9);border-bottom:1px solid rgba(var(--grid-rgb),.32);
   backdrop-filter:blur(6px);
 }
 .topbar b{color:var(--primary);font-weight:500}
@@ -169,9 +258,9 @@ main.slip,footer.slip{animation:slip .34s steps(3) 1}
 
 /* NEOW launch control, pinned in the bar — always one click away */
 .launch-mini{
-  display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(255,179,71,.55)!important;
+  display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(var(--accent-rgb),.55)!important;
   padding:3px 9px;color:var(--accent);letter-spacing:.16em;font-size:10px;
-  background:rgba(255,179,71,.06);
+  background:rgba(var(--accent-rgb),.06);
 }
 .launch-mini:hover{background:var(--accent);color:var(--bg);border-color:var(--accent)!important}
 .launch-mini .rad{
@@ -179,16 +268,30 @@ main.slip,footer.slip{animation:slip .34s steps(3) 1}
   box-shadow:0 0 0 0 currentColor;animation:ping 2.4s ease-out infinite;
 }
 @keyframes ping{
-  0%{box-shadow:0 0 0 0 rgba(255,179,71,.6)}
-  70%,100%{box-shadow:0 0 0 7px rgba(255,179,71,0)}
+  0%{box-shadow:0 0 0 0 rgba(var(--accent-rgb),.6)}
+  70%,100%{box-shadow:0 0 0 7px rgba(var(--accent-rgb),0)}
 }
+
+/* the two switches: motion and Unit 01 */
+.sw{
+  display:inline-flex;align-items:center;gap:6px;
+  border:1px solid rgba(var(--grid-rgb),.5);background:transparent;
+  color:var(--muted);font:inherit;font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;padding:3px 9px;cursor:pointer;
+}
+.sw:hover{color:var(--primary);border-color:var(--primary)}
+.sw b{color:var(--primary);font-weight:500}
+.sw[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+.sw[aria-pressed="true"] b{color:var(--accent)}
+.sw .k{color:var(--accent)}
+@media(max-width:860px){.sw .lbl{display:none}.sw{padding:3px 7px}}
 
 /* ============================================================
    NAV
    ============================================================ */
 .nav{
   position:fixed;top:31px;left:0;right:0;z-index:39;
-  background:rgba(4,6,11,.88);border-bottom:1px solid rgba(18,113,140,.22);
+  background:rgba(var(--bg-rgb),.88);border-bottom:1px solid rgba(var(--grid-rgb),.22);
   backdrop-filter:blur(6px);
   overflow-x:auto;scrollbar-width:none;
 }
@@ -205,15 +308,15 @@ main.slip,footer.slip{animation:slip .34s steps(3) 1}
 .nav a.on{color:var(--primary);border-bottom-color:var(--primary)}
 .nav a.ext{color:var(--accent)}
 .nav a.ext::after{content:" ▸"}
-.nav a.ext:hover{color:var(--accent);background:rgba(255,179,71,.08)}
+.nav a.ext:hover{color:var(--accent);background:rgba(var(--accent-rgb),.08)}
 
 /* ============================================================
    TICKER
    ============================================================ */
 .ticker{
   position:fixed;top:70px;left:0;right:0;z-index:38;
-  border-bottom:1px solid rgba(18,113,140,.18);
-  background:rgba(11,22,32,.7);overflow:hidden;
+  border-bottom:1px solid rgba(var(--grid-rgb),.18);
+  background:rgba(var(--surface-rgb),.7);overflow:hidden;
   font-size:10.5px;letter-spacing:.14em;color:var(--muted);
   padding:4px 0;
 }
@@ -223,12 +326,12 @@ main.slip,footer.slip{animation:slip .34s steps(3) 1}
 .ticker:hover .ticker-track,.ticker:focus-within .ticker-track{animation-play-state:paused}
 .tick-link{
   display:inline-flex;align-items:center;gap:7px;margin:0 6px;padding:3px 13px;
-  border:1px solid rgba(18,113,140,.34);border-radius:2px;background:transparent;
+  border:1px solid rgba(var(--grid-rgb),.34);border-radius:2px;background:transparent;
   color:var(--muted);letter-spacing:.14em;text-transform:uppercase;
 }
 .tick-link::before{content:"▸";color:var(--grid)}
 .tick-link:hover,.tick-link:focus-visible{
-  color:var(--primary);border-color:var(--primary);background:rgba(53,224,240,.09)
+  color:var(--primary);border-color:var(--primary);background:rgba(var(--primary-rgb),.09)
 }
 .tick-link:hover::before{color:var(--primary)}
 @media(prefers-reduced-motion:reduce){
@@ -250,7 +353,7 @@ section{padding:56px 0;scroll-margin-top:110px}
   color:var(--primary-lo);
 }
 .sec-h .path{color:var(--muted);font-weight:400}
-.sec-h .rule{position:relative;flex:1;height:1px;background:rgba(18,113,140,.45);overflow:hidden}
+.sec-h .rule{position:relative;flex:1;height:1px;background:rgba(var(--grid-rgb),.45);overflow:hidden}
 .sec-h .rule::after{
   content:"";position:absolute;top:-1px;left:0;width:26px;height:3px;
   background:linear-gradient(90deg,transparent,var(--primary-lo));
@@ -265,13 +368,13 @@ section{padding:56px 0;scroll-margin-top:110px}
 .name pre{
   margin:0;font-size:clamp(3.6px,1.68vw,20px);line-height:1.02;
   font-weight:700;color:var(--primary);
-  text-shadow:0 0 18px rgba(53,224,240,.28);
+  text-shadow:0 0 18px rgba(var(--primary-rgb),.28);
 }
 /* Y2K chrome: a hard specular band travelling across the plate */
 .name > pre{
   background:linear-gradient(105deg,
     var(--primary) 0%,var(--primary) 38%,
-    #eafcff 45%,#ffffff 48%,#eafcff 51%,
+    var(--bright) 45%,var(--spec) 48%,var(--bright) 51%,
     var(--primary-lo) 58%,var(--primary) 70%,var(--primary) 100%);
   background-size:280% 100%;background-position:100% 0;
   -webkit-background-clip:text;background-clip:text;
@@ -308,12 +411,12 @@ section{padding:56px 0;scroll-margin-top:110px}
 .rail{display:flex;flex-wrap:wrap;gap:8px}
 .chip{
   font-size:11px;letter-spacing:.13em;text-transform:uppercase;
-  padding:5px 10px;border:1px solid rgba(18,113,140,.5);color:var(--muted);
+  padding:5px 10px;border:1px solid rgba(var(--grid-rgb),.5);color:var(--muted);
 }
-.chip.live{color:var(--accent);border-color:rgba(255,179,71,.5)}
+.chip.live{color:var(--accent);border-color:rgba(var(--accent-rgb),.5)}
 
 /* profiler panel */
-.profiler{border:1px solid rgba(18,113,140,.55);background:linear-gradient(180deg,rgba(11,22,32,.9),rgba(4,6,11,.9));position:relative}
+.profiler{border:1px solid rgba(var(--grid-rgb),.55);background:linear-gradient(180deg,rgba(var(--surface-rgb),.9),rgba(var(--bg-rgb),.9));position:relative}
 .profiler::before,.profiler::after{
   content:"";position:absolute;width:11px;height:11px;border:2px solid var(--primary);
 }
@@ -333,7 +436,7 @@ section{padding:56px 0;scroll-margin-top:110px}
    SIGNATURE: audit tags + provenance on every number
    ============================================================ */
 .datum{
-  position:relative;color:var(--primary-lo);border-bottom:1px dotted rgba(125,239,255,.45);
+  position:relative;color:var(--primary-lo);border-bottom:1px dotted rgba(var(--primary-lo-rgb),.45);
   cursor:help;
 }
 .datum::after{
@@ -341,7 +444,7 @@ section{padding:56px 0;scroll-margin-top:110px}
   position:absolute;left:0;bottom:calc(100% + 8px);z-index:30;
   min-width:190px;max-width:290px;
   padding:7px 9px;font-size:10.5px;line-height:1.45;letter-spacing:.04em;
-  color:var(--fg);background:#071019;border:1px solid var(--grid);
+  color:var(--fg);background:var(--surface-2);border:1px solid var(--grid);
   text-transform:none;white-space:normal;
   opacity:0;visibility:hidden;transform:translateY(3px);
   transition:opacity .12s,transform .12s,visibility 0s .12s;
@@ -360,7 +463,7 @@ section{padding:56px 0;scroll-margin-top:110px}
    PANELS / CARDS
    ============================================================ */
 .panel{
-  border:1px solid rgba(18,113,140,.42);background:rgba(11,22,32,.55);
+  border:1px solid rgba(var(--grid-rgb),.42);background:rgba(var(--surface-rgb),.55);
   padding:22px;position:relative;
 }
 .panel.flag{border-left:2px solid var(--accent)}
@@ -371,7 +474,7 @@ section{padding:56px 0;scroll-margin-top:110px}
 
 .notice{
   display:flex;gap:10px;align-items:flex-start;
-  border:1px solid rgba(255,179,71,.4);background:rgba(255,179,71,.06);
+  border:1px solid rgba(var(--accent-rgb),.4);background:rgba(var(--accent-rgb),.06);
   padding:10px 12px;font-size:12.5px;color:var(--accent);margin:0 0 20px;
 }
 .notice b{font-weight:700;letter-spacing:.1em;white-space:nowrap}
@@ -398,12 +501,12 @@ ol.find b{color:var(--primary-lo);font-weight:500}
 /* table */
 .tbl-wrap{overflow-x:auto;margin:0 0 6px}
 table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:520px}
-th,td{text-align:left;padding:8px 12px;border-bottom:1px solid rgba(18,113,140,.25)}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid rgba(var(--grid-rgb),.25)}
 thead th{
   font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
   border-bottom:1px solid var(--grid);font-weight:500;
 }
-tbody tr:hover{background:rgba(53,224,240,.05)}
+tbody tr:hover{background:rgba(var(--primary-rgb),.05)}
 td.num{color:var(--primary-lo);text-align:right}
 td.win{color:var(--accent);text-align:right}
 caption{caption-side:bottom;text-align:left;font-size:11px;color:var(--muted);padding-top:10px;letter-spacing:.06em}
@@ -411,11 +514,11 @@ caption{caption-side:bottom;text-align:left;font-size:11px;color:var(--muted);pa
 /* project grid */
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
 .card{
-  border:1px solid rgba(18,113,140,.35);background:rgba(11,22,32,.45);
+  border:1px solid rgba(var(--grid-rgb),.35);background:rgba(var(--surface-rgb),.45);
   padding:18px;display:flex;flex-direction:column;gap:10px;
   transition:border-color .15s,background .15s;
 }
-.card:hover{border-color:var(--primary);background:rgba(11,22,32,.8)}
+.card:hover{border-color:var(--primary);background:rgba(var(--surface-rgb),.8)}
 .card h3{margin:0;font-size:16px;color:var(--primary-lo);font-weight:700}
 .card p{margin:0;font-size:13px;color:var(--fg)}
 .card .meta{margin-top:auto;display:flex;flex-direction:column;gap:5px;font-size:11.5px}
@@ -425,10 +528,10 @@ caption{caption-side:bottom;text-align:left;font-size:11px;color:var(--muted);pa
 .card .go::after{content:" →"}
 
 /* archive list */
-.archive{list-style:none;margin:0;padding:0;border-top:1px solid rgba(18,113,140,.25)}
+.archive{list-style:none;margin:0;padding:0;border-top:1px solid rgba(var(--grid-rgb),.25)}
 .archive li{
   display:grid;grid-template-columns:96px 1fr;gap:16px;
-  padding:14px 0;border-bottom:1px solid rgba(18,113,140,.25);
+  padding:14px 0;border-bottom:1px solid rgba(var(--grid-rgb),.25);
 }
 .archive .code{color:var(--accent);font-size:12px;letter-spacing:.1em}
 .archive h4{margin:0 0 4px;font-size:14px;color:var(--primary-lo);font-weight:500}
@@ -442,11 +545,11 @@ caption{caption-side:bottom;text-align:left;font-size:11px;color:var(--muted);pa
 
 /* toolchain */
 .term{
-  border:1px solid rgba(18,113,140,.42);background:rgba(11,22,32,.6);
+  border:1px solid rgba(var(--grid-rgb),.42);background:rgba(var(--surface-rgb),.6);
 }
 .term-bar{
   display:flex;gap:8px;align-items:center;padding:6px 12px;
-  border-bottom:1px solid rgba(18,113,140,.32);
+  border-bottom:1px solid rgba(var(--grid-rgb),.32);
   font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
 }
 .term-bar em{color:var(--grid);font-style:normal;margin-left:auto}
@@ -457,7 +560,7 @@ caption{caption-side:bottom;text-align:left;font-size:11px;color:var(--muted);pa
 
 /* credentials */
 .creds{list-style:none;margin:0;padding:0;font-size:13.5px}
-.creds li{display:flex;flex-wrap:wrap;gap:10px;padding:9px 0;border-bottom:1px dashed rgba(18,113,140,.28)}
+.creds li{display:flex;flex-wrap:wrap;gap:10px;padding:9px 0;border-bottom:1px dashed rgba(var(--grid-rgb),.28)}
 .creds .when{margin-left:auto;color:var(--muted);font-size:12px;letter-spacing:.08em}
 .creds .who{color:var(--muted)}
 /* certificate rows resolve to the scanned PDF in /certs */
@@ -471,29 +574,29 @@ caption{caption-side:bottom;text-align:left;font-size:11px;color:var(--muted);pa
   content:"▸";position:absolute;left:6px;top:9px;
   color:var(--accent);font-size:11px;opacity:0;transition:opacity .15s,transform .15s;
 }
-.cert:hover,.cert:focus-visible{background:rgba(255,179,71,.07)}
+.cert:hover,.cert:focus-visible{background:rgba(var(--accent-rgb),.07)}
 .cert:hover::before,.cert:focus-visible::before{opacity:1}
 .cert:hover .doc,.cert:focus-visible .doc{color:var(--accent);border-color:var(--accent)}
 /* .when keeps its original margin-left:auto, so date + badge ride the right edge together */
 .cert .doc{
   flex:0 0 auto;font-size:9.5px;letter-spacing:.16em;
-  color:var(--muted);border:1px solid rgba(18,113,140,.45);
+  color:var(--muted);border:1px solid rgba(var(--grid-rgb),.45);
   padding:1px 5px;transition:color .15s,border-color .15s;
 }
 
 /* contact */
 .contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:20px}
 .link-box{
-  border:1px solid rgba(18,113,140,.4);padding:14px 16px;display:block;
-  border-bottom:1px solid rgba(18,113,140,.4);
+  border:1px solid rgba(var(--grid-rgb),.4);padding:14px 16px;display:block;
+  border-bottom:1px solid rgba(var(--grid-rgb),.4);
 }
-.link-box:hover{border-color:var(--primary);background:rgba(53,224,240,.05)}
+.link-box:hover{border-color:var(--primary);background:rgba(var(--primary-rgb),.05)}
 .link-box .lbl{display:block;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
 .link-box .val{display:block;color:var(--primary-lo);font-size:14px;word-break:break-all}
 
 footer{
   position:relative;z-index:5;max-width:var(--maxw);margin:0 auto;
-  padding:34px var(--gut) 60px;border-top:1px solid rgba(18,113,140,.28);
+  padding:34px var(--gut) 60px;border-top:1px solid rgba(var(--grid-rgb),.28);
 }
 footer pre{
   margin:0 0 14px;font-size:clamp(4.5px,1.05vw,11px);line-height:1.15;color:var(--grid);
@@ -509,7 +612,7 @@ footer pre{
   position:relative;display:inline-flex;align-items:center;gap:10px;
   padding:11px 18px;border:1px solid var(--grid);border-bottom:1px solid var(--grid);
   font-family:var(--hud);font-size:12px;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--primary);background:rgba(11,22,32,.6);overflow:hidden;
+  color:var(--primary);background:rgba(var(--surface-rgb),.6);overflow:hidden;
   transition:color .12s,border-color .12s;
 }
 .btn::before{
@@ -517,12 +620,12 @@ footer pre{
   transform:scaleX(0);transform-origin:left;transition:transform .18s steps(5);
 }
 .btn > *{position:relative;z-index:1}
-.btn:hover{color:var(--bg);border-color:var(--primary);background:rgba(11,22,32,.6)}
+.btn:hover{color:var(--bg);border-color:var(--primary);background:rgba(var(--surface-rgb),.6)}
 .btn:hover::before{transform:scaleX(1)}
 .btn .k{font-size:15px;line-height:1}
 .btn.primary{
-  color:var(--accent);border-color:rgba(255,179,71,.65);
-  box-shadow:inset 0 0 0 1px rgba(255,179,71,.12),0 0 22px rgba(255,179,71,.1);
+  color:var(--accent);border-color:rgba(var(--accent-rgb),.65);
+  box-shadow:inset 0 0 0 1px rgba(var(--accent-rgb),.12),0 0 22px rgba(var(--accent-rgb),.1);
 }
 .btn.primary::before{background:var(--accent)}
 .btn.primary:hover{color:var(--bg);border-color:var(--accent)}
@@ -535,12 +638,12 @@ footer pre{
 .profiler .scan{
   position:absolute;left:0;right:0;height:2px;top:0;z-index:2;pointer-events:none;
   background:linear-gradient(90deg,transparent,var(--primary-lo),transparent);
-  box-shadow:0 0 14px rgba(53,224,240,.6);
+  box-shadow:0 0 14px rgba(var(--primary-rgb),.6);
   animation:profscan 4.6s cubic-bezier(.6,0,.4,1) infinite;
 }
 @keyframes profscan{0%{top:26px;opacity:0}8%{opacity:1}92%{opacity:1}100%{top:100%;opacity:0}}
 .profiler .foot{
-  border-top:1px solid rgba(18,113,140,.4);padding:8px 14px;
+  border-top:1px solid rgba(var(--grid-rgb),.4);padding:8px 14px;
   display:flex;justify-content:flex-end;gap:10px;
   font-family:var(--hud);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--grid);
 }
@@ -560,7 +663,7 @@ footer pre{
 .card::after{bottom:6px;right:6px;border-left:0;border-top:0;transform:translate(-4px,-4px)}
 .card:hover::before,.card:hover::after{opacity:1;transform:translate(0,0)}
 .card .scanline{
-  position:absolute;left:0;right:0;top:0;height:1px;background:rgba(53,224,240,.7);
+  position:absolute;left:0;right:0;top:0;height:1px;background:rgba(var(--primary-rgb),.7);
   opacity:0;pointer-events:none;
 }
 .card:hover .scanline{opacity:1;animation:cardscan 1.1s linear infinite}
@@ -581,7 +684,7 @@ footer pre{
   .ascii{
     background-image:linear-gradient(100deg,
       var(--muted) 0%,var(--muted) 36%,
-      var(--primary-lo) 46%,#eafcff 50%,var(--primary-lo) 54%,
+      var(--primary-lo) 46%,var(--bright) 50%,var(--primary-lo) 54%,
       var(--muted) 64%,var(--muted) 100%);
     background-size:320% 100%;background-position:100% 0;
     -webkit-background-clip:text;background-clip:text;
@@ -596,36 +699,36 @@ footer pre{
    ============================================================ */
 .viz{
   display:block;width:100%;height:104px;
-  border:1px solid rgba(18,113,140,.28);
-  background:rgba(4,6,11,.6);
+  border:1px solid rgba(var(--grid-rgb),.28);
+  background:rgba(var(--bg-rgb),.6);
 }
-.card:hover .viz{border-color:rgba(255,179,71,.4)}
+.card:hover .viz{border-color:rgba(var(--accent-rgb),.4)}
 
 /* ============================================================
    NEOW LAUNCH BAY — the one-click route to the tracker
    ============================================================ */
 .bay{
-  position:relative;display:block;border:1px solid rgba(255,179,71,.4);
-  background:#05080e;overflow:hidden;margin:2px 0 4px;
+  position:relative;display:block;border:1px solid rgba(var(--accent-rgb),.4);
+  background:var(--bay);overflow:hidden;margin:2px 0 4px;
 }
-.bay:hover{border-color:var(--accent);background:#05080e}
+.bay:hover{border-color:var(--accent);background:var(--bay)}
 .bay .hexmask{
   position:absolute;inset:0;pointer-events:none;
   background:
-    repeating-linear-gradient(60deg,rgba(18,113,140,.10) 0 1px,transparent 1px 26px),
-    repeating-linear-gradient(-60deg,rgba(18,113,140,.10) 0 1px,transparent 1px 26px);
+    repeating-linear-gradient(60deg,rgba(var(--grid-rgb),.10) 0 1px,transparent 1px 26px),
+    repeating-linear-gradient(-60deg,rgba(var(--grid-rgb),.10) 0 1px,transparent 1px 26px);
 }
 .bay .cta{
   position:absolute;inset:0;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:8px;
-  background:radial-gradient(ellipse at center,rgba(4,6,11,.45),rgba(4,6,11,.88));
+  background:radial-gradient(ellipse at center,rgba(var(--bg-rgb),.45),rgba(var(--bg-rgb),.88));
   transition:background .15s;
 }
-.bay:hover .cta{background:radial-gradient(ellipse at center,rgba(4,6,11,.2),rgba(4,6,11,.78))}
+.bay:hover .cta{background:radial-gradient(ellipse at center,rgba(var(--bg-rgb),.2),rgba(var(--bg-rgb),.78))}
 .bay .cta strong{
   font-family:var(--hud);font-size:clamp(15px,2.6vw,22px);letter-spacing:.32em;
   color:var(--accent);text-transform:uppercase;font-weight:400;
-  text-shadow:0 0 24px rgba(255,179,71,.4);
+  text-shadow:0 0 24px rgba(var(--accent-rgb),.4);
 }
 .bay .cta em{
   font-style:normal;font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);
@@ -650,8 +753,8 @@ footer pre{
 /* ============================================================
    Y2K — beveled terminal chrome + dither rails
    ============================================================ */
-.term{box-shadow:inset 1px 1px 0 rgba(53,224,240,.14),inset -1px -1px 0 rgba(0,0,0,.6)}
-.term-bar{background:linear-gradient(180deg,rgba(53,224,240,.14),rgba(11,22,32,.2))}
+.term{box-shadow:inset 1px 1px 0 rgba(var(--primary-rgb),.14),inset -1px -1px 0 rgba(var(--shade-rgb),.6)}
+.term-bar{background:linear-gradient(180deg,rgba(var(--primary-rgb),.14),rgba(var(--surface-rgb),.2))}
 .term-bar .win{display:inline-flex;gap:4px;margin-right:6px}
 .term-bar .win b{width:9px;height:9px;border:1px solid var(--grid);font-size:0;display:block}
 .dither{
@@ -705,6 +808,12 @@ footer pre{
   <div><span class="dot">●</span> <b>MAVROS.N</b> <span class="hide-s">// ELECTRICAL &amp; COMPUTER ENGINEERING</span></div>
   <div class="right">
     <a class="launch-mini" href="https://mavroul1s.github.io/neo_tracker/neo-tracker.html" target="_blank" rel="noopener"><span class="rad" aria-hidden="true"></span> NEOW TRACKER</a>
+    <button type="button" class="sw" id="motionsw" aria-pressed="false" aria-label="Hold the animations still">
+      <span class="k" aria-hidden="true">◈</span> <span class="lbl">MOTION <b>ON</b></span>
+    </button>
+    <button type="button" class="sw" id="themesw" aria-pressed="false" aria-label="Unit 01 light theme">
+      <span class="k" aria-hidden="true">◐</span> <span class="lbl">UNIT <b>01</b></span>
+    </button>
     <span class="hide-s">VOLOS · GR</span>
     <span id="clock">--:--:--</span>
   </div>
@@ -1132,7 +1241,31 @@ footer pre{
 
 <script>
 (function(){
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var root = document.documentElement;
+  var reduce = root.getAttribute('data-motion') === 'off';   /* the state at boot */
+
+  /* MOTION is live: the switch flips it, every loop reads it each frame.
+     STARTERS restart the loops when it comes back on; REPAINT redraws the
+     canvases once when it is off and something else has to change (theme). */
+  var MOTION = !reduce, STARTERS = [], REPAINT = [];
+  function onMotion(start){ STARTERS.push(start); if(MOTION) start(); }
+  function repaint(){ REPAINT.forEach(function(f){ try{ f(); }catch(e){} }); }
+
+  /* canvas palette, read from the CSS tokens so it follows the theme */
+  var C_HI,C_ACC,C_RED,C_MID,C_DIM,C_MID_S,
+      C_PRIM_RGB,C_PLO_RGB,C_GRID_RGB,C_ACC_RGB,C_ALERT_RGB,C_MUTED_RGB,C_HAB_RGB,
+      C_BG_RGB,C_STARA,C_STARB,C_CORE;
+  function readPalette(){
+    var cs = getComputedStyle(root);
+    function v(n){ return cs.getPropertyValue(n).trim(); }
+    C_PRIM_RGB=v('--primary-rgb'); C_GRID_RGB=v('--grid-rgb'); C_ACC_RGB=v('--accent-rgb');
+    C_ALERT_RGB=v('--alert-rgb');  C_MUTED_RGB=v('--muted-rgb'); C_HAB_RGB=v('--hab-rgb');
+    C_BG_RGB=v('--bg-rgb'); C_STARA=v('--starA'); C_STARB=v('--starB'); C_CORE=v('--core');
+    C_PLO_RGB=v('--primary-lo-rgb');
+    C_HI=v('--primary'); C_ACC=v('--accent'); C_RED=v('--alert'); C_MID_S=v('--muted');
+    C_DIM='rgba('+C_GRID_RGB+',.45)'; C_MID='rgba('+C_MUTED_RGB+',.9)';
+  }
+  readPalette();
 
   /* ---------- clock ---------- */
   var clock = document.getElementById('clock');
@@ -1178,7 +1311,7 @@ footer pre{
       var n = REPOS === null ? parseInt(el.getAttribute('data-repo-count'),10) : REPOS;
       if(isNaN(n) || el.getAttribute('data-shown') === String(n)) return;
       el.setAttribute('data-shown', n);
-      if(reduce){ el.textContent = n; return; }
+      if(!MOTION){ el.textContent = n; return; }
       var t0 = performance.now();
       requestAnimationFrame(function step(now){
         var k = Math.min(1,(now-t0)/700);
@@ -1197,6 +1330,102 @@ footer pre{
         paintRepos();
       })
       .catch(function(){});                 /* offline or rate-limited: fallback stands */
+  }
+
+  /* ---------- the two switches ---------- */
+  var msw = document.getElementById('motionsw'), tsw = document.getElementById('themesw');
+  var running = false;
+  function store(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+
+  function setMotion(on){
+    MOTION = on;
+    root.setAttribute('data-motion', on ? 'on' : 'off');
+    msw.setAttribute('aria-pressed', String(!on));
+    msw.querySelector('b').textContent = on ? 'ON' : 'OFF';
+    msw.title = on ? 'Hold every animation still (the ticker keeps running)'
+                   : 'Let the animations run again';
+    store('motion', on ? 'on' : 'off');
+    /* `running` keeps a second start from stacking a duplicate frame loop */
+    if(on){ if(!running){ running = true; STARTERS.forEach(function(f){ try{ f(); }catch(e){} }); } }
+    else { running = false; repaint(); }   /* leave each canvas on a finished frame */
+  }
+  function setTheme(light){
+    root.setAttribute('data-theme', light ? 'light' : 'dark');
+    tsw.setAttribute('aria-pressed', String(light));
+    tsw.querySelector('b').textContent = light ? '01' : '00';
+    tsw.title = light ? 'Back to the dark terminal' : 'Unit 01: white, purple and neon green';
+    store('theme', light ? 'light' : 'dark');
+    readPalette();
+    if(!MOTION) repaint();   /* nothing is redrawing itself, so re-tint by hand */
+  }
+  msw.addEventListener('click', function(){ setMotion(!MOTION); });
+  tsw.addEventListener('click', function(){
+    setTheme(root.getAttribute('data-theme') !== 'light');
+  });
+  setMotion(MOTION);
+  setTheme(root.getAttribute('data-theme') === 'light');
+
+  /* ---------- hero typing + glitch ---------- */
+  var typedEl = document.getElementById('typed');
+  var LEDES = [
+    'Deep learning for remote sensing.',
+    'Auditing the labels everyone else trusted.',
+    'Ten seeds, reported as mean ± standard deviation.',
+    'Orbital mechanics from published osculating elements.',
+    'Computer vision that runs locally — no network, no API.',
+    'Volos, Greece. Open to research and internships.'
+  ];
+  var started = false;
+  var li = 0, n = 0, typing = false;
+  /* type it, hold it, wipe it, move to the next one — held still, the line
+     just stands there fully typed */
+  function cycle(){
+    if(!MOTION){ typing = false; typedEl.textContent = LEDES[li]; return; }
+    if(typing) return; typing = true;
+    var s = LEDES[li];
+    (function type(){
+      if(!MOTION){ typing = false; typedEl.textContent = s; n = s.length; return; }
+      typedEl.textContent = s.slice(0, ++n);
+      if(n < s.length) return setTimeout(type, 21);
+      setTimeout(function erase(){
+        if(!MOTION){ typing = false; typedEl.textContent = s; n = s.length; return; }
+        typedEl.textContent = s.slice(0, --n);
+        if(n > 0) return setTimeout(erase, 11);
+        li = (li + 1) % LEDES.length;
+        typing = false;
+        setTimeout(cycle, 260);
+      }, 3400);
+    })();
+  }
+  function startHero(){
+    if(started) return; started = true;
+    onMotion(cycle);
+    if(!MOTION) typedEl.textContent = LEDES[li];
+    var plate = document.getElementById('nameplate');
+    onMotion(function burst(){
+      if(!MOTION) return;
+      setTimeout(function(){
+        if(!MOTION) return;
+        plate.classList.add('glitch');
+        setTimeout(function(){ plate.classList.remove('glitch'); }, 430);
+        burst();
+      }, 5200 + Math.random()*6000);
+    });
+
+    /* horizontal-hold slip — rare, brief, no layout shift */
+    var slippers = [document.querySelector('main'), document.querySelector('footer')];
+    onMotion(function slip(){
+      if(!MOTION) return;
+      setTimeout(function(){
+        if(!MOTION) return;
+        slippers.forEach(function(el){
+          if(!el) return;
+          el.classList.add('slip');
+          setTimeout(function(){ el.classList.remove('slip'); }, 360);
+        });
+        slip();
+      }, 14000 + Math.random()*16000);
+    });
   }
 
   /* ---------- boot ---------- */
@@ -1231,61 +1460,9 @@ footer pre{
     boot.addEventListener('click', finishBoot);
   }
 
-  /* ---------- hero typing + glitch ---------- */
-  var typedEl = document.getElementById('typed');
-  var LEDES = [
-    'Deep learning for remote sensing.',
-    'Auditing the labels everyone else trusted.',
-    'Ten seeds, reported as mean ± standard deviation.',
-    'Orbital mechanics from published osculating elements.',
-    'Computer vision that runs locally — no network, no API.',
-    'Volos, Greece. Open to research and internships.'
-  ];
-  var started = false;
-  function startHero(){
-    if(started) return; started = true;
-    if(reduce){ typedEl.textContent = LEDES[0]; return; }
-    /* type it, hold it, wipe it, move to the next one */
-    var li = 0, n = 0;
-    (function cycle(){
-      var s = LEDES[li];
-      (function type(){
-        typedEl.textContent = s.slice(0, ++n);
-        if(n < s.length) return setTimeout(type, 21);
-        setTimeout(function erase(){
-          typedEl.textContent = s.slice(0, --n);
-          if(n > 0) return setTimeout(erase, 11);
-          li = (li + 1) % LEDES.length;
-          setTimeout(cycle, 260);
-        }, 3400);
-      })();
-    })();
-    var plate = document.getElementById('nameplate');
-    (function burst(){
-      setTimeout(function(){
-        plate.classList.add('glitch');
-        setTimeout(function(){ plate.classList.remove('glitch'); }, 430);
-        burst();
-      }, 5200 + Math.random()*6000);
-    })();
-
-    /* horizontal-hold slip — rare, brief, no layout shift */
-    var slippers = [document.querySelector('main'), document.querySelector('footer')];
-    (function slip(){
-      setTimeout(function(){
-        slippers.forEach(function(el){
-          if(!el) return;
-          el.classList.add('slip');
-          setTimeout(function(){ el.classList.remove('slip'); }, 360);
-        });
-        slip();
-      }, 14000 + Math.random()*16000);
-    })();
-  }
-
   /* ---------- glyph field: dim characters drifting down the margins ---------- */
   var gc = document.getElementById('glyphs');
-  if(gc && gc.getContext && !reduce){
+  if(gc && gc.getContext){
     var g = gc.getContext('2d');
     var GLYPHS = 'アカサタナハマヤラワヲンイキシチニヒミリΑΒΓΔΘΛΞΠΣΦΨΩ0123456789ABCDEF<>/\\[]{}=+*·';
     var cols = [], CW = 15, GW = 0, GH = 0;
@@ -1302,7 +1479,8 @@ footer pre{
     window.addEventListener('resize', gsize);
 
     var last = 0;
-    (function rain(now){
+    function rain(now){
+      if(!MOTION){ g.clearRect(0,0,GW,GH); return; }
       requestAnimationFrame(rain);
       if(now - last < 66) return;            /* ~15fps, deliberately mechanical */
       last = now;
@@ -1313,12 +1491,13 @@ footer pre{
         col.y += col.sp * 12;
         if(col.y > GH + 40){ col.y = -40; col.sp = 0.25 + Math.random() * 0.7; }
         if(Math.random() < 0.35) col.ch = GLYPHS[(Math.random() * GLYPHS.length) | 0];
-        g.fillStyle = 'rgba(63,125,140,.34)';
+        g.fillStyle = 'rgba('+C_MUTED_RGB+',.34)';
         g.fillText(col.ch, c * CW, col.y);
-        g.fillStyle = 'rgba(125,239,255,.22)';
+        g.fillStyle = 'rgba('+C_PLO_RGB+',.22)';
         g.fillText(col.ch, c * CW, col.y - 14);
       }
-    })(0);
+    }
+    onMotion(function(){ requestAnimationFrame(rain); });
   }
 
   /* ---------- ASCII rail ----------
@@ -1391,22 +1570,21 @@ footer pre{
       fields.forEach(function(f){ f.cw=charWidth(f.el); f.fit(); drawField(f,0); });
     });
 
-    if(!reduce){
-      var fT0=performance.now(), fLast=0;
-      requestAnimationFrame(function fstep(now){
-        requestAnimationFrame(fstep);
-        if(now-fLast < 80) return;          /* ~12fps, same mechanical cadence as the rain */
-        fLast=now;
-        var t=(now-fT0)/1000;
-        for(var i=0;i<fields.length;i++) if(fields[i].vis) drawField(fields[i],t);
-      });
+    REPAINT.push(function(){ fields.forEach(function(f){ drawField(f,0); }); });
+    var fT0=performance.now(), fLast=0;
+    function fstep(now){
+      if(!MOTION) return;
+      requestAnimationFrame(fstep);
+      if(now-fLast < 80) return;          /* ~12fps, same mechanical cadence as the rain */
+      fLast=now;
+      var t=(now-fT0)/1000;
+      for(var i=0;i<fields.length;i++) if(fields[i].vis) drawField(fields[i],t);
     }
+    onMotion(function(){ requestAnimationFrame(fstep); });
   }
 
   /* ---------- project visualisers ----------
      One canvas per card, each drawing the thing the project actually does. */
-  var C_DIM='rgba(18,113,140,.45)', C_MID='rgba(63,125,140,.9)',
-      C_HI='#35e0f0', C_ACC='#ffb347', C_RED='#ff3d5a';
 
   /* GridSense — five stores feeding one gateway, requests in flight */
   var GS=['CASSANDRA','NEO4J','MONGO','POSTGRES','REDIS'];
@@ -1421,7 +1599,7 @@ footer pre{
       g.beginPath(); g.arc(lx-3,y,2,0,7); g.fillStyle=C_HI; g.fill();
       var span=(gx-8)-lx, ph=(t*(0.30+i*0.055)+i*0.21)%1, px=lx+span*ph;
       var grd=g.createLinearGradient(px-14,0,px,0);
-      grd.addColorStop(0,'rgba(53,224,240,0)'); grd.addColorStop(1,C_HI);
+      grd.addColorStop(0,'rgba('+C_PRIM_RGB+',0)'); grd.addColorStop(1,C_HI);
       g.strokeStyle=grd; g.lineWidth=1.6;
       g.beginPath(); g.moveTo(Math.max(lx,px-14),y); g.lineTo(px,y); g.stroke();
       g.fillStyle=C_HI; g.beginPath(); g.arc(px,y,1.7,0,7); g.fill();
@@ -1429,7 +1607,7 @@ footer pre{
     var pulse=0.5+0.5*Math.sin(t*3.1);
     g.strokeStyle=C_ACC; g.lineWidth=1;
     g.strokeRect(gx-8,cy-11,20,22);
-    g.fillStyle='rgba(255,179,71,'+(0.10+0.20*pulse)+')';
+    g.fillStyle='rgba('+C_ACC_RGB+','+(0.10+0.20*pulse)+')';
     g.fillRect(gx-8,cy-11,20,22);
     g.fillStyle=C_ACC; g.textAlign='left';
     g.fillText('REST',gx+16,cy-4); g.fillText('14 EP',gx+16,cy+5);
@@ -1443,7 +1621,7 @@ footer pre{
       for(var k=0;k<3;k++)
         v+=Math.sin(i*0.7+k*2.1+t*(0.5+k*0.2))*Math.sin(j*0.45+k*1.3-t*(0.4+k*0.15));
       v=v/3*0.5+0.5;
-      g.fillStyle='rgba(53,224,240,'+(0.06+v*v*0.8)+')';
+      g.fillStyle='rgba('+C_PRIM_RGB+','+(0.06+v*v*0.8)+')';
       g.fillRect(ox+j*cw,oy+i*ch,Math.max(1,cw-1),Math.max(1,ch-1));
     }
     g.font='7px "Share Tech Mono",monospace'; g.textBaseline='middle'; g.textAlign='left';
@@ -1465,7 +1643,7 @@ footer pre{
     for(var i=0;i<n;i++) for(var j=0;j<n;j++){
       var d=i-j, a=Math.exp(-d*d*0.22)*(0.55+0.45*Math.sin(j*0.5-t*1.6+i*0.3));
       if(Math.abs(i-q)<1.4) a=Math.min(1,a*1.9+0.12);
-      g.fillStyle='rgba(53,224,240,'+(0.05+a*0.8)+')';
+      g.fillStyle='rgba('+C_PRIM_RGB+','+(0.05+a*0.8)+')';
       g.fillRect(ox+j*s,oy+i*s,Math.max(1,s-0.6),Math.max(1,s-0.6));
     }
     g.strokeStyle=C_ACC; g.lineWidth=1;
@@ -1495,13 +1673,13 @@ footer pre{
       var th=st.arm*Math.PI + r*4.2 + st.off + t*0.62/(0.30+r);
       var x=cx+Math.cos(th)*r*R, y=cy+Math.sin(th)*r*R*0.40;
       var a=(1-r*0.72)*st.s;
-      g.fillStyle='rgba('+(r<0.35?'234,252,255':'125,239,255')+','+a.toFixed(3)+')';
+      g.fillStyle='rgba('+(r<0.35?C_STARA:C_STARB)+','+a.toFixed(3)+')';
       g.fillRect(x,y,1.4,1.4);
     }
     var cg=g.createRadialGradient(cx,cy,0,cx,cy,R*0.30);
-    cg.addColorStop(0,'rgba(255,240,214,.95)');
-    cg.addColorStop(0.45,'rgba(255,179,71,.30)');
-    cg.addColorStop(1,'rgba(255,179,71,0)');
+    cg.addColorStop(0,'rgba('+C_CORE+',.95)');
+    cg.addColorStop(0.45,'rgba('+C_ACC_RGB+',.30)');
+    cg.addColorStop(1,'rgba('+C_ACC_RGB+',0)');
     g.fillStyle=cg; g.beginPath(); g.arc(cx,cy,R*0.30,0,7); g.fill();
     g.font='7px "Share Tech Mono",monospace'; g.textBaseline='middle'; g.textAlign='left';
     g.fillStyle=C_MID; g.fillText('37 MORPH FEATURES',6,10);
@@ -1535,7 +1713,7 @@ footer pre{
     }
     g.fillStyle=C_HI; g.beginPath(); g.arc(cx,wy,2.6,0,7); g.fill();
     var bx=cx-15*u, bw=30*u, by=wy-52*u, bh=58*u;
-    g.strokeStyle='rgba(255,179,71,.75)'; g.lineWidth=1;
+    g.strokeStyle='rgba('+C_ACC_RGB+',.75)'; g.lineWidth=1;
     var c=7;
     [[bx,by,1,1],[bx+bw,by,-1,1],[bx,by+bh,1,-1],[bx+bw,by+bh,-1,-1]].forEach(function(k){
       g.beginPath(); g.moveTo(k[0]+c*k[2],k[1]); g.lineTo(k[0],k[1]);
@@ -1572,7 +1750,7 @@ footer pre{
       var c=GCOLS.d[(GCOLS.head+i)%ncol];
       for(var b2=0;b2<nb;b2++){
         var v=c[b2];
-        g.fillStyle='rgba('+(v>0.6?'255,179,71':'53,224,240')+','+(0.05+v*0.85)+')';
+        g.fillStyle='rgba('+(v>0.6?C_ACC_RGB:C_PRIM_RGB)+','+(0.05+v*0.85)+')';
         g.fillRect(6+i*sw,7+b2*bh,sw-0.5,Math.max(1,bh-0.5));
       }
     }
@@ -1639,14 +1817,16 @@ footer pre{
       vizzes.forEach(function(v){ v.size(); drawViz(v,0); });
     });
 
-    if(!reduce){
-      var vT0=performance.now();
-      requestAnimationFrame(function vstep(now){
-        requestAnimationFrame(vstep);
-        var t=(now-vT0)/1000;
-        for(var i=0;i<vizzes.length;i++) if(vizzes[i].vis) drawViz(vizzes[i],t);
-      });
+    REPAINT.push(function(){ vizzes.forEach(function(v){ drawViz(v,1.4); }); });
+    var vT0=performance.now();
+    function vstep(now){
+      if(!MOTION) return;
+      requestAnimationFrame(vstep);
+      var t=(now-vT0)/1000;
+      for(var i=0;i<vizzes.length;i++) if(vizzes[i].vis) drawViz(vizzes[i],t);
     }
+    onMotion(function(){ requestAnimationFrame(vstep); });
+    if(!MOTION) vizzes.forEach(function(v){ drawViz(v,1.4); });
   }
 
   /* ---------- ctOS card scan overlay ---------- */
@@ -1699,13 +1879,15 @@ footer pre{
     size();
     window.addEventListener('resize', size);
 
+    /* colours by name, resolved each frame so a theme change carries through */
     var bodies = [
-      {a:0.30, e:0.10, s:1.62, r:1.6, c:'#3f7d8c'},
-      {a:0.45, e:0.05, s:1.18, r:2.0, c:'#3f7d8c'},
-      {a:0.60, e:0.06, s:1.00, r:2.4, c:'#35e0f0'},
-      {a:0.76, e:0.11, s:0.79, r:2.0, c:'#ffb347'},
-      {a:0.93, e:0.34, s:0.55, r:1.6, c:'#ff3d5a'}
+      {a:0.30, e:0.10, s:1.62, r:1.6, c:'mid'},
+      {a:0.45, e:0.05, s:1.18, r:2.0, c:'mid'},
+      {a:0.60, e:0.06, s:1.00, r:2.4, c:'hi'},
+      {a:0.76, e:0.11, s:0.79, r:2.0, c:'acc'},
+      {a:0.93, e:0.34, s:0.55, r:1.6, c:'red'}
     ];
+    function bcol(k){ return k==='hi'?C_HI:k==='acc'?C_ACC:k==='red'?C_RED:C_MID_S; }
     var t0 = performance.now();
     function draw(now){
       var t = (now - t0)/1000;
@@ -1715,21 +1897,21 @@ footer pre{
       // radar sweep — the ctOS scan arm
       var sweepA = (t*0.55) % (Math.PI*2);
       var gsw = ctx.createLinearGradient(cx, cy, cx+Math.cos(sweepA)*R*1.6, cy+Math.sin(sweepA)*R*1.6);
-      gsw.addColorStop(0, 'rgba(53,224,240,.22)');
-      gsw.addColorStop(1, 'rgba(53,224,240,0)');
+      gsw.addColorStop(0, 'rgba('+C_PRIM_RGB+',.22)');
+      gsw.addColorStop(1, 'rgba('+C_PRIM_RGB+',0)');
       ctx.strokeStyle = gsw; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(cx, cy);
       ctx.lineTo(cx+Math.cos(sweepA)*R*1.6, cy+Math.sin(sweepA)*R*1.6);
       ctx.stroke();
 
       // range rings
-      ctx.strokeStyle = 'rgba(18,113,140,.22)'; ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba('+C_GRID_RGB+',.22)'; ctx.lineWidth = 1;
       [0.35, 0.7, 1.05].forEach(function(k){
         ctx.beginPath(); ctx.arc(cx, cy, R*k, 0, Math.PI*2); ctx.stroke();
       });
 
       // crosshair reticle
-      ctx.strokeStyle = 'rgba(18,113,140,.35)';
+      ctx.strokeStyle = 'rgba('+C_GRID_RGB+',.35)';
       ctx.beginPath();
       ctx.moveTo(cx-R-14, cy); ctx.lineTo(cx-R+2, cy);
       ctx.moveTo(cx+R-2, cy); ctx.lineTo(cx+R+14, cy);
@@ -1738,29 +1920,31 @@ footer pre{
       ctx.stroke();
 
       // sun
-      ctx.fillStyle = '#ffb347';
+      ctx.fillStyle = C_ACC;
       ctx.beginPath(); ctx.arc(cx, cy, 3, 0, Math.PI*2); ctx.fill();
-      ctx.strokeStyle = 'rgba(255,179,71,.35)';
+      ctx.strokeStyle = 'rgba('+C_ACC_RGB+',.35)';
       ctx.beginPath(); ctx.arc(cx, cy, 7 + Math.sin(t*1.6)*1.5, 0, Math.PI*2); ctx.stroke();
 
       bodies.forEach(function(b){
         var ax = R*b.a, by = R*b.a*(1-b.e*0.55), fx = cx - R*b.a*b.e*0.6;
-        ctx.strokeStyle = 'rgba(18,113,140,.5)';
+        ctx.strokeStyle = 'rgba('+C_GRID_RGB+',.5)';
         ctx.beginPath(); ctx.ellipse(fx, cy, ax, by, 0, 0, Math.PI*2); ctx.stroke();
         var th = t*b.s*0.45;
         var px = fx + ax*Math.cos(th), py = cy + by*Math.sin(th);
         // tick brackets on the tracked body
-        if(b.c === '#ff3d5a'){
-          ctx.strokeStyle = 'rgba(255,61,90,.7)';
+        if(b.c === 'red'){
+          ctx.strokeStyle = 'rgba('+C_ALERT_RGB+',.7)';
           ctx.strokeRect(px-6, py-6, 12, 12);
         }
-        ctx.fillStyle = b.c;
+        ctx.fillStyle = bcol(b.c);
         ctx.beginPath(); ctx.arc(px, py, b.r, 0, Math.PI*2); ctx.fill();
       });
 
-      if(!reduce) requestAnimationFrame(draw);
+      if(MOTION) requestAnimationFrame(draw);
     }
-    if(reduce) draw(performance.now()); else requestAnimationFrame(draw);
+    REPAINT.push(function(){ draw(performance.now()); });
+    onMotion(function(){ requestAnimationFrame(draw); });
+    if(!MOTION) draw(performance.now());
   }
 
   /* ---------- Sector 07 schematic ----------
@@ -1803,9 +1987,12 @@ footer pre{
     });
     var order=plots.slice().sort(function(a,b){ return (a.x+a.y)-(b.x+b.y); });
 
-    var ROLE=[['rgba(63,125,140,.20)','rgba(99,160,175,.95)'],
-              ['rgba(53,224,240,.16)','#35e0f0'],
-              ['rgba(255,179,71,.18)','#ffb347']];
+    /* rebuilt per frame so the sector re-tints with the theme */
+    function roles(){
+      return [['rgba('+C_MUTED_RGB+',.20)','rgba('+C_HAB_RGB+',.95)'],
+              ['rgba('+C_PRIM_RGB+',.16)',C_HI],
+              ['rgba('+C_ACC_RGB+',.18)',C_ACC]];
+    }
     var THREAT=['SECURE','WATCH','ELEVATED','HOSTILE','CRITICAL','SEVERE','OVERRUN'];
 
     var st0=performance.now(), svis=true;
@@ -1817,7 +2004,7 @@ footer pre{
     /* w is the pad half-width; hy follows from the camera, not a fixed 2:1 guess */
     function sbox(X,Y,w,hy,h,col,lit,a){
       sg.globalAlpha=a;
-      sg.fillStyle='rgba(4,6,11,.92)';                       /* opaque body */
+      sg.fillStyle='rgba('+C_BG_RGB+',.92)';                       /* opaque body */
       sg.beginPath();
       sg.moveTo(X-w,Y-h); sg.lineTo(X,Y-h-hy); sg.lineTo(X+w,Y-h);
       sg.lineTo(X+w,Y); sg.lineTo(X,Y+hy); sg.lineTo(X-w,Y); sg.closePath(); sg.fill();
@@ -1841,12 +2028,13 @@ footer pre{
     }
 
     function sdraw(now){
-      if(!reduce) requestAnimationFrame(sdraw);
+      if(MOTION) requestAnimationFrame(sdraw);
       if(!SW || !svis) return;
       var t=(now-st0)/1000;
       sg.clearRect(0,0,SW,SH);
 
       /* a shallow camera: the bay is far wider than it is tall */
+      var ROLE=roles();
       var s=Math.min(SW*0.088,SH*0.128), cx=SW*0.5, cy=SH*0.58,
           KX=s*0.866, KY=s*0.40, ISO=KY/KX;
       var built=Math.min(7.4,t*2.2);              /* claims each ring in turn, once */
@@ -1856,7 +2044,7 @@ footer pre{
       sg.lineWidth=1;
       for(var r=0;r<7;r++){
         var rad=(r+0.78)*0.60;
-        sg.strokeStyle='rgba(18,113,140,'+(r<built?0.34:0.10)+')';
+        sg.strokeStyle='rgba('+C_GRID_RGB+','+(r<built?0.34:0.10)+')';
         sg.beginPath();
         sg.ellipse(cx,cy,rad*1.2247*s,rad*0.5657*s,0,0,6.2832);
         sg.stroke();
@@ -1870,21 +2058,21 @@ footer pre{
         if(lv<=0.02) continue;
         var ax=cx+(A.x-A.y)*KX, ay=cy+(A.x+A.y)*KY,
             bx=cx+(B.x-B.y)*KX, by=cy+(B.x+B.y)*KY;
-        sg.strokeStyle='rgba(18,113,140,'+(0.55*lv)+')';
+        sg.strokeStyle='rgba('+C_GRID_RGB+','+(0.55*lv)+')';
         sg.beginPath(); sg.moveTo(ax,ay); sg.lineTo(bx,by); sg.stroke();
         if(i%3===0){
           var ph=(t*0.42+i*0.137)%1;
-          sg.fillStyle='rgba(53,224,240,'+(0.9*lv)+')';
+          sg.fillStyle='rgba('+C_PRIM_RGB+','+(0.9*lv)+')';
           sg.fillRect(ax+(bx-ax)*ph-1,ay+(by-ay)*ph-1,2,2);
         }
       }
 
       /* the core spire, harvested from the centre */
       var beat=0.5+0.5*Math.sin(t*1.9);
-      sg.strokeStyle='rgba(255,179,71,'+(0.10+0.16*beat)+')';
+      sg.strokeStyle='rgba('+C_ACC_RGB+','+(0.10+0.16*beat)+')';
       sg.beginPath(); sg.ellipse(cx,cy,s*1.5,s*0.69,0,0,6.2832); sg.stroke();
       sbox(cx,cy,s*0.36,s*0.36*ISO,s*(2.0+0.10*beat),ROLE[2],0.75+0.25*beat,1);
-      sg.fillStyle='rgba(255,179,71,'+(0.45+0.55*beat)+')';
+      sg.fillStyle='rgba('+C_ACC_RGB+','+(0.45+0.55*beat)+')';
       sg.beginPath(); sg.arc(cx,cy-s*2.30,2.2+beat,0,6.2832); sg.fill();
 
       /* the sector itself, drawn back to front */
@@ -1892,7 +2080,7 @@ footer pre{
         var p=order[k];
         var b=Math.max(0,Math.min(1,(built-p.seq)*1.5));
         var X=cx+(p.x-p.y)*KX, Y=cy+(p.x+p.y)*KY, w=s*0.27, hy=w*ISO;
-        sg.strokeStyle='rgba(18,113,140,'+(0.16+0.26*b)+')';
+        sg.strokeStyle='rgba('+C_GRID_RGB+','+(0.16+0.26*b)+')';
         sg.beginPath();
         sg.moveTo(X,Y-hy); sg.lineTo(X+w,Y); sg.lineTo(X,Y+hy); sg.lineTo(X-w,Y);
         sg.closePath(); sg.stroke();
@@ -1908,15 +2096,15 @@ footer pre{
         var BX=cx+(bp.x-bp.y)*KX, BY=cy+(bp.x+bp.y)*KY-bp.h*s*1.7-8;
         if(life<3.0){
           var q=1-life/3.0;
-          sg.strokeStyle='rgba(255,61,90,.9)'; sg.lineWidth=1.4;
+          sg.strokeStyle='rgba('+C_ALERT_RGB+',.9)'; sg.lineWidth=1.4;
           sg.beginPath(); sg.arc(BX,BY,7,-1.5708,-1.5708+6.2832*q); sg.stroke();
-          sg.fillStyle='rgba(255,61,90,'+(0.55+0.45*Math.sin(t*11))+')';
+          sg.fillStyle='rgba('+C_ALERT_RGB+','+(0.55+0.45*Math.sin(t*11))+')';
           sg.beginPath();
           sg.moveTo(BX,BY-3.6); sg.lineTo(BX+3.6,BY); sg.lineTo(BX,BY+3.6); sg.lineTo(BX-3.6,BY);
           sg.closePath(); sg.fill();
         } else {
           var pr=(life-3.0)/1.2;                 /* purge flash */
-          sg.strokeStyle='rgba(53,224,240,'+(1-pr)+')'; sg.lineWidth=1.2;
+          sg.strokeStyle='rgba('+C_PRIM_RGB+','+(1-pr)+')'; sg.lineWidth=1.2;
           sg.beginPath(); sg.arc(BX,BY,7+pr*16,0,6.2832); sg.stroke();
         }
       }
@@ -1924,18 +2112,28 @@ footer pre{
       /* HUD */
       sg.font='8px "Share Tech Mono",monospace'; sg.textBaseline='middle';
       sg.textAlign='left';
-      sg.fillStyle='rgba(53,224,240,.75)'; sg.fillText('SECTOR 07',10,12);
-      sg.fillStyle='rgba(99,160,175,.85)';
+      sg.fillStyle='rgba('+C_PRIM_RGB+',.75)'; sg.fillText('SECTOR 07',10,12);
+      sg.fillStyle='rgba('+C_HAB_RGB+',.85)';
       sg.fillText('⌁ '+Math.floor(4200+t*137).toLocaleString()+' CR',10,SH-11);
       sg.textAlign='right';
-      sg.fillStyle='rgba(99,160,175,.85)';
+      sg.fillStyle='rgba('+C_HAB_RGB+',.85)';
       sg.fillText('6 RINGS · 117 PLOTS',SW-10,12);
       var lvl=Math.min(6,Math.floor(built));
-      sg.fillStyle=lvl>3?'rgba(255,61,90,.9)':'rgba(255,179,71,.85)';
+      sg.fillStyle=lvl>3?'rgba('+C_ALERT_RGB+',.9)':'rgba('+C_ACC_RGB+',.85)';
       sg.fillText('THREAT '+THREAT[lvl],SW-10,SH-11);
     }
-    if(reduce){ st0=performance.now()-6000; sdraw(performance.now()); }
-    else requestAnimationFrame(sdraw);
+    /* held still, the sector still shows a finished grid rather than bare pads */
+    /* forces a frame even when the canvas is out of view, so a theme change
+       does not leave it holding the other palette until it is scrolled to */
+    function sstatic(){
+      var k=st0, v=svis;
+      svis=true; st0=performance.now()-6000;
+      sdraw(performance.now());
+      st0=k; svis=v;
+    }
+    REPAINT.push(sstatic);
+    onMotion(function(){ st0=performance.now(); requestAnimationFrame(sdraw); });
+    if(!MOTION) sstatic();
   }
 })();
 </script>
