@@ -45,9 +45,9 @@
   --grid-rgb:18,113,140;
   --hab-rgb:99,160,175;
   --shade-rgb:0,0,0;
-  --rain-rgb:255,179,71;
-  --rain-head-rgb:255,222,170;
-  --rain-a:.42;
+  --rain-rgb:255,166,44;
+  --rain-head-rgb:255,238,198;
+  --rain-a:.58;
   --bay:#05080e;
   --surface-2:#071019;
   --bright:#eafcff;
@@ -91,9 +91,9 @@ html[data-theme="light"]{
   --grid-rgb:138,111,184;
   --hab-rgb:120,95,160;
   --shade-rgb:95,42,158;
-  --rain-rgb:113,190,0;
-  --rain-head-rgb:58,104,0;
-  --rain-a:.6;
+  --rain-rgb:124,208,0;
+  --rain-head-rgb:52,100,0;
+  --rain-a:.72;
   --bay:#f1ecfa;
   --surface-2:#f6f2fd;
   --bright:#8fd400;
@@ -1536,8 +1536,8 @@ footer pre{
           var yy = (row-k)*CH;
           if(yy < -CH || yy > GH) continue;
           var f = 1 - k/col.len;
-          if(k === 0) g.fillStyle = 'rgba('+C_RAINH_RGB+',.75)';       /* the head */
-          else        g.fillStyle = 'rgba('+C_RAIN_RGB+','+(0.34*f*f).toFixed(3)+')';
+          if(k === 0) g.fillStyle = 'rgba('+C_RAINH_RGB+',.92)';       /* the head */
+          else        g.fillStyle = 'rgba('+C_RAIN_RGB+','+(0.44*f*f).toFixed(3)+')';
           g.fillText(col.ch[k], x, yy);
         }
         if((row - col.ch.length)*CH > GH) cols[c] = newCol(false);     /* recycle */
