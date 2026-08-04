@@ -306,9 +306,6 @@ main.slip,footer.slip{animation:slip .34s steps(3) 1}
 }
 .nav a:hover{color:var(--primary-lo);background:transparent}
 .nav a.on{color:var(--primary);border-bottom-color:var(--primary)}
-.nav a.ext{color:var(--accent)}
-.nav a.ext::after{content:" ▸"}
-.nav a.ext:hover{color:var(--accent);background:rgba(var(--accent-rgb),.08)}
 
 /* ============================================================
    TICKER
@@ -413,7 +410,6 @@ section{padding:56px 0;scroll-margin-top:110px}
   font-size:11px;letter-spacing:.13em;text-transform:uppercase;
   padding:5px 10px;border:1px solid rgba(var(--grid-rgb),.5);color:var(--muted);
 }
-.chip.live{color:var(--accent);border-color:rgba(var(--accent-rgb),.5)}
 
 /* profiler panel */
 .profiler{border:1px solid rgba(var(--grid-rgb),.55);background:linear-gradient(180deg,rgba(var(--surface-rgb),.9),rgba(var(--bg-rgb),.9));position:relative}
@@ -430,7 +426,6 @@ section{padding:56px 0;scroll-margin-top:110px}
 .profiler dt{color:var(--muted);letter-spacing:.1em;text-transform:uppercase;font-size:11px;padding-top:1px}
 .profiler dd{margin:0;color:var(--fg)}
 .profiler dd b{color:var(--primary-lo);font-weight:500}
-.ok-dot{color:var(--accent)}
 
 /* ============================================================
    SIGNATURE: audit tags + provenance on every number
@@ -828,7 +823,6 @@ footer pre{
     <li><a href="#toolchain">~/toolchain</a></li>
     <li><a href="#credentials">~/credentials</a></li>
     <li><a href="#contact">~/contact</a></li>
-    <li><a class="ext" href="https://mavroul1s.github.io/neo_tracker/neo-tracker.html" target="_blank" rel="noopener">~/neow</a></li>
   </ul>
 </nav>
 
@@ -875,7 +869,6 @@ footer pre{
       <div class="rail">
         <span class="chip">UTH · VOLOS · GR</span>
         <span class="chip">EL NATIVE · EN ECCE B2</span>
-        <span class="chip live">● OPEN TO RESEARCH &amp; INTERNSHIPS</span>
       </div>
       <pre class="ascii rail" data-art="wave" data-rows="5" style="margin-top:22px" aria-hidden="true"></pre>
     </div>
@@ -890,7 +883,6 @@ footer pre{
         <dt>Node</dt><dd>Univ. of Thessaly, Volos</dd>
         <dt>Focus</dt><dd>Deep learning · remote sensing · computer vision</dd>
         <dt>Repos</dt><dd><span class="datum" tabindex="0" data-src="SOURCE: counted live from the GitHub REST API — api.github.com/users/mavroul1s. Falls back to the printed number if the API is unreachable."><span data-repo-count="19">19</span> public</span></dd>
-        <dt>Status</dt><dd><span class="ok-dot">●</span> Available</dd>
       </dl>
       <div class="foot">
         <span class="meter" aria-hidden="true"><b class="on"></b><b class="on"></b><b class="on"></b><b class="on"></b><b class="on"></b><b></b><b></b></span>
@@ -1160,8 +1152,8 @@ footer pre{
   <div class="term">
     <div class="term-bar"><span class="win" aria-hidden="true"><b></b><b></b><b></b></span><span>mavros@uth</span><span>:~$ cat toolchain.txt</span><em>read only</em></div>
     <dl>
-      <dt>Languages</dt><dd>Python · MATLAB · Julia · JavaScript</dd>
-      <dt>Machine learning</dt><dd>PyTorch · TensorFlow · scikit-learn · 3D segmentation · CNNs · ViTs · knowledge distillation · recommender systems</dd>
+      <dt>Languages</dt><dd>Python · C · Assembly · Verilog · SQL · MATLAB · Julia · JavaScript</dd>
+      <dt>Machine learning</dt><dd>PyTorch · TensorFlow · scikit-learn · neural networks · reinforcement learning · 3D segmentation · CNNs · ViTs</dd>
       <dt>Data / backend</dt><dd>FastAPI · Docker Compose · Cassandra · Neo4j · MongoDB · PostgreSQL · Redis</dd>
       <dt>CV / DSP</dt><dd>OpenCV · MediaPipe · MFCC and LPC · spectral analysis · classical filtering</dd>
       <dt>Realtime / media</dt><dd>TouchDesigner · Avidemux</dd>
