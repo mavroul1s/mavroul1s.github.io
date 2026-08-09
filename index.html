@@ -244,10 +244,21 @@ main.slip,footer.slip{animation:slip .34s steps(3) 1}
   opacity:0;transition:opacity .5s steps(5) .18s;
 }
 #boot.granted .wired{opacity:1}
+/* the door: dim while the log is still printing, then lit and waiting.
+   Nothing dismisses the boot screen on a timer — the visitor opens it. */
 #boot .skip{
   position:absolute;bottom:calc(var(--gut) - 4px);left:0;right:0;text-align:center;
   font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--grid);
+  transition:color .3s steps(4),letter-spacing .3s steps(4);
 }
+#boot.ready .skip{
+  color:var(--accent);letter-spacing:.3em;
+  animation:enterpulse 1.5s ease-in-out infinite;
+}
+#boot.ready .skip::before{content:"▸ "}
+#boot.ready .skip::after{content:" ◂"}
+@keyframes enterpulse{0%,100%{opacity:1}50%{opacity:.34}}
+#boot{cursor:pointer}
 #boot.done{opacity:0;visibility:hidden;transition:opacity .45s steps(6),visibility 0s .45s}
 
 /* the episode opener: top left, on arrival, then gone. Sits above the boot
@@ -1008,7 +1019,7 @@ footer pre{
     <div class="grant">ACCESS GRANTED</div>
     <div class="wired">No matter where you are, we are always connected.</div>
   </div>
-  <div class="skip">click anywhere to skip</div>
+  <div class="skip">click anywhere to enter</div>
 </div>
 
 <!-- ===================== TOP BAR ===================== -->
@@ -2099,15 +2110,36 @@ footer pre{
       setTimeout(function(){ if(pdpt.parentNode) pdpt.parentNode.removeChild(pdpt); }, 900);
     }, hold);
   }
-  function finishBoot(){ boot.classList.add('done'); startHero(); dropPdpt(0); }
-  if(reduce){ boot.style.display='none'; startHero(); dropPdpt(2200); }
+  /* Entering is a deliberate act: the boot screen has no timer on it. It
+     prints its log, the door lights up, and it waits. A click anywhere opens
+     it — so does any key, so nobody who cannot reach a pointer is shut out,
+     and so does a long stall, which is the one case where waiting would be
+     the wrong answer. */
+  var entered = false, standby;
+  function onKey(e){
+    if(e.metaKey || e.ctrlKey || e.altKey) return;   /* not a browser shortcut */
+    finishBoot();
+  }
+  function finishBoot(){
+    if(entered) return;
+    entered = true;
+    clearTimeout(standby);
+    window.removeEventListener('keydown', onKey);
+    boot.classList.add('done');
+    startHero();
+    dropPdpt(0);
+  }
+  if(reduce){ entered = true; boot.style.display='none'; startHero(); dropPdpt(2200); }
   else {
     var i = 0;
     (function next(){
+      if(entered) return;
       if(i >= lines.length){
         bar.style.width = '100%';
         boot.classList.add('granted');
-        setTimeout(finishBoot, 1700);   /* long enough to read the line it signs off with */
+        /* the sign-off lands first, then the prompt lights up under it */
+        setTimeout(function(){ if(!entered) boot.classList.add('ready'); }, 620);
+        standby = setTimeout(finishBoot, 45000);   /* left open, not left stuck */
         return;
       }
       log.innerHTML += lines[i++] + '\n';
@@ -2115,8 +2147,8 @@ footer pre{
       bar.style.width = Math.round(i/lines.length*100) + '%';
       setTimeout(next, 260);
     })();
-    setTimeout(function(){ if(!boot.classList.contains('done')) finishBoot(); }, 6200);
     boot.addEventListener('click', finishBoot);
+    window.addEventListener('keydown', onKey);
   }
 
   /* ---------- glyph rain: columns pouring the full width, behind the grid ----
