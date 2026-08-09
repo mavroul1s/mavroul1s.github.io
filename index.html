@@ -237,6 +237,13 @@ main.slip,footer.slip{animation:slip .34s steps(3) 1}
   color:var(--accent);opacity:0;
 }
 #boot.granted .grant{opacity:1;animation:blink .28s steps(1) 3}
+/* the line the whole site is named after — it lands last, after the lock opens */
+#boot .wired{
+  margin-top:9px;font-family:var(--hud);font-size:11px;letter-spacing:.19em;
+  text-transform:uppercase;color:var(--muted);
+  opacity:0;transition:opacity .5s steps(5) .18s;
+}
+#boot.granted .wired{opacity:1}
 #boot .skip{
   position:absolute;bottom:calc(var(--gut) - 4px);left:0;right:0;text-align:center;
   font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--grid);
@@ -562,6 +569,65 @@ caption{caption-side:bottom;text-align:left;font-size:11px;color:var(--muted);pa
 .card .go{font-size:11px;letter-spacing:.14em;text-transform:uppercase;border:0}
 .card .go::after{content:" →"}
 
+/* ============================================================
+   NEWS — a log that is tailed, not a blog
+   ============================================================ */
+.feed{padding:0}
+.feed-bar{
+  display:flex;gap:8px;align-items:center;padding:6px 12px;
+  border-bottom:1px solid rgba(var(--grid-rgb),.32);
+  background:linear-gradient(180deg,rgba(var(--primary-rgb),.14),rgba(var(--surface-rgb),.2));
+  font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+}
+.feed-bar .win{display:inline-flex;gap:4px;margin-right:6px}
+.feed-bar .win b{width:9px;height:9px;border:1px solid var(--grid);font-size:0;display:block}
+.feed-bar em{color:var(--grid);font-style:normal;margin-left:auto}
+/* the log scrolls inside its own frame; the page stays short */
+.feed-scroll{
+  position:relative;max-height:412px;overflow-y:auto;overscroll-behavior:contain;
+  scrollbar-width:thin;scrollbar-color:rgba(var(--grid-rgb),.7) transparent;
+}
+.feed-scroll::-webkit-scrollbar{width:8px}
+.feed-scroll::-webkit-scrollbar-track{background:transparent}
+.feed-scroll::-webkit-scrollbar-thumb{background:rgba(var(--grid-rgb),.55)}
+.feed-scroll::-webkit-scrollbar-thumb:hover{background:var(--primary)}
+ol.news{list-style:none;margin:0;padding:4px 0}
+.news li{
+  display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline;
+  padding:7px 18px 7px 30px;position:relative;font-size:13px;
+  border-bottom:1px dashed rgba(var(--grid-rgb),.2);
+}
+.news li:last-child{border-bottom:0}
+.news li::before{
+  content:"▸";position:absolute;left:14px;top:7px;color:var(--grid);
+  transition:color .12s,transform .12s steps(2);
+}
+.news li:hover{background:rgba(var(--primary-rgb),.05)}
+.news li:hover::before{color:var(--accent);transform:translateX(2px)}
+.news time{
+  color:var(--muted);font-size:11.5px;letter-spacing:.06em;white-space:nowrap;
+  font-family:var(--hud);
+}
+.news .what{color:var(--fg);min-width:0}
+.news .line{min-width:0}
+.news a.what{color:var(--fg);border-bottom:1px solid transparent}
+.news a.what:hover{color:var(--primary-lo);border-bottom-color:rgba(var(--primary-lo-rgb),.4);background:transparent}
+.news .new{
+  margin-left:9px;font-size:9px;letter-spacing:.18em;padding:1px 5px;
+  border:1px solid currentColor;color:var(--accent);vertical-align:1px;
+  animation:blink 1.9s steps(1) infinite;
+}
+@keyframes newsin{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+.feed-foot{
+  border-top:1px solid rgba(var(--grid-rgb),.32);padding:8px 18px;
+  font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--grid);
+}
+.feed-foot .caret{color:var(--primary);animation:blink 1.05s steps(1) infinite}
+@media(max-width:560px){
+  .news li{grid-template-columns:1fr;gap:2px;padding-left:26px}
+  .news li::before{left:11px}
+}
+
 /* archive list */
 .archive{list-style:none;margin:0;padding:0;border-top:1px solid rgba(var(--grid-rgb),.25)}
 .archive li{
@@ -650,6 +716,8 @@ footer pre{
   overflow:hidden;
 }
 .foot-line{display:flex;flex-wrap:wrap;gap:10px 22px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+/* the same line the boot screen signs off with */
+.wired-line{font-family:var(--hud);letter-spacing:.2em;color:var(--primary-lo);opacity:.85}
 
 /* ============================================================
    CONTROLS — ctOS action buttons
@@ -794,8 +862,15 @@ footer pre{
   opacity:.45;transition:opacity .15s,inset .15s;
 }
 .bay:hover .reticle{opacity:1;top:6px;left:6px;right:6px;bottom:6px}
-#orbit,#sector{display:block;width:100%;height:230px}
-@media(max-width:620px){#orbit,#sector{height:180px}}
+#orbit,#sector,#firemap{display:block;width:100%;height:230px}
+@media(max-width:620px){#orbit,#sector,#firemap{height:180px}}
+/* DeepFire has no live demo to launch, so its bay is a readout rather than a
+   door: no CTA plate over the canvas, and the frame does not react to a hover
+   that leads nowhere */
+.bay.readout{border-color:rgba(var(--grid-rgb),.45);cursor:default}
+.bay.readout:hover{border-color:rgba(var(--grid-rgb),.45)}
+.bay.readout .reticle{opacity:.3}
+.capt{margin:7px 0 18px;font-size:11px;line-height:1.5;letter-spacing:.05em;color:var(--grid)}
 
 /* ============================================================
    GITHUB STATS
@@ -886,10 +961,11 @@ footer pre{
 <!-- ===================== BOOT ===================== -->
 <div id="boot" aria-hidden="true">
   <div id="boot-frame">
-    <div class="hdr"><span>ctOS_LOCAL // NODE VOLOS-GR</span><span>SEC LVL 3</span></div>
+    <div class="hdr"><span>NAVI // WIRED UPLINK</span><span>LAYER 07</span></div>
     <pre id="bootlog"></pre>
     <div class="bar"><span id="bootbar"></span></div>
     <div class="grant">ACCESS GRANTED</div>
+    <div class="wired">No matter where you are, we are always connected.</div>
   </div>
   <div class="skip">click anywhere to skip</div>
 </div>
@@ -913,7 +989,7 @@ footer pre{
 <nav class="nav" aria-label="Sections">
   <ul>
     <li><a href="#hero">~/</a></li>
-    <li><a href="#current">~/current</a></li>
+    <li><a href="#news">~/news</a></li>
     <li><a href="#projects">~/projects</a></li>
     <li><a href="#github">~/github</a></li>
     <li><a href="#archive">~/archive</a></li>
@@ -958,7 +1034,7 @@ footer pre{
       <p class="hero-sub">Neural networks, computer vision, and remote sensing. Fifth-year ECE at the University of Thessaly.</p>
 
       <div class="actions">
-        <a class="btn primary" href="#current"><span class="k">▸</span><span>Current work</span></a>
+        <a class="btn primary" href="#projects"><span class="k">▸</span><span>Selected work</span></a>
         <a class="btn ghost" href="https://github.com/mavroul1s" target="_blank" rel="noopener"><span class="k">▸</span><span>GitHub</span></a>
       </div>
 
@@ -1027,7 +1103,7 @@ footer pre{
         <dt>Role</dt><dd>Undergraduate student, Electrical &amp; Computer Engineering — currently year 5</dd>
         <dt>Node</dt><dd>Univ. of Thessaly, Volos</dd>
         <dt>Focus</dt><dd>Neural networks · computer vision · deep learning</dd>
-        <dt>Repos</dt><dd><span class="datum" tabindex="0" data-src="SOURCE: counted live from the GitHub REST API — api.github.com/users/mavroul1s. Falls back to the printed number if the API is unreachable."><span data-repo-count="19">19</span> public</span></dd>
+        <dt>Repos</dt><dd><span class="datum" tabindex="0" data-src="SOURCE: counted live from the GitHub REST API — api.github.com/users/mavroul1s. Falls back to the printed number if the API is unreachable."><span data-repo-count="18">18</span> public</span></dd>
       </dl>
       <div class="foot">
         <span class="meter" aria-hidden="true"><b class="on"></b><b class="on"></b><b class="on"></b><b class="on"></b><b class="on"></b><b></b><b></b></span>
@@ -1036,16 +1112,147 @@ footer pre{
   </div>
 </section>
 
-<!-- ===================== CURRENT ===================== -->
-<section id="current">
-  <h2 class="sec-h"><span class="path">~/</span>current work <span class="rule"></span></h2>
+<!-- ===================== NEWS =====================
+     One line per entry, newest first. To add one, copy the block below and put
+     it at the top of the list — the date in `datetime` is what the NEW badge is
+     worked out from, the text in <time> is what is printed.
 
-  <div class="panel flag">
+       <li>
+         <time datetime="2026-09-01">(Sep 01st, '26)</time>
+         <span class="what">What happened, in one short line</span>
+       </li>
+
+     Wrap the text in <a class="what" href="…"> instead of <span> when there is
+     somewhere to send the reader. Month-only entries use datetime="2026-09" and
+     print as (Sep '26).
+     ================================================ -->
+<section id="news">
+  <h2 class="sec-h"><span class="path">~/</span>news <span class="rule"></span></h2>
+
+  <div class="panel feed">
+    <div class="feed-bar">
+      <span class="win" aria-hidden="true"><b></b><b></b><b></b></span>
+      <span>mavros@uth</span><span>:~$ tail -f news.log</span><em>newest first</em>
+    </div>
+
+    <div class="feed-scroll">
+      <ol class="news">
+        <li>
+          <time datetime="2026-08-05">(Aug 05th, '26)</time>
+          <a class="what" href="https://github.com/mavroul1s/neuron-death" target="_blank" rel="noopener">New repository opened: neuron-death</a>
+        </li>
+        <li>
+          <time datetime="2026-08-02">(Aug 02nd, '26)</time>
+          <a class="what" href="https://github.com/mavroul1s/pokemon_competition" target="_blank" rel="noopener">New repository opened: pokemon_competition</a>
+        </li>
+        <li>
+          <time datetime="2026-07-31">(Jul 31st, '26)</time>
+          <a class="what" href="https://mavroul1s.github.io/Isometric-Cyberpunk-Megastructure-Defense-Grid/" target="_blank" rel="noopener">Sector 07 released — an isometric defence grid that runs in the browser</a>
+        </li>
+        <li>
+          <time datetime="2026-07-29">(Jul 29th, '26)</time>
+          <a class="what" href="https://github.com/mavroul1s/mavroul1s.github.io" target="_blank" rel="noopener">This site went live at mavroul1s.github.io</a>
+        </li>
+        <li>
+          <time datetime="2026-07-28">(Jul 28th, '26)</time>
+          <a class="what" href="https://mavroul1s.github.io/neo_tracker/neo-tracker.html" target="_blank" rel="noopener">NEOW orbital tracker published, built on NASA's NeoWs feed</a>
+        </li>
+        <li>
+          <time datetime="2026-05-21">(May 21st, '26)</time>
+          <a class="what" href="https://github.com/mavroul1s/GridSense_collab" target="_blank" rel="noopener">GridSense — polyglot-persistence smart grid prototype</a>
+        </li>
+        <li>
+          <time datetime="2026-05-02">(May 02nd, '26)</time>
+          <a class="what" href="https://github.com/mavroul1s/ir-assignment-2026" target="_blank" rel="noopener">ECE328 Information Retrieval coursework published</a>
+        </li>
+        <li>
+          <time datetime="2026-04-20">(Apr 20th, '26)</time>
+          <a class="what" href="https://github.com/mavroul1s/ncf-assignment" target="_blank" rel="noopener">NCF reproduction on MovieLens-100K published</a>
+        </li>
+        <li>
+          <time datetime="2026-04-08">(Apr 08th, '26)</time>
+          <a class="what" href="https://github.com/mavroul1s/groking-ecg-signals" target="_blank" rel="noopener">New repository opened: groking-ecg-signals</a>
+        </li>
+        <li>
+          <time datetime="2026-04-06">(Apr 06th, '26)</time>
+          <a class="what" href="https://github.com/mavroul1s/KinetiCore" target="_blank" rel="noopener">KinetiCore — real-time hand and face tracking sandbox</a>
+        </li>
+        <li>
+          <time datetime="2026-03-25">(Mar 25th, '26)</time>
+          <a class="what" href="https://github.com/mavroul1s/vit-gradient-flow" target="_blank" rel="noopener">vit-gradient-flow — the analytic Jacobian of self-attention, in Julia</a>
+        </li>
+        <li>
+          <time datetime="2026-03-11">(Mar 11th, '26)</time>
+          <a class="what" href="https://github.com/mavroul1s/ECE443-Coursework" target="_blank" rel="noopener">ECE443 Speech and Audio Processing coursework published</a>
+        </li>
+        <li>
+          <time datetime="2026-02-28">(Feb 28th, '26)</time>
+          <a class="what" href="https://github.com/mavroul1s/DeepFire-Forecaster" target="_blank" rel="noopener">DeepFire-Forecaster opened — wildfire remote sensing on TS-SatFire</a>
+        </li>
+        <li>
+          <time datetime="2026-02-18">(Feb 18th, '26)</time>
+          <a class="what" href="https://github.com/mavroul1s/ECE457-Coursework" target="_blank" rel="noopener">ECE457 Computer Vision coursework published</a>
+        </li>
+        <li>
+          <time datetime="2026-02-17">(Feb 17th, '26)</time>
+          <a class="what" href="https://github.com/mavroul1s/ECE418-Coursework" target="_blank" rel="noopener">ECE418 Neuro-Fuzzy Computing coursework published</a>
+        </li>
+        <li>
+          <time datetime="2026-02-07">(Feb 07th, '26)</time>
+          <a class="what" href="https://github.com/mavroul1s/Galaxy-Morphology-CNN" target="_blank" rel="noopener">Galaxy-Morphology-CNN — 0.109 RMSE on the Galaxy Zoo blind test</a>
+        </li>
+        <li>
+          <time datetime="2026-01-12">(Jan 12th, '26)</time>
+          <a class="what" href="https://github.com/mavroul1s/GMM-Music-Genre-Recognition" target="_blank" rel="noopener">GMM music genre recogniser — EM written from scratch</a>
+        </li>
+        <li>
+          <time datetime="2025-12">(Dec '25)</time>
+          <a class="what" href="certs/mathworks-machine-learning-onramp.pdf" target="_blank" rel="noopener">Machine Learning Onramp certificate, MathWorks</a>
+        </li>
+        <li>
+          <time datetime="2025-03">(Mar '25)</time>
+          <a class="what" href="certs/mathworks-matlab-fundamentals.pdf" target="_blank" rel="noopener">MATLAB Fundamentals certificate, MathWorks</a>
+        </li>
+        <li>
+          <time datetime="2024-12">(Dec '24)</time>
+          <a class="what" href="certs/qualcomm-5g-introductory.pdf" target="_blank" rel="noopener">5G Introductory-Level certification, Qualcomm Wireless Academy</a>
+        </li>
+        <li>
+          <time datetime="2024-10">(Oct '24)</time>
+          <a class="what" href="certs/etc-2024-edge-intelligence.pdf" target="_blank" rel="noopener">Attended the 3rd Emerging Tech Conference: Edge Intelligence, UTh Volos</a>
+        </li>
+        <li>
+          <time datetime="2024-03">(Mar '24)</time>
+          <a class="what" href="certs/mathworks-matlab-onramp.pdf" target="_blank" rel="noopener">MATLAB Onramp certificate, MathWorks</a>
+        </li>
+        <li>
+          <time datetime="2023-04">(Apr '23)</time>
+          <a class="what" href="certs/ecescon-14.pdf" target="_blank" rel="noopener">Attended ECESCON 14, University of Thessaly</a>
+        </li>
+      </ol>
+    </div>
+
+    <div class="feed-foot"><span class="caret" aria-hidden="true">&gt; _</span> awaiting next entry</div>
+  </div>
+</section>
+
+<!-- ===================== PROJECTS ===================== -->
+<section id="projects">
+  <h2 class="sec-h"><span class="path">~/</span>selected projects <span class="rule"></span></h2>
+
+  <div class="panel flag" style="margin-bottom:16px">
     <div class="panel-h">
       <h3>DeepFire-Forecaster</h3>
       <span class="tag rev">Under review</span>
     </div>
     <p class="stack">BurnBench<span>/</span>Jupyter + PyTorch<span>/</span>156 commits<span>/</span>MIT</p>
+
+    <div class="bay readout" aria-hidden="true">
+      <canvas id="firemap"></canvas>
+      <span class="hexmask"></span>
+      <span class="reticle"></span>
+    </div>
+    <p class="capt">Schematic, not model output: a fire front advancing across a VIIRS tile — burn scar behind it, active front on the edge, and in cyan the perimeter the model is asked to place for the next acquisition.</p>
 
     <div class="notice">
       <b>NOTICE</b>
@@ -1094,11 +1301,6 @@ footer pre{
     <p style="margin:18px 0 0;font-size:13px;color:var(--muted)">Everything reproduces on a Kaggle T4 inside the 12-hour session limit. No local setup.</p>
     <p style="margin:14px 0 0"><a href="https://github.com/mavroul1s/DeepFire-Forecaster" target="_blank" rel="noopener">github.com/mavroul1s/DeepFire-Forecaster →</a></p>
   </div>
-</section>
-
-<!-- ===================== PROJECTS ===================== -->
-<section id="projects">
-  <h2 class="sec-h"><span class="path">~/</span>selected projects <span class="rule"></span></h2>
 
   <div class="panel flag" style="margin-bottom:16px;border-left-color:var(--accent)">
     <div class="panel-h"><h3>NEOW / neo_tracker</h3></div>
@@ -1182,7 +1384,7 @@ footer pre{
       <div class="meta">
         <span class="kv">Endpoints <b>14</b></span>
         <span class="kv">Setup <b>one docker compose up</b></span>
-        <a class="go" href="https://github.com/mavroul1s/gridsense" target="_blank" rel="noopener">Open repository</a>
+        <a class="go" href="https://github.com/mavroul1s/GridSense_collab" target="_blank" rel="noopener">Open repository</a>
       </div>
     </article>
 
@@ -1257,27 +1459,27 @@ footer pre{
   <details class="panel gh-fold">
     <summary>
       <span class="ghsum-h">github.com/mavroul1s</span>
-      <span class="ghsum-n"><b data-gh="repos" data-fb="19">19</b> repos · <b data-gh="stars" data-fb="6">6</b> stars · <b data-gh="followers" data-fb="9">9</b> followers</span>
+      <span class="ghsum-n"><b data-gh="repos" data-fb="18">18</b> repos · <b data-gh="stars" data-fb="6">6</b> stars · <b data-gh="followers" data-fb="10">10</b> followers</span>
       <span class="ghsum-cue" aria-hidden="true"></span>
     </summary>
     <div class="fold-body">
     <p class="stack" style="margin-top:2px">counted live from the public API<span>/</span>no third-party badge services</p>
 
     <div class="ghgrid">
-      <div class="ghstat"><b data-gh="repos" data-fb="19">19</b><span>public repositories</span></div>
+      <div class="ghstat"><b data-gh="repos" data-fb="18">18</b><span>public repositories</span></div>
       <div class="ghstat"><b data-gh="stars" data-fb="6">6</b><span>stars earned</span></div>
-      <div class="ghstat"><b data-gh="followers" data-fb="9">9</b><span>followers</span></div>
+      <div class="ghstat"><b data-gh="followers" data-fb="10">10</b><span>followers</span></div>
       <div class="ghstat"><b data-gh="since">Dec 2022</b><span>on GitHub since</span></div>
       <div class="ghstat"><b data-gh="lastpush">today</b><span>last push</span></div>
     </div>
 
     <h4 class="sub" style="margin:22px 0 10px">Languages by repository</h4>
     <div class="ghlangs" id="ghlangs">
-      <div class="lang"><span class="l">Jupyter Notebook</span><span class="bar"><i style="width:100%"></i></span><span class="n">8</span></div>
-      <div class="lang"><span class="l">HTML</span><span class="bar"><i style="width:37.5%"></i></span><span class="n">3</span></div>
-      <div class="lang"><span class="l">Python</span><span class="bar"><i style="width:37.5%"></i></span><span class="n">3</span></div>
-      <div class="lang"><span class="l">MATLAB</span><span class="bar"><i style="width:25%"></i></span><span class="n">2</span></div>
-      <div class="lang"><span class="l">TeX</span><span class="bar"><i style="width:12.5%"></i></span><span class="n">1</span></div>
+      <div class="lang"><span class="l">Jupyter Notebook</span><span class="bar"><i style="width:100%"></i></span><span class="n">7</span></div>
+      <div class="lang"><span class="l">HTML</span><span class="bar"><i style="width:42.9%"></i></span><span class="n">3</span></div>
+      <div class="lang"><span class="l">Python</span><span class="bar"><i style="width:42.9%"></i></span><span class="n">3</span></div>
+      <div class="lang"><span class="l">MATLAB</span><span class="bar"><i style="width:28.6%"></i></span><span class="n">2</span></div>
+      <div class="lang"><span class="l">TeX</span><span class="bar"><i style="width:14.3%"></i></span><span class="n">1</span></div>
     </div>
 
     <p style="margin:16px 0 0"><a href="https://github.com/mavroul1s" target="_blank" rel="noopener">github.com/mavroul1s →</a></p>
@@ -1405,7 +1607,10 @@ footer pre{
   <div class="foot-line">
     <span>© <span id="yr">2026</span> Nikos Mavros</span>
   </div>
-  <div class="foot-line" style="margin-top:14px;color:var(--grid);font-size:10px">
+  <div class="foot-line" style="margin-top:14px">
+    <span class="wired-line">No matter where you are, we are always connected.</span>
+  </div>
+  <div class="foot-line" style="margin-top:10px;color:var(--grid);font-size:10px">
     <span>Present day. Present time.</span>
   </div>
 </footer>
@@ -1456,7 +1661,7 @@ footer pre{
     ['DeepFire-Forecaster',        'https://github.com/mavroul1s/DeepFire-Forecaster'],
     ['NEOW / neo_tracker',         'https://github.com/mavroul1s/neo_tracker'],
     ['Sector 07 — Grid Expansion', 'https://github.com/mavroul1s/Isometric-Cyberpunk-Megastructure-Defense-Grid'],
-    ['GridSense',                  'https://github.com/mavroul1s/gridsense'],
+    ['GridSense',                  'https://github.com/mavroul1s/GridSense_collab'],
     ['NCF Reproduction',           'https://github.com/mavroul1s/ncf-assignment'],
     ['vit-gradient-flow',          'https://github.com/mavroul1s/vit-gradient-flow'],
     ['Galaxy-Morphology-CNN',      'https://github.com/mavroul1s/Galaxy-Morphology-CNN'],
@@ -1578,6 +1783,46 @@ footer pre{
         ghLangs(list);
       })
       .catch(function(){});
+  }
+
+  /* ---------- news feed ----------
+     Two live touches, both worked out from the dates in the markup rather than
+     typed in, so neither can go stale: the NEW badge on anything filed in the
+     last fortnight, and the entries printing themselves in when the log first
+     comes into view. */
+  var newsRows = [].slice.call(document.querySelectorAll('.news li'));
+  if(newsRows.length){
+    var FRESH = 14*86400000, badged = 0;
+    newsRows.forEach(function(li){
+      if(badged >= 3) return;
+      var stamp = li.querySelector('time'), iso = stamp && stamp.getAttribute('datetime');
+      if(!iso || iso.length < 10) return;            /* month-only entries never qualify */
+      var filed = new Date(iso + 'T00:00:00');
+      if(isNaN(filed) || Date.now() - filed.getTime() > FRESH) return;
+      var badge = document.createElement('span');
+      badge.className = 'new'; badge.textContent = 'NEW';
+      /* the badge shares the text's grid cell rather than claiming a row of
+         its own, so an entry stays one line tall */
+      var whatEl = li.querySelector('.what'), cellEl = document.createElement('span');
+      cellEl.className = 'line';
+      li.replaceChild(cellEl, whatEl);
+      cellEl.appendChild(whatEl); cellEl.appendChild(badge);
+      badged++;
+    });
+
+    if(!reduce && window.IntersectionObserver){
+      var nio = new IntersectionObserver(function(en){
+        en.forEach(function(e){
+          if(!e.isIntersecting) return;
+          nio.disconnect();
+          if(!MOTION) return;                        /* held still: they are simply there */
+          newsRows.slice(0,14).forEach(function(li,i){
+            li.style.animation = 'newsin .34s steps(5) ' + (i*0.045).toFixed(3) + 's both';
+          });
+        });
+      }, {threshold:.15});
+      nio.observe(document.querySelector('.feed-scroll') || newsRows[0]);
+    }
   }
 
   /* ---------- discord handle ----------
@@ -1769,12 +2014,12 @@ footer pre{
   var boot = document.getElementById('boot'), log = document.getElementById('bootlog');
   var bar = document.getElementById('bootbar');
   var lines = [
-    '> ctOS_LOCAL  v2.0   INIT',
-    '> mount /dev/portfolio ............ <span class="ok">OK</span>',
+    '> connect :: protocol seven ...... <span class="ok">LINKED</span>',
+    '> pull latest updates ............ <span class="ok">OK</span>',
+    '> mount /dev/portfolio ........... <span class="ok">OK</span>',
     '> load identity.dat .............. <span class="ok">OK</span>',
-    '> load projects.idx  [<span data-repo-count="19">19</span> REPOS] .. <span class="ok">OK</span>',
+    '> load projects.idx  [<span data-repo-count="18">18</span> REPOS] .. <span class="ok">OK</span>',
     '> link neow.orbital .............. <span class="ok">READY</span>',
-    '> verify checksums ............... <span class="ok">OK</span>',
     '> render'
   ];
   function finishBoot(){ boot.classList.add('done'); startHero(); }
@@ -1785,7 +2030,7 @@ footer pre{
       if(i >= lines.length){
         bar.style.width = '100%';
         boot.classList.add('granted');
-        setTimeout(finishBoot, 620);
+        setTimeout(finishBoot, 1050);   /* long enough to read the line it signs off with */
         return;
       }
       log.innerHTML += lines[i++] + '\n';
@@ -2329,7 +2574,9 @@ footer pre{
     if(window.ResizeObserver) new ResizeObserver(sectorBox).observe(sv);
 
     /* fixed seed — the sector looks the same on every visit */
-    var RINGS=[7,12,17,22,27,32], plots=[], links=[], rings=[], sseed=70831;
+    /* `slinks`, not `links`: var is function-scoped and the nav highlight up
+       there owns that name */
+    var RINGS=[7,12,17,22,27,32], plots=[], slinks=[], rings=[], sseed=70831;
     function srnd(){ sseed=(sseed*1103515245+12345)&0x7fffffff; return sseed/0x7fffffff; }
     RINGS.forEach(function(n,r){
       var ring=[];
@@ -2344,10 +2591,10 @@ footer pre{
         plots.push(p); ring.push(p);
       }
       /* nodes auto-connect to their neighbours; every third one also reaches inward */
-      for(var j=0;j<n;j++) links.push([ring[j],ring[(j+1)%n]]);
+      for(var j=0;j<n;j++) slinks.push([ring[j],ring[(j+1)%n]]);
       if(r){
         var prev=rings[r-1];
-        for(var m=0;m<n;m+=3) links.push([ring[m],prev[Math.floor(m*prev.length/n)]]);
+        for(var m=0;m<n;m+=3) slinks.push([ring[m],prev[Math.floor(m*prev.length/n)]]);
       }
       rings.push(ring);
     });
@@ -2423,8 +2670,8 @@ footer pre{
       }
 
       /* links, with data packets riding the transit tubes */
-      for(var i=0;i<links.length;i++){
-        var A=links[i][0], B=links[i][1];
+      for(var i=0;i<slinks.length;i++){
+        var A=slinks[i][0], B=slinks[i][1];
         var lv=Math.min(Math.max(0,Math.min(1,(built-A.seq)*1.5)),
                         Math.max(0,Math.min(1,(built-B.seq)*1.5)));
         if(lv<=0.02) continue;
@@ -2506,6 +2753,134 @@ footer pre{
     REPAINT.push(sstatic);
     onMotion(function(){ st0=performance.now(); requestAnimationFrame(sdraw); });
     if(!MOTION) sstatic();
+  }
+
+  /* ---------- DeepFire readout ----------
+     The task itself, drawn as a raster: a VIIRS tile with a fire front crossing
+     it, burn scar cooling behind, and the perimeter the model has to place for
+     the next acquisition running ahead of the flame. The terrain is a hashed
+     value-noise field with a fixed seed, so the same fire burns on every visit.
+     A schematic of the problem, not of any particular prediction. */
+  var fm = document.getElementById('firemap');
+  if(fm && fm.getContext){
+    var fg = fm.getContext('2d'), FW=0, FH=0, fdpr = Math.min(window.devicePixelRatio||1, 2);
+    function fsize(){
+      FW = fm.clientWidth; FH = fm.clientHeight;
+      fm.width = Math.round(FW*fdpr); fm.height = Math.round(FH*fdpr);
+      fg.setTransform(fdpr,0,0,fdpr,0,0);
+    }
+    function fireBox(){ fsize(); if(!MOTION) fstatic(); }
+    fsize();
+    window.addEventListener('resize', fireBox);
+    if(window.ResizeObserver) new ResizeObserver(fireBox).observe(fm);
+
+    function fhash(x,y){ var n=Math.sin(x*127.1+y*311.7)*43758.5453; return n-Math.floor(n); }
+    function fnoise(x,y){
+      var xi=Math.floor(x), yi=Math.floor(y), xf=x-xi, yf=y-yi;
+      var u=xf*xf*(3-2*xf), v=yf*yf*(3-2*yf);
+      return (fhash(xi,yi)*(1-u)+fhash(xi+1,yi)*u)*(1-v)+
+             (fhash(xi,yi+1)*(1-u)+fhash(xi+1,yi+1)*u)*v;
+    }
+
+    var FIRES=[[0.30,0.56],[0.63,0.42]], ft0=performance.now(), fvis=true;
+    if(window.IntersectionObserver){
+      new IntersectionObserver(function(en){ fvis=en[0].isIntersecting; },{rootMargin:'160px'})
+        .observe(fm);
+    }
+
+    function fdraw(now){
+      if(MOTION) requestAnimationFrame(fdraw);
+      if(!FW || !fvis) return;
+      var t=(now-ft0)/1000;
+      fg.clearRect(0,0,FW,FH);
+
+      var cell=Math.max(5,Math.round(FW/104));
+      var cols=Math.ceil(FW/cell), rows=Math.ceil(FH/cell), wide=FW/FH;
+      /* one acquisition cycle: ignition, spread, then the tile clears and the
+         next pass starts over. Distances are measured in units of the panel
+         height, so the fire is the same size whatever width it is given. */
+      var CYC=22, cyc=t%CYC, CLR=2.2;
+      var grow=Math.min(1,cyc/(CYC-CLR));
+      var R=0.06+0.34*grow*grow*(3-2*grow);        /* eased, so the front slows as it runs out of fuel */
+      var LEAD=0.055, band=0.045;
+      var fade=cyc>CYC-CLR ? Math.max(0,1-(cyc-(CYC-CLR))/CLR) : 1;
+
+      for(var j=0;j<rows;j++){
+        var ny=(j+0.5)/rows, y=j*cell;
+        for(var i=0;i<cols;i++){
+          var nx=(i+0.5)/cols, x=i*cell, w=cell-1;
+          /* distance to the nearest ignition, warped by the fuel field so the
+             perimeter is ragged rather than a circle */
+          var d=9;
+          for(var s=0;s<FIRES.length;s++){
+            var dx=(nx-FIRES[s][0])*wide, dy=ny-FIRES[s][1];
+            var dd=Math.sqrt(dx*dx+dy*dy)/(0.80+0.42*fnoise(nx*6+s*17,ny*6+s*7));
+            if(dd<d) d=dd;
+          }
+          var burn=R-d;
+          if(burn>band){                                   /* scar, cooling with age */
+            var age=Math.min(1,(burn-band)/0.24);
+            fg.fillStyle='rgba('+C_MUTED_RGB+','+(fade*(0.44-0.26*age)).toFixed(3)+')';
+            fg.fillRect(x,y,w,w);
+          } else if(burn>-0.008){                          /* the active front */
+            var fl=0.5+0.5*Math.sin(t*6.5+i*1.7+j*2.9);
+            fg.fillStyle='rgba('+(fl>0.72?C_ALERT_RGB:C_ACC_RGB)+','+(fade*(0.42+0.55*fl)).toFixed(3)+')';
+            fg.fillRect(x,y,w,w);
+          } else {                                         /* unburnt fuel */
+            var fuel=fnoise(nx*9,ny*9);
+            if(fuel>0.56){
+              fg.fillStyle='rgba('+C_GRID_RGB+','+((fuel-0.56)*0.62).toFixed(3)+')';
+              fg.fillRect(x,y,w,w);
+            }
+          }
+          if(Math.abs(d-(R+LEAD))<0.014){                  /* predicted perimeter, t+1 */
+            fg.fillStyle='rgba('+C_PRIM_RGB+','+(0.8*fade).toFixed(3)+')';
+            fg.fillRect(x,y,w,w);
+          }
+        }
+      }
+
+      /* the sensor pass crossing the tile */
+      var sx=((cyc/CYC)*1.22-0.11)*FW;
+      if(sx>-50 && sx<FW+50){
+        var gsc=fg.createLinearGradient(sx-52,0,sx,0);
+        gsc.addColorStop(0,'rgba('+C_PRIM_RGB+',0)');
+        gsc.addColorStop(1,'rgba('+C_PRIM_RGB+',.15)');
+        fg.fillStyle=gsc; fg.fillRect(sx-52,0,52,FH);
+        fg.fillStyle='rgba('+C_PLO_RGB+',.5)'; fg.fillRect(sx,0,1,FH);
+      }
+
+      /* HUD */
+      fg.font='8px "Share Tech Mono",monospace'; fg.textBaseline='middle';
+      fg.textAlign='left';
+      fg.fillStyle='rgba('+C_PRIM_RGB+',.75)'; fg.fillText('VIIRS · SUOMI-NPP / NOAA-20',10,12);
+      fg.fillStyle='rgba('+C_ACC_RGB+',.9)';   fg.fillText('ACTIVE FIRE · F1 0.855',10,FH-11);
+      fg.textAlign='right';
+      fg.fillStyle='rgba('+C_HAB_RGB+',.85)';
+      fg.fillText('TS_LENGTH = 2',FW-10,12);
+      fg.fillText('PREDICTED PERIMETER · t+1',FW-10,FH-11);
+
+      if(FW>620){                                          /* only where it fits */
+        var key=[[C_ACC_RGB,'FRONT'],[C_MUTED_RGB,'SCAR'],[C_PRIM_RGB,'PREDICTED']];
+        var kx=FW*0.5-70;
+        fg.textAlign='left';
+        for(var k=0;k<key.length;k++){
+          fg.fillStyle='rgba('+key[k][0]+',.85)'; fg.fillRect(kx,FH-14,6,6);
+          fg.fillStyle='rgba('+C_MUTED_RGB+',.95)'; fg.fillText(key[k][1],kx+10,FH-11);
+          kx+=22+key[k][1].length*5.4;
+        }
+      }
+    }
+    /* held still, the tile shows a fire mid-spread rather than a bare raster */
+    function fstatic(){
+      var k=ft0, v=fvis;
+      fvis=true; ft0=performance.now()-13000;
+      fdraw(performance.now());
+      ft0=k; fvis=v;
+    }
+    REPAINT.push(fstatic);
+    onMotion(function(){ ft0=performance.now(); requestAnimationFrame(fdraw); });
+    if(!MOTION) fstatic();
   }
 })();
 </script>
