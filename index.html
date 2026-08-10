@@ -537,6 +537,8 @@ html[data-motion="off"] .portrait .ln{opacity:1}
 .panel.flag{border-left:2px solid var(--accent)}
 .panel-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin:0 0 4px}
 .panel-h h3{margin:0;font-size:clamp(17px,2.4vw,22px);font-weight:700;color:var(--primary-lo);letter-spacing:.02em}
+/* a paper title is a sentence, not a banner — it gets read, not shouted */
+.panel-h h3.paper{font-size:clamp(14.5px,1.75vw,18px);line-height:1.45;max-width:72ch}
 .stack{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 16px}
 .stack span{color:var(--grid);padding:0 4px}
 
@@ -953,6 +955,40 @@ footer pre{
 .lang:first-child .bar i{background:var(--accent);opacity:.9}
 .lang .n{font-size:11px;color:var(--primary-lo);text-align:right}
 
+/* ---- commit calendar ----
+   Five steps from the grid colour up to the bright end of the palette, so it
+   reads purple under Unit 01 and blue under Unit 00 without a second set of
+   values to keep in step */
+.ghcal-wrap{overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+.ghcal-months{
+  position:relative;height:13px;min-width:min-content;
+  font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+}
+.ghcal-months span{position:absolute;top:0;white-space:nowrap}
+.ghcal{
+  display:grid;grid-template-rows:repeat(7,11px);grid-auto-flow:column;
+  grid-auto-columns:11px;gap:3px;min-width:min-content;
+}
+.ghcal i{
+  display:block;width:11px;height:11px;
+  background:rgba(var(--grid-rgb),.14);box-shadow:inset 0 0 0 1px rgba(var(--grid-rgb),.16);
+}
+.ghcal i[data-l="1"]{background:rgba(var(--primary-rgb),.30);box-shadow:inset 0 0 0 1px rgba(var(--primary-rgb),.34)}
+.ghcal i[data-l="2"]{background:rgba(var(--primary-rgb),.55);box-shadow:none}
+.ghcal i[data-l="3"]{background:rgba(var(--primary-rgb),.82);box-shadow:none}
+.ghcal i[data-l="4"]{background:var(--primary-lo);box-shadow:0 0 7px rgba(var(--primary-rgb),.45)}
+.ghcal i[data-l="0"].void{background:transparent;box-shadow:none}
+.ghcal-foot{
+  display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin-top:10px;
+  font-size:10.5px;letter-spacing:.1em;color:var(--muted);
+}
+.ghcal-key{display:flex;align-items:center;gap:4px;margin-left:auto;text-transform:uppercase}
+.ghcal-key i{display:block;width:10px;height:10px;background:rgba(var(--grid-rgb),.14)}
+.ghcal-key i[data-l="1"]{background:rgba(var(--primary-rgb),.30)}
+.ghcal-key i[data-l="2"]{background:rgba(var(--primary-rgb),.55)}
+.ghcal-key i[data-l="3"]{background:rgba(var(--primary-rgb),.82)}
+.ghcal-key i[data-l="4"]{background:var(--primary-lo)}
+
 /* the stats fold away — they are supporting evidence, not the argument */
 .gh-fold{padding:0}
 .gh-fold summary{
@@ -1204,75 +1240,76 @@ footer pre{
 
     <div class="feed-scroll">
       <ol class="news">
+        <!-- NEWS:START -->
         <li>
           <time datetime="2026-08-10">(Aug 10th, '26)</time>
           <a class="what" href="certs/Acceptance-Certificate-sensors-4426418.pdf" target="_blank" rel="noopener">SpaSE-UNet3D accepted in <em>Sensors</em> (MDPI) — wildfire detection and progression from VIIRS</a>
         </li>
-        <li>
+        <li data-repo="1324097243">
           <time datetime="2026-08-05">(Aug 05th, '26)</time>
           <a class="what" href="https://github.com/mavroul1s/neuron-death" target="_blank" rel="noopener">neuron-death opened — are dead units a cause of plasticity loss, or a correlate?</a>
         </li>
-        <li>
+        <li data-repo="1320465836">
           <time datetime="2026-08-02">(Aug 02nd, '26)</time>
           <a class="what" href="https://github.com/mavroul1s/pokemon_competition" target="_blank" rel="noopener">New repository opened: pokemon_competition</a>
         </li>
-        <li>
+        <li data-repo="1318092820">
           <time datetime="2026-07-31">(Jul 31st, '26)</time>
           <a class="what" href="https://mavroul1s.github.io/Isometric-Cyberpunk-Megastructure-Defense-Grid/" target="_blank" rel="noopener">Sector 07 released — an isometric defence grid that runs in the browser</a>
         </li>
-        <li>
+        <li data-repo="1316128769">
           <time datetime="2026-07-29">(Jul 29th, '26)</time>
           <a class="what" href="https://github.com/mavroul1s/mavroul1s.github.io" target="_blank" rel="noopener">This site went live at mavroul1s.github.io</a>
         </li>
-        <li>
+        <li data-repo="1314801836">
           <time datetime="2026-07-28">(Jul 28th, '26)</time>
           <a class="what" href="https://mavroul1s.github.io/neo_tracker/neo-tracker.html" target="_blank" rel="noopener">NEOW orbital tracker published, built on NASA's NeoWs feed</a>
         </li>
-        <li>
+        <li data-repo="1245634115">
           <time datetime="2026-05-21">(May 21st, '26)</time>
           <a class="what" href="https://github.com/mavroul1s/GridSense_collab" target="_blank" rel="noopener">GridSense — polyglot-persistence smart grid prototype</a>
         </li>
-        <li>
+        <li data-repo="1227096225">
           <time datetime="2026-05-02">(May 02nd, '26)</time>
           <a class="what" href="https://github.com/mavroul1s/ir-assignment-2026" target="_blank" rel="noopener">ECE328 Information Retrieval coursework published</a>
         </li>
-        <li>
+        <li data-repo="1216290305">
           <time datetime="2026-04-20">(Apr 20th, '26)</time>
           <a class="what" href="https://github.com/mavroul1s/ncf-assignment" target="_blank" rel="noopener">NCF reproduction on MovieLens-100K published</a>
         </li>
-        <li>
+        <li data-repo="1204750793">
           <time datetime="2026-04-08">(Apr 08th, '26)</time>
           <a class="what" href="https://github.com/mavroul1s/groking-ecg-signals" target="_blank" rel="noopener">New repository opened: groking-ecg-signals</a>
         </li>
-        <li>
+        <li data-repo="1203198906">
           <time datetime="2026-04-06">(Apr 06th, '26)</time>
           <a class="what" href="https://github.com/mavroul1s/KinetiCore" target="_blank" rel="noopener">KinetiCore — real-time hand and face tracking sandbox</a>
         </li>
-        <li>
+        <li data-repo="1191539752">
           <time datetime="2026-03-25">(Mar 25th, '26)</time>
           <a class="what" href="https://github.com/mavroul1s/vit-gradient-flow" target="_blank" rel="noopener">vit-gradient-flow — the analytic Jacobian of self-attention, in Julia</a>
         </li>
-        <li>
+        <li data-repo="1178653534">
           <time datetime="2026-03-11">(Mar 11th, '26)</time>
           <a class="what" href="https://github.com/mavroul1s/ECE443-Coursework" target="_blank" rel="noopener">ECE443 Speech and Audio Processing coursework published</a>
         </li>
-        <li>
+        <li data-repo="1169407216">
           <time datetime="2026-02-28">(Feb 28th, '26)</time>
           <a class="what" href="https://github.com/mavroul1s/DeepFire-Forecaster" target="_blank" rel="noopener">DeepFire-Forecaster opened — wildfire remote sensing on TS-SatFire</a>
         </li>
-        <li>
+        <li data-repo="1160676452">
           <time datetime="2026-02-18">(Feb 18th, '26)</time>
           <a class="what" href="https://github.com/mavroul1s/ECE457-Coursework" target="_blank" rel="noopener">ECE457 Computer Vision coursework published</a>
         </li>
-        <li>
+        <li data-repo="1160296476">
           <time datetime="2026-02-17">(Feb 17th, '26)</time>
           <a class="what" href="https://github.com/mavroul1s/ECE418-Coursework" target="_blank" rel="noopener">ECE418 Neuro-Fuzzy Computing coursework published</a>
         </li>
-        <li>
+        <li data-repo="1152280647">
           <time datetime="2026-02-07">(Feb 07th, '26)</time>
           <a class="what" href="https://github.com/mavroul1s/Galaxy-Morphology-CNN" target="_blank" rel="noopener">Galaxy-Morphology-CNN — 0.109 RMSE on the Galaxy Zoo blind test</a>
         </li>
-        <li>
+        <li data-repo="1132700205">
           <time datetime="2026-01-12">(Jan 12th, '26)</time>
           <a class="what" href="https://github.com/mavroul1s/GMM-Music-Genre-Recognition" target="_blank" rel="noopener">GMM music genre recogniser — EM written from scratch</a>
         </li>
@@ -1300,6 +1337,7 @@ footer pre{
           <time datetime="2023-04">(Apr '23)</time>
           <a class="what" href="certs/ecescon-14.pdf" target="_blank" rel="noopener">Attended ECESCON 14, University of Thessaly</a>
         </li>
+      <!-- NEWS:END -->
       </ol>
     </div>
 
@@ -1313,10 +1351,10 @@ footer pre{
 
   <div class="panel flag" style="margin-bottom:16px">
     <div class="panel-h">
-      <h3>DeepFire-Forecaster</h3>
+      <h3 class="paper">SpaSE-UNet3D: Sensor-Driven Wildfire Detection and Progression Prediction from VIIRS Multispectral Imagery</h3>
       <span class="tag acc">Accepted</span>
     </div>
-    <p class="stack">BurnBench<span>/</span>Jupyter + PyTorch<span>/</span>156 commits<span>/</span>MIT</p>
+    <p class="stack">MIT licensed</p>
 
     <div class="bay readout" aria-hidden="true">
       <canvas id="firemap"></canvas>
@@ -1327,48 +1365,27 @@ footer pre{
 
     <div class="notice ok">
       <b>ACCEPTED</b>
-      <span><em>SpaSE-UNet3D: Sensor-Driven Wildfire Detection and Progression Prediction from VIIRS Multispectral Imagery</em> — Mavros and Katsaros, accepted in <em>Sensors</em> (MDPI) on 10 August 2026, manuscript sensors-4426418. In press: no DOI or page numbers until it appears. <a href="certs/Acceptance-Certificate-sensors-4426418.pdf" target="_blank" rel="noopener">Certificate of acceptance (PDF)</a></span>
+      <span>Mavros and Katsaros, accepted in <em>Sensors</em> (MDPI) on 10 August 2026, manuscript sensors-4426418. In press: no DOI or page numbers until it appears. <a href="certs/Acceptance-Certificate-sensors-4426418.pdf" target="_blank" rel="noopener">Certificate of acceptance (PDF)</a></span>
     </div>
 
-    <p style="margin:0 0 20px;max-width:78ch">Wildfire remote sensing on the TS-SatFire benchmark (2025) — VIIRS image stacks from Suomi-NPP and NOAA-20, scored on active fire detection and fire progression.</p>
+    <p style="margin:0 0 20px;max-width:78ch">Wildfire remote sensing on the TS-SatFire benchmark — VIIRS multispectral stacks from Suomi-NPP and NOAA-20, scored on detecting the fire that is burning now and predicting where its front goes next. Two contributions:</p>
 
     <div class="cols">
       <div>
-        <h4 class="sub">SpaSE-UNet3D</h4>
-        <ul class="spec">
-          <li>Spatial squeeze-and-excitation 3D U-Net, <span class="datum" tabindex="0" data-src="SOURCE: model definition in DeepFire-Forecaster.">~32.9M parameters</span></li>
-          <li>Spatial-only <span class="datum" tabindex="0" data-src="SOURCE: ResBlock3D definition, DeepFire-Forecaster.">(1, 3, 3)</span> convolutions — no mixing across days, because the observation windows are too short to pay for it. Squeeze-and-excitation reweights the spectral bands instead</li>
-          <li>ASPP bottleneck, deep supervision, Dice + Focal loss</li>
-          <li>One config switch (<code>TS_LENGTH = 1</code> or <code>2</code>) for a clean ablation</li>
-        </ul>
+        <h4 class="sub">The architecture</h4>
+        <p style="margin:0;font-size:13.5px">A 3D U-Net whose convolutions are <span class="datum" tabindex="0" data-src="SOURCE: ResBlock3D definition, DeepFire-Forecaster.">spatial-only (1, 3, 3)</span>: it refuses to mix across days, because the observation windows are too short to pay for it, and squeeze-and-excitation reweights the VIIRS bands instead. <span class="datum" tabindex="0" data-src="SOURCE: F1 micro-averaged over all test pixels, mean ± std, 15 verified test fires. DeepFire-Forecaster manuscript.">F1 0.8549</span> on active fire, matching the strongest baselines on their own terms with a third of their temporal context at <span class="datum" tabindex="0" data-src="SOURCE: DeepFire-Forecaster manuscript abstract.">2.72× fewer parameters</span>.</p>
       </div>
       <div>
-        <h4 class="sub">The finding is in the labels</h4>
-        <p style="margin:0 0 10px;font-size:13.5px">Many fires carry no ground truth at all. <span class="datum" tabindex="0" data-src="SOURCE: label-completeness audit, DeepFire-Forecaster manuscript.">18 training fires and 2 test fires</span> are excluded for active fire — and those two test fires cannot be scored by any model, not just this one.</p>
-        <p style="margin:0;font-size:13.5px">Training on audited data raised recall from <span class="datum" tabindex="0" data-src="SOURCE: before/after audit training runs, DeepFire-Forecaster.">~0.80 to 0.86</span>. The benchmark's own scoring differs from ours in ways that make the two sets of figures incomparable, so no baseline delta is quoted.</p>
+        <h4 class="sub">The audit</h4>
+        <p style="margin:0;font-size:13.5px">Many fires in the benchmark carry no ground truth at all. <span class="datum" tabindex="0" data-src="SOURCE: label-completeness audit, DeepFire-Forecaster manuscript.">18 training fires and 2 test fires</span> are excluded for active fire — and those two cannot be scored by any model, not just this one. Training on audited data raised recall from <span class="datum" tabindex="0" data-src="SOURCE: before/after audit training runs, DeepFire-Forecaster.">~0.80 to 0.86</span>, which makes the label quality the finding rather than the model.</p>
       </div>
     </div>
 
-    <div class="tbl-wrap" style="margin-top:20px">
-      <table>
-        <caption>F1 micro-averaged over all test pixels, mean ± std, over 15 verified fires. IoU derived as F1/(2−F1).</caption>
-        <thead>
-          <tr><th>Task</th><th>Config</th><th style="text-align:right">F1</th><th style="text-align:right">IoU</th><th>Note</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Active fire</td><td>TS=2</td><td class="num">0.8549 ± 0.0005</td><td class="num">0.747</td><td>Matches or exceeds the strongest baselines on their own terms</td></tr>
-          <tr><td>Active fire</td><td>TS=1</td><td class="num">0.8520 ± 0.0008</td><td class="num">0.742</td><td>One acquisition carries almost all of it, where baselines use up to six days</td></tr>
-          <tr><td>Fire progression</td><td>TS=2</td><td class="num">0.3845 ± 0.0221</td><td class="num">0.238</td><td>A third of the baselines' context, at <span class="datum" tabindex="0" data-src="SOURCE: DeepFire-Forecaster manuscript abstract.">2.72× fewer parameters</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <p style="margin:16px 0 0;font-size:13px;color:var(--muted)">Reproduces on a Kaggle T4 inside the 12-hour session limit. No local setup. <a href="https://github.com/mavroul1s/DeepFire-Forecaster" target="_blank" rel="noopener">github.com/mavroul1s/DeepFire-Forecaster →</a></p>
+    <p style="margin:18px 0 0;font-size:13px;color:var(--muted)">Reproduces on a Kaggle T4 inside the 12-hour session limit. <a href="https://github.com/mavroul1s/DeepFire-Forecaster" target="_blank" rel="noopener">github.com/mavroul1s/DeepFire-Forecaster →</a></p>
   </div>
 
   <div class="panel flag" style="margin-bottom:16px;border-left-color:var(--accent)">
     <div class="panel-h"><h3>NEOW / neo_tracker</h3></div>
-    <p class="stack">three.js<span>/</span>single HTML file<span>/</span>no build step</p>
 
     <a class="bay" href="https://mavroul1s.github.io/neo_tracker/neo-tracker.html" target="_blank" rel="noopener" aria-label="Launch the NEOW orbital tracker">
       <canvas id="orbit" aria-hidden="true"></canvas>
@@ -1403,7 +1420,6 @@ footer pre{
 
   <div class="panel flag" style="margin-bottom:16px;border-left-color:var(--accent)">
     <div class="panel-h"><h3>Sector 07 — Grid Expansion</h3></div>
-    <p class="stack">three.js<span>/</span>WebGL2<span>/</span>Web Audio<span>/</span>single HTML file<span>/</span>no build step</p>
 
     <a class="bay" href="https://mavroul1s.github.io/Isometric-Cyberpunk-Megastructure-Defense-Grid/" target="_blank" rel="noopener" aria-label="Play Sector 07, the isometric defence grid">
       <canvas id="sector" aria-hidden="true"></canvas>
@@ -1550,6 +1566,16 @@ footer pre{
       <div class="ghstat"><b data-gh="lastpush">today</b><span>last push</span></div>
     </div>
 
+    <h4 class="sub" style="margin:22px 0 10px">Commits per day — last 52 weeks</h4>
+    <div class="ghcal-wrap">
+      <div class="ghcal-months" id="ghcalmonths" aria-hidden="true"></div>
+      <div class="ghcal" id="ghcal" role="img" aria-label="Commit calendar for the last 52 weeks"></div>
+    </div>
+    <div class="ghcal-foot">
+      <span id="ghcalnote">counting…</span>
+      <span class="ghcal-key" aria-hidden="true">less <i data-l="0"></i><i data-l="1"></i><i data-l="2"></i><i data-l="3"></i><i data-l="4"></i> more</span>
+    </div>
+
     <h4 class="sub" style="margin:22px 0 10px">Languages by repository</h4>
     <div class="ghlangs" id="ghlangs">
       <div class="lang"><span class="l">Jupyter Notebook</span><span class="bar"><i style="width:100%"></i></span><span class="n">7</span></div>
@@ -1660,9 +1686,7 @@ footer pre{
 <!-- ===================== CONTACT ===================== -->
 <section id="contact">
   <h2 class="sec-h"><span class="path">~/</span>contact <span class="rule"></span></h2>
-  <p style="margin:0;max-width:64ch">Open to research collaborations and internships in machine learning and computer vision. The fastest route is email; code is on GitHub.</p>
-
-  <div class="contact-grid">
+  <div class="contact-grid" style="margin-top:0">
     <a class="link-box" href="mailto:nick.black.4416@gmail.com">
       <span class="lbl">Email</span><span class="val">nick.black.4416@gmail.com</span>
     </a>
@@ -1843,6 +1867,145 @@ footer pre{
     });
   }
 
+  /* ---------- commit calendar ----------
+     GitHub's own contribution graph is not in the public REST API, and this
+     site does not use badge services, so the grid is built from what the API
+     will actually hand over: the per-day commit counts each repository keeps
+     for the last 52 weeks, summed. That is commits only — no issues, reviews
+     or pull requests — over the repositories listed below, so the total is
+     smaller than the one on the profile page. The note under it says so.
+     Answers are cached for six hours, because the unauthenticated API allows
+     sixty calls an hour and a reload should not spend them all. */
+  var CAL_REPOS = 12, CAL_TTL = 6*3600*1000, CAL_KEY = 'ghcal-v1';
+  var calBox = document.getElementById('ghcal'), calDays = {}, calCells = [];
+
+  function dayKey(d){
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+
+           String(d.getDate()).padStart(2,'0');
+  }
+  function buildCal(){
+    if(!calBox) return;
+    var end = new Date(); end.setHours(0,0,0,0);
+    end.setDate(end.getDate() + (6 - end.getDay()));      /* to the end of this week */
+    var start = new Date(end); start.setDate(start.getDate() - (53*7 - 1));
+    var months = document.getElementById('ghcalmonths');
+    var seen = -1, frag = document.createDocumentFragment(), today = dayKey(new Date());
+    for(var w=0; w<53; w++){
+      for(var d=0; d<7; d++){
+        var day = new Date(start); day.setDate(start.getDate() + w*7 + d);
+        var cell = document.createElement('i');
+        cell.setAttribute('data-l','0');
+        var key = dayKey(day);
+        if(day > new Date()) cell.className = 'void';       /* the rest of this week */
+        else { cell.setAttribute('data-d', key); calCells.push(cell); }
+        frag.appendChild(cell);
+        if(months && d === 0 && day.getMonth() !== seen && day.getDate() <= 7){
+          seen = day.getMonth();
+          var lab = document.createElement('span');
+          lab.textContent = MONTHS[seen];
+          lab.style.left = (w*14) + 'px';
+          months.appendChild(lab);
+        }
+      }
+    }
+    calBox.appendChild(frag);
+  }
+  function paintCal(note){
+    if(!calBox) return;
+    var vals = [], k;
+    for(k in calDays) if(calDays[k] > 0) vals.push(calDays[k]);
+    vals.sort(function(a,b){ return a-b; });
+    /* thresholds from the distribution, so a quiet year still has contrast */
+    function q(p){ return vals.length ? vals[Math.min(vals.length-1, Math.floor(vals.length*p))] : 1; }
+    var t1 = 1, t2 = Math.max(2, q(0.50)), t3 = Math.max(t2+1, q(0.80)), t4 = Math.max(t3+1, q(0.95));
+    var total = 0, best = 0;
+    calCells.forEach(function(cell){
+      var n = calDays[cell.getAttribute('data-d')] || 0;
+      total += n; if(n > best) best = n;
+      var lv = n === 0 ? 0 : n < t2 ? 1 : n < t3 ? 2 : n < t4 ? 3 : 4;
+      cell.setAttribute('data-l', lv);
+      cell.setAttribute('title', (n === 0 ? 'No commits' : n + (n === 1 ? ' commit' : ' commits')) +
+                                 ' on ' + cell.getAttribute('data-d'));
+    });
+    var el = document.getElementById('ghcalnote');
+    if(el) el.textContent = note ? note :
+      total.toLocaleString() + ' commits over the last year · busiest day ' + best +
+      ' · counted from the public API over the ' + CAL_REPOS + ' most recently active repositories, commits only';
+  }
+  /* done(true) only when this repository really handed over its weeks — an
+     empty answer must not be mistaken for a quiet year, or cached as one */
+  function calStats(fullName, tries, done){
+    fetch('https://api.github.com/repos/'+fullName+'/stats/commit_activity')
+      .then(function(r){
+        /* the stats are computed on demand: 202 means come back in a moment */
+        if((r.status === 202 || r.status === 204) && tries < 3){
+          setTimeout(function(){ calStats(fullName, tries+1, done); }, 1500*(tries+1));
+          return null;
+        }
+        if(!r.ok) return [];
+        return r.json().catch(function(){ return []; });
+      })
+      .then(function(weeks){
+        if(weeks === null) return;                /* a retry is already booked */
+        var got = false;
+        if(weeks.length){
+          weeks.forEach(function(w){
+            if(!w || !w.days) return;
+            for(var i=0;i<7;i++){
+              if(!w.days[i]) continue;
+              got = true;
+              var key = dayKey(new Date((w.week + i*86400) * 1000));
+              calDays[key] = (calDays[key] || 0) + w.days[i];
+            }
+          });
+        }
+        done(got || weeks.length > 0);
+      })
+      .catch(function(){ done(false); });
+  }
+  /* the repository list is what the calendar is built from, so if that call
+     is refused there is nothing to count and the grid must say so rather than
+     sit on "counting…" for the rest of the visit */
+  var calGaveUp = false;
+  function calFail(){
+    if(calGaveUp || !calBox) return;
+    calGaveUp = true;
+    paintCal('commit counts unavailable — the public API is rate-limited or unreachable');
+  }
+  function ghCal(list){
+    if(!calBox) return;
+    var cached = null;
+    try{ cached = JSON.parse(localStorage.getItem(CAL_KEY) || 'null'); }catch(e){}
+    if(cached && cached.days && Object.keys(cached.days).length &&
+       Date.now() - cached.t < CAL_TTL){
+      calDays = cached.days; paintCal(cached.note); return;
+    }
+    var top = list.slice(0, CAL_REPOS), left = top.length, answered = 0, settled = false;
+    if(!left){ paintCal('no repositories to count'); return; }
+    function settle(){
+      if(settled) return;                       /* exactly once, however we got here */
+      settled = true;
+      if(!answered){
+        /* sixty calls an hour, shared by everyone behind this address */
+        paintCal('commit counts unavailable — the public API is rate-limited or still counting');
+        return;
+      }
+      paintCal();
+      var el = document.getElementById('ghcalnote');
+      try{
+        localStorage.setItem(CAL_KEY, JSON.stringify({t:Date.now(), days:calDays,
+          note: el ? el.textContent : ''}));
+      }catch(e){}                               /* a full or refused store is not fatal */
+    }
+    top.forEach(function(r){
+      calStats(r.full_name, 0, function(ok){
+        if(ok) answered++;
+        if(--left <= 0) settle();
+      });
+    });
+  }
+  buildCal();
+
   if(window.fetch){
     fetch('https://api.github.com/users/mavroul1s')
       .then(function(r){ return r.ok ? r.json() : null; })
@@ -1857,7 +2020,7 @@ footer pre{
     fetch('https://api.github.com/users/mavroul1s/repos?per_page=100&sort=pushed')
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(list){
-        if(!list || !list.length) return;
+        if(!list || !list.length){ calFail(); return; }
         var stars = 0, last = '';
         for(var i=0;i<list.length;i++){
           stars += list[i].stargazers_count || 0;
@@ -1866,8 +2029,9 @@ footer pre{
         ghNum('stars', stars);
         if(last) ghAgo(last);
         ghLangs(list);
+        ghCal(list);                          /* the list arrives sorted by last push */
       })
-      .catch(function(){});
+      .catch(calFail);
   }
 
   /* ---------- news feed ----------

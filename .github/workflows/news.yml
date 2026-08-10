@@ -1,0 +1,46 @@
+name: news
+
+# Keeps the ~/news log in step with the public repository list: a repository
+# that appears is announced, one that is deleted is removed from the log, and
+# one that is renamed is announced again. Everything hand-written in the log
+# is left alone — see scripts/sync_news.py.
+#
+# To stop it: disable this workflow in the Actions tab, or delete this file.
+
+on:
+  schedule:
+    - cron: '17 5,17 * * *'   # twice a day, off the hour so it is not queued with everyone else
+  workflow_dispatch:          # or run it by hand from the Actions tab
+
+permissions:
+  contents: write
+
+concurrency:
+  group: news
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read the repository list and edit the log
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 scripts/sync_news.py
+
+      - name: Commit, but only if something actually moved
+        run: |
+          if [ -z "$(git status --porcelain index.html data/repos.json)" ]; then
+            echo "nothing changed"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html data/repos.json
+          git commit -m "Sync the news log with the repository list
+
+          Written by .github/workflows/news.yml. The repository list moved, so
+          the log moved with it."
+          git push

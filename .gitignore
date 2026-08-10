@@ -8,3 +8,7 @@ nikos-mavros-brief.md
 # anything committed here is world-readable and stays in git history.
 certs/ΑΣΤΥΝΟΜΙΚΗ ΤΑΥΤΌΤΗΤΑ.pdf
 certs/desktop.ini
+
+# Python bytecode from the news sync script
+__pycache__/
+*.pyc
