@@ -87,10 +87,7 @@ def load_snapshot():
 def entry_html(repo):
     """One <li>, in the same shape a hand-written entry takes."""
     created = repo["created_at"][:10]
-    desc = (repo.get("description") or "").strip().rstrip(".")
-    what = "New repository opened: %s" % repo["name"]
-    if desc:
-        what += " — %s" % desc
+    what = "New repository created (%s)" % repo["name"]
     return (
         '        <li data-repo="%d" data-auto="1">\n'
         '          <time datetime="%s">%s</time>\n'
