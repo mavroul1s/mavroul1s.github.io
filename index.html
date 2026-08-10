@@ -523,6 +523,7 @@ html[data-motion="off"] .portrait .ln{opacity:1}
   padding:2px 7px;border:1px solid currentColor;vertical-align:2px;
 }
 .tag.rev{color:var(--accent)}
+.tag.acc{color:var(--primary)}
 .tag.ver{color:var(--muted)}
 .tag.course{color:var(--grid)}
 
@@ -545,6 +546,13 @@ html[data-motion="off"] .portrait .ln{opacity:1}
   padding:10px 12px;font-size:12.5px;color:var(--accent);margin:0 0 20px;
 }
 .notice b{font-weight:700;letter-spacing:.1em;white-space:nowrap}
+/* the same block, once the answer came back */
+.notice.ok{
+  border-color:rgba(var(--primary-rgb),.45);background:rgba(var(--primary-rgb),.07);
+  color:var(--primary-lo);
+}
+.notice.ok em{font-style:italic}
+.notice.ok a{color:var(--primary-lo);border-bottom-color:rgba(var(--primary-lo-rgb),.45)}
 
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:26px}
 @media(max-width:820px){.cols{grid-template-columns:1fr;gap:20px}}
@@ -1197,6 +1205,10 @@ footer pre{
     <div class="feed-scroll">
       <ol class="news">
         <li>
+          <time datetime="2026-08-10">(Aug 10th, '26)</time>
+          <a class="what" href="certs/Acceptance-Certificate-sensors-4426418.pdf" target="_blank" rel="noopener">SpaSE-UNet3D accepted in <em>Sensors</em> (MDPI) — wildfire detection and progression from VIIRS</a>
+        </li>
+        <li>
           <time datetime="2026-08-05">(Aug 05th, '26)</time>
           <a class="what" href="https://github.com/mavroul1s/neuron-death" target="_blank" rel="noopener">neuron-death opened — are dead units a cause of plasticity loss, or a correlate?</a>
         </li>
@@ -1302,7 +1314,7 @@ footer pre{
   <div class="panel flag" style="margin-bottom:16px">
     <div class="panel-h">
       <h3>DeepFire-Forecaster</h3>
-      <span class="tag rev">Under review</span>
+      <span class="tag acc">Accepted</span>
     </div>
     <p class="stack">BurnBench<span>/</span>Jupyter + PyTorch<span>/</span>156 commits<span>/</span>MIT</p>
 
@@ -1313,9 +1325,9 @@ footer pre{
     </div>
     <p class="capt">Schematic, not model output: a fire front advancing across a VIIRS tile — burn scar behind it, active front on the edge, and in cyan the perimeter the model is asked to place for the next acquisition.</p>
 
-    <div class="notice">
-      <b>NOTICE</b>
-      <span>Manuscript under review at MDPI <em>Sensors</em>. Not accepted, not published, no DOI. Results below are from the repository.</span>
+    <div class="notice ok">
+      <b>ACCEPTED</b>
+      <span><em>SpaSE-UNet3D: Sensor-Driven Wildfire Detection and Progression Prediction from VIIRS Multispectral Imagery</em> — Mavros and Katsaros, accepted in <em>Sensors</em> (MDPI) on 10 August 2026, manuscript sensors-4426418. In press: no DOI or page numbers until it appears. <a href="certs/Acceptance-Certificate-sensors-4426418.pdf" target="_blank" rel="noopener">Certificate of acceptance (PDF)</a></span>
     </div>
 
     <p style="margin:0 0 20px;max-width:78ch">Wildfire remote sensing on the TS-SatFire benchmark (2025) — VIIRS image stacks from Suomi-NPP and NOAA-20, scored on active fire detection and fire progression.</p>
@@ -1613,6 +1625,16 @@ footer pre{
 <!-- ===================== CREDENTIALS ===================== -->
 <section id="credentials">
   <h2 class="sec-h"><span class="path">~/</span>credentials <span class="rule"></span></h2>
+
+  <h4 class="sub">Publications</h4>
+  <ul class="creds" style="margin:0 0 26px">
+    <li><a class="cert" href="certs/Acceptance-Certificate-sensors-4426418.pdf" target="_blank" rel="noopener">
+      <span>Mavros, N. and Katsaros, D. — <em>SpaSE-UNet3D: Sensor-Driven Wildfire Detection and Progression Prediction from VIIRS Multispectral Imagery</em></span>
+      <span class="who">Sensors (MDPI), ISSN 1424-8220 — accepted, in press</span>
+      <span class="when">10 Aug 2026</span>
+      <span class="doc">PDF</span>
+    </a></li>
+  </ul>
 
   <div class="cols">
     <div>
