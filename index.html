@@ -398,63 +398,8 @@ section{padding:56px 0;scroll-margin-top:calc(var(--bar-h,31px) + var(--nav-h,39
 /* ============================================================
    HERO
    ============================================================ */
-.name{position:relative;margin:0 0 18px}
-/* the plate cuts in on arrival — base state is visible, so with motion off
-   (animation:none) it is simply there */
-.name.in{animation:plate-in 1.08s steps(9,end) 1}
-.name.in .lay{animation:plate-lay 1.08s steps(9,end) 1}
-@keyframes plate-in{
-  from{clip-path:inset(0 100% 0 0)}
-  to{clip-path:inset(0 0 0 0)}
-}
-@keyframes plate-lay{
-  0%{opacity:.9;transform:translateX(-7px)}
-  60%{opacity:.45;transform:translateX(5px)}
-  100%{opacity:0;transform:translateX(0)}
-}
-.name pre{
-  margin:0;font-size:clamp(6px,2.0vw,29px);line-height:1.02;
-  font-weight:700;color:var(--primary);
-  text-shadow:0 0 18px rgba(var(--primary-rgb),.28);
-}
-/* sized against the column it sits in; the clamp above is the fallback.
-   37 characters wide, so roughly twice the type the old plate could take */
-@container (min-width:0px){ .name pre{font-size:min(3.8cqw,29px)} }
-/* Y2K chrome: a hard specular band travelling across the plate */
-.name > pre{
-  background:linear-gradient(105deg,
-    var(--primary) 0%,var(--primary) 38%,
-    var(--bright) 45%,var(--spec) 48%,var(--bright) 51%,
-    var(--primary-lo) 58%,var(--primary) 70%,var(--primary) 100%);
-  background-size:280% 100%;background-position:100% 0;
-  -webkit-background-clip:text;background-clip:text;
-  -webkit-text-fill-color:transparent;color:transparent;
-  animation:chrome 9s linear infinite;
-}
-@keyframes chrome{0%,55%{background-position:100% 0}100%{background-position:-40% 0}}
-.name .lay{position:absolute;inset:0;opacity:0}
-.name .lay.r pre{color:var(--alert)}
-.name .lay.b pre{color:var(--accent)}
-.name.glitch .lay.r{opacity:.85;animation:gr .42s steps(2) 1}
-.name.glitch .lay.b{opacity:.7;animation:gb .42s steps(2) 1}
-@keyframes gr{
-  0%{transform:translate(0,0);clip-path:inset(0 0 72% 0)}
-  25%{transform:translate(-5px,1px);clip-path:inset(38% 0 30% 0)}
-  50%{transform:translate(4px,-2px);clip-path:inset(65% 0 8% 0)}
-  75%{transform:translate(-3px,0);clip-path:inset(12% 0 58% 0)}
-  100%{transform:translate(0,0);clip-path:inset(0 0 100% 0)}
-}
-@keyframes gb{
-  0%{transform:translate(0,0);clip-path:inset(55% 0 20% 0)}
-  40%{transform:translate(5px,2px);clip-path:inset(10% 0 66% 0)}
-  80%{transform:translate(-4px,-1px);clip-path:inset(70% 0 4% 0)}
-  100%{transform:translate(0,0);clip-path:inset(0 0 100% 0)}
-}
-
 .hero-grid{display:grid;grid-template-columns:1.55fr .95fr;gap:34px;align-items:start;margin-top:0}
-/* the plate is sized against its column, not the window, so it can never
-   outgrow the half it now lives in */
-.hero-main{min-width:0;container-type:inline-size}
+.hero-main{min-width:0}
 @media(max-width:860px){.hero-grid{grid-template-columns:1fr;gap:26px}}
 
 .lede{font-size:clamp(15px,1.9vw,19px);line-height:1.55;color:var(--primary-lo);margin:0 0 18px;min-height:3.2em}
@@ -1118,26 +1063,6 @@ footer pre{
 <section id="hero">
   <div class="hero-grid">
     <div class="hero-main">
-  <div class="name" id="nameplate">
-    <pre aria-label="wired">██╗    ██╗██╗██████╗ ███████╗██████╗ 
-██║    ██║██║██╔══██╗██╔════╝██╔══██╗
-██║ █╗ ██║██║██████╔╝█████╗  ██║  ██║
-██║███╗██║██║██╔══██╗██╔══╝  ██║  ██║
-╚███╔███╔╝██║██║  ██║███████╗██████╔╝
- ╚══╝╚══╝ ╚═╝╚═╝  ╚═╝╚══════╝╚═════╝ </pre>
-    <div class="lay r" aria-hidden="true"><pre>██╗    ██╗██╗██████╗ ███████╗██████╗ 
-██║    ██║██║██╔══██╗██╔════╝██╔══██╗
-██║ █╗ ██║██║██████╔╝█████╗  ██║  ██║
-██║███╗██║██║██╔══██╗██╔══╝  ██║  ██║
-╚███╔███╔╝██║██║  ██║███████╗██████╔╝
- ╚══╝╚══╝ ╚═╝╚═╝  ╚═╝╚══════╝╚═════╝ </pre></div>
-    <div class="lay b" aria-hidden="true"><pre>██╗    ██╗██╗██████╗ ███████╗██████╗ 
-██║    ██║██║██╔══██╗██╔════╝██╔══██╗
-██║ █╗ ██║██║██████╔╝█████╗  ██║  ██║
-██║███╗██║██║██╔══██╗██╔══╝  ██║  ██║
-╚███╔███╔╝██║██║  ██║███████╗██████╔╝
- ╚══╝╚══╝ ╚═╝╚═╝  ╚═╝╚══════╝╚═════╝ </pre></div>
-  </div>
 
       <p class="lede"><span id="typed"></span><span class="cursor" aria-hidden="true"></span></p>
       <p class="hero-sub">Personal site — <strong>not for professional use</strong>. I just post here whatever I do that I consider worth noticing about me and my career. I'm interested in neural nets, computer vision and signal processing, and I often work on projects that blend these categories. Take a look, and contact me if you have any questions or ideas you would like to discuss.</p>
@@ -1419,8 +1344,10 @@ footer pre{
 
     <div class="cols" style="margin-top:16px">
       <div>
-        <p style="margin:0 0 12px">Heliocentric solar system viewer built on NASA's NeoWs near-Earth object feed. It propagates eight planets, fifteen moons, and every tracked NEO from published osculating elements through a Kepler solver.</p>
-        <p style="margin:0;color:var(--muted);font-size:13px">Publishes its own scale factors rather than faking scale, shows JPL orbit uncertainty codes, and explicitly corrects the "potentially hazardous means close now" misconception. Bilingual English / Ελληνικά. No dependencies beyond three.js.</p>
+        <p style="margin:0 0 12px">A watch post for the traffic around Earth. Choose a date range and it shows every near-Earth object NASA is tracking in that window — how close each one passes, how large it is, how well its orbit is actually known — and puts it in its place in a solar system you can fly around.</p>
+        <p style="margin:0 0 12px">Nothing is animated. Eight planets, fifteen moons and every tracked asteroid are propagated from published osculating elements through a Kepler solver, so what you see is computed. Move the camera freely, lock onto a contact for its telemetry, sort the registry by miss distance, or open any planet or moon for its figures and a link through to NASA's page on it.</p>
+        <p style="margin:0 0 12px"><b style="color:var(--primary-lo);font-weight:500">Bring your own NASA key.</b> It ships on the shared <code>DEMO_KEY</code>, which works but is rate-limited to a handful of calls an hour. Paste a free key from <span class="datum" tabindex="0" data-src="SOURCE: api.nasa.gov issues free keys instantly. The tracker calls one endpoint with it — api.nasa.gov/neo/rest/v1/feed, NASA's Near Earth Object Web Service.">api.nasa.gov</span> into the data link panel and the feed is yours: live close-approach data for any dates you ask for, with hazard classifications, Sentry listings and JPL orbit uncertainty codes as NASA publishes them.</p>
+        <p style="margin:0;color:var(--muted);font-size:13px">Publishes its own scale factors rather than faking scale, and corrects the "potentially hazardous means close now" misconception rather than trading on it. Bilingual English / Ελληνικά. One HTML file, no dependencies beyond three.js.</p>
       </div>
       <div>
         <h4 class="sub">Checked against independent ground truth</h4>
@@ -1517,7 +1444,7 @@ footer pre{
     <article class="card">
       <h3>vit-gradient-flow</h3>
       <p class="stack" style="margin:0">Julia<span>/</span>ECE452</p>
-      <p>Derives the explicit Jacobian of the self-attention mechanism using matrix calculus, then verifies it numerically with ForwardDiff.jl. Compares orthogonal initialisation (WᵀW = I) against Xavier/Glorot on Jacobian conditioning and feature saliency, using MNIST as sequential patches.</p>
+      <p>A Vision Transformer built from scratch in Julia — attention, initialisation and training loop — in order to take matrix calculus to it. The Jacobian of the self-attention mechanism is derived by hand with matrix differential rules, then checked numerically against ForwardDiff.jl to prove the derivation right. With that in hand, the experiment: does orthogonal initialisation (WᵀW = I) keep gradients better conditioned through attention than Xavier/Glorot? Measured on Jacobian condition numbers and feature saliency, with MNIST fed in as sequential patches.</p>
       <canvas class="viz" data-viz="vit" aria-hidden="true"></canvas>
       <div class="meta">
         <span class="kv">Commits <b>52</b></span>
@@ -2307,24 +2234,9 @@ footer pre{
     if(started) return; started = true;
     onMotion(cycle);
     if(!MOTION) typedEl.textContent = LEDES[li];
-    var plate = document.getElementById('nameplate');
-    /* both intros wait for the boot screen to clear, so they are not spent
-       behind it; they replay whenever motion is switched back on */
-    onMotion(function(){
-      plate.classList.remove('in');
-      void plate.offsetWidth;                  /* restart the keyframes */
-      plate.classList.add('in');
-    });
+    /* the portrait waits for the boot screen to clear, so it is not drawn
+       behind it; it replays whenever motion is switched back on */
     onMotion(revealPortrait);
-    onMotion(function burst(){
-      if(!MOTION) return;
-      setTimeout(function(){
-        if(!MOTION) return;
-        plate.classList.add('glitch');
-        setTimeout(function(){ plate.classList.remove('glitch'); }, 430);
-        burst();
-      }, 5200 + Math.random()*6000);
-    });
 
     /* horizontal-hold slip — rare, brief, no layout shift */
     var slippers = [document.querySelector('main'), document.querySelector('footer')];
@@ -2360,7 +2272,7 @@ footer pre{
     '> render'
   ];
   /* the opener goes out with the boot screen it was printed on, so it never
-     sits over the nameplate. With the boot skipped it simply holds a beat. */
+     sits over the hero. With the boot skipped it simply holds a beat. */
   var pdpt = document.getElementById('pdpt');
   function dropPdpt(hold){
     if(!pdpt) return;
