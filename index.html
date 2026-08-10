@@ -1890,8 +1890,10 @@ footer pre{
      smaller than the one on the profile page. The note under it says so.
      Answers are cached for six hours, because the unauthenticated API allows
      sixty calls an hour and a reload should not spend them all. */
-  var CAL_REPOS = 12, CAL_TTL = 6*3600*1000, CAL_KEY = 'ghcal-v1';
+  var CAL_REPOS = 12, CAL_PAGES = 3, CAL_TTL = 6*3600*1000, CAL_KEY = 'ghcal-v2';
   var calBox = document.getElementById('ghcal'), calDays = {}, calCells = [];
+  var calAsked = 0, calCounted = 0;         /* how many repositories were asked, and answered */
+  var calSince = '';                        /* the first day the grid shows, in ISO */
 
   function dayKey(d){
     return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+
@@ -1902,6 +1904,8 @@ footer pre{
     var end = new Date(); end.setHours(0,0,0,0);
     end.setDate(end.getDate() + (6 - end.getDay()));      /* to the end of this week */
     var start = new Date(end); start.setDate(start.getDate() - (53*7 - 1));
+    calSince = new Date(start.getTime() - start.getTimezoneOffset()*60000)
+                 .toISOString().slice(0,19) + 'Z';   /* the window the API is asked for */
     var months = document.getElementById('ghcalmonths');
     var seen = -1, frag = document.createDocumentFragment(), today = dayKey(new Date());
     for(var w=0; w<53; w++){
@@ -1942,38 +1946,53 @@ footer pre{
                                  ' on ' + cell.getAttribute('data-d'));
     });
     var el = document.getElementById('ghcalnote');
-    if(el) el.textContent = note ? note :
-      total.toLocaleString() + ' commits over the last year · busiest day ' + best +
-      ' · counted from the public API over the ' + CAL_REPOS + ' most recently active repositories, commits only';
+    if(el) el.textContent = note ? note : calNote(total, best);
   }
-  /* done(true) only when this repository really handed over its weeks — an
-     empty answer must not be mistaken for a quiet year, or cached as one */
-  function calStats(fullName, tries, done){
-    fetch('https://api.github.com/repos/'+fullName+'/stats/commit_activity')
-      .then(function(r){
-        /* the stats are computed on demand: 202 means come back in a moment */
-        if((r.status === 202 || r.status === 204) && tries < 3){
-          setTimeout(function(){ calStats(fullName, tries+1, done); }, 1500*(tries+1));
-          return null;
+  /* A count is only worth printing if it says what it counted. GitHub computes
+     these statistics on demand, so on a cold call some repositories answer 202
+     and are still missing when the rest have arrived — printing the sum as if
+     it were the year would make the figure change between visits for no reason
+     the reader can see. So the note carries the denominator whenever it is
+     short of the full set. */
+  function calNote(total, best){
+    var head = total.toLocaleString() + ' commits in the last year · busiest day ' + best;
+    if(calCounted < calAsked){
+      return head + ' · counted over ' + calCounted + ' of ' + calAsked +
+             ' repositories, the rest were still being computed by GitHub';
+    }
+    return head + ' · summed over ' + calAsked +
+           ' repositories from the public API, commits only';
+  }
+  /* Counted from the commit list rather than from /stats/commit_activity.
+     The statistics endpoint is computed on demand: a repository pushed
+     recently answers 202 and keeps answering it while GitHub recomputes, so
+     the busiest repositories were the ones most often missing and the yearly
+     total moved between visits for no reason a reader could see. The commit
+     list is always there to be read. An empty answer from it is information —
+     no commits in the window — rather than an unfinished one.
+
+     Pages are followed while they come back full, up to CAL_PAGES, which is
+     enough for a hundred commits a page over a year. */
+  function calCommits(fullName, page, done){
+    fetch('https://api.github.com/repos/'+fullName+'/commits?since='+calSince+
+          '&per_page=100&page='+page)
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(commits){
+        if(!commits || !commits.length){
+          done(commits !== null);               /* [] is a real answer; null is not */
+          return;
         }
-        if(!r.ok) return [];
-        return r.json().catch(function(){ return []; });
-      })
-      .then(function(weeks){
-        if(weeks === null) return;                /* a retry is already booked */
-        var got = false;
-        if(weeks.length){
-          weeks.forEach(function(w){
-            if(!w || !w.days) return;
-            for(var i=0;i<7;i++){
-              if(!w.days[i]) continue;
-              got = true;
-              var key = dayKey(new Date((w.week + i*86400) * 1000));
-              calDays[key] = (calDays[key] || 0) + w.days[i];
-            }
-          });
+        commits.forEach(function(c){
+          var when = c.commit && (c.commit.author || c.commit.committer);
+          if(!when || !when.date) return;
+          var key = dayKey(new Date(when.date));
+          calDays[key] = (calDays[key] || 0) + 1;
+        });
+        if(commits.length === 100 && page < CAL_PAGES){
+          calCommits(fullName, page+1, done);   /* there is more of this year */
+        } else {
+          done(true);
         }
-        done(got || weeks.length > 0);
       })
       .catch(function(){ done(false); });
   }
@@ -1994,17 +2013,23 @@ footer pre{
        Date.now() - cached.t < CAL_TTL){
       calDays = cached.days; paintCal(cached.note); return;
     }
-    var top = list.slice(0, CAL_REPOS), left = top.length, answered = 0, settled = false;
+    var top = list.slice(0, CAL_REPOS), left = top.length, settled = false;
+    calAsked = top.length;
     if(!left){ paintCal('no repositories to count'); return; }
     function settle(){
       if(settled) return;                       /* exactly once, however we got here */
       settled = true;
-      if(!answered){
+      if(!calCounted){
         /* sixty calls an hour, shared by everyone behind this address */
         paintCal('commit counts unavailable — the public API is rate-limited or still counting');
         return;
       }
       paintCal();
+      /* Only a complete answer is worth keeping for six hours. A short one is
+         shown, because a mostly-drawn year beats an empty one, but it is not
+         written down — the next visit asks again and by then GitHub has
+         usually finished computing. */
+      if(calCounted < calAsked) return;
       var el = document.getElementById('ghcalnote');
       try{
         localStorage.setItem(CAL_KEY, JSON.stringify({t:Date.now(), days:calDays,
@@ -2012,8 +2037,8 @@ footer pre{
       }catch(e){}                               /* a full or refused store is not fatal */
     }
     top.forEach(function(r){
-      calStats(r.full_name, 0, function(ok){
-        if(ok) answered++;
+      calCommits(r.full_name, 1, function(ok){
+        if(ok){ calCounted++; paintCal(); }     /* the grid fills in as they land */
         if(--left <= 0) settle();
       });
     });
