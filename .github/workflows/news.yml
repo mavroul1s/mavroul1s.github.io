@@ -30,17 +30,23 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 scripts/sync_news.py
 
+      # Counted here rather than in the browser: this token allows five
+      # thousand calls an hour, the visitor's address allows sixty.
+      - name: Count commits for the calendar
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 scripts/build_calendar.py
+
       - name: Commit, but only if something actually moved
         run: |
-          if [ -z "$(git status --porcelain index.html data/repos.json)" ]; then
+          if [ -z "$(git status --porcelain index.html data/)" ]; then
             echo "nothing changed"
             exit 0
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html data/repos.json
-          git commit -m "Sync the news log with the repository list
+          git add index.html data/
+          git commit -m "Sync the news log and the commit calendar
 
-          Written by .github/workflows/news.yml. The repository list moved, so
-          the log moved with it."
+          Written by .github/workflows/news.yml."
           git push

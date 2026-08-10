@@ -1893,6 +1893,7 @@ footer pre{
   var CAL_REPOS = 12, CAL_PAGES = 3, CAL_TTL = 6*3600*1000, CAL_KEY = 'ghcal-v2';
   var calBox = document.getElementById('ghcal'), calDays = {}, calCells = [];
   var calAsked = 0, calCounted = 0;         /* how many repositories were asked, and answered */
+  var calBuilt = null;                      /* set when the counts came from the committed file */
   var calSince = '';                        /* the first day the grid shows, in ISO */
 
   function dayKey(d){
@@ -1948,20 +1949,40 @@ footer pre{
     var el = document.getElementById('ghcalnote');
     if(el) el.textContent = note ? note : calNote(total, best);
   }
-  /* A count is only worth printing if it says what it counted. GitHub computes
-     these statistics on demand, so on a cold call some repositories answer 202
-     and are still missing when the rest have arrived — printing the sum as if
-     it were the year would make the figure change between visits for no reason
-     the reader can see. So the note carries the denominator whenever it is
-     short of the full set. */
+  /* A count is only worth printing if it says what it counted, so the note
+     carries the denominator whenever it is short of the full set. */
   function calNote(total, best){
     var head = total.toLocaleString() + ' commits in the last year · busiest day ' + best;
-    if(calCounted < calAsked){
-      return head + ' · counted over ' + calCounted + ' of ' + calAsked +
-             ' repositories, the rest were still being computed by GitHub';
+    function repos(n){ return n + (n === 1 ? ' repository' : ' repositories'); }
+    if(calBuilt){
+      return head + ' · counted over all ' + repos(calAsked) + ', commits only' +
+             (calBuilt.length ? ' · rebuilt ' + calBuilt : '');
     }
-    return head + ' · summed over ' + calAsked +
-           ' repositories from the public API, commits only';
+    if(calCounted < calAsked){
+      return head + ' · counted over ' + calCounted + ' of ' + repos(calAsked) +
+             ', the API refused the rest';
+    }
+    return head + ' · summed over ' + repos(calAsked) + ' from the public API, commits only';
+  }
+  /* The counting is done once, in the workflow, and committed as a file: the
+     unauthenticated API allows sixty calls an hour shared by everyone behind
+     one address, which a dozen calls a visit will exhaust on any busy network.
+     Reading a file costs nothing, is the same for every visitor, and covers
+     every repository rather than the dozen most recent. The API path below is
+     kept as the fallback for a checkout without the file. */
+  function calFromFile(){
+    if(!calBox || !window.fetch) return Promise.resolve(false);
+    return fetch('data/commits.json')
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){
+        if(!d || !d.days || !Object.keys(d.days).length) return false;
+        calDays = d.days;
+        calAsked = calCounted = d.repos || 0;
+        calBuilt = d.generated ? d.generated.slice(0,10) : '';
+        paintCal();
+        return true;
+      })
+      .catch(function(){ return false; });
   }
   /* Counted from the commit list rather than from /stats/commit_activity.
      The statistics endpoint is computed on demand: a repository pushed
@@ -2044,6 +2065,9 @@ footer pre{
     });
   }
   buildCal();
+  /* asked for straight away; the repository call below waits on the answer
+     before deciding whether it has to count anything itself */
+  var calFile = calFromFile();
 
   if(window.fetch){
     fetch('https://api.github.com/users/mavroul1s')
@@ -2059,7 +2083,10 @@ footer pre{
     fetch('https://api.github.com/users/mavroul1s/repos?per_page=100&sort=pushed')
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(list){
-        if(!list || !list.length){ calFail(); return; }
+        if(!list || !list.length){
+          calFile.then(function(had){ if(!had) calFail(); });
+          return;
+        }
         var stars = 0, last = '';
         for(var i=0;i<list.length;i++){
           stars += list[i].stargazers_count || 0;
@@ -2068,9 +2095,10 @@ footer pre{
         ghNum('stars', stars);
         if(last) ghAgo(last);
         ghLangs(list);
-        ghCal(list);                          /* the list arrives sorted by last push */
+        /* only count from the browser if the committed file was not there */
+        calFile.then(function(had){ if(!had) ghCal(list); });
       })
-      .catch(calFail);
+      .catch(function(){ calFile.then(function(had){ if(!had) calFail(); }); });
   }
 
   /* ---------- news feed ----------
