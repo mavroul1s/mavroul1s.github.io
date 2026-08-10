@@ -413,12 +413,13 @@ section{padding:56px 0;scroll-margin-top:calc(var(--bar-h,31px) + var(--nav-h,39
   100%{opacity:0;transform:translateX(0)}
 }
 .name pre{
-  margin:0;font-size:clamp(3px,1.02vw,15px);line-height:1.02;
+  margin:0;font-size:clamp(6px,2.0vw,29px);line-height:1.02;
   font-weight:700;color:var(--primary);
   text-shadow:0 0 18px rgba(var(--primary-rgb),.28);
 }
-/* sized against the column it sits in; the clamp above is the fallback */
-@container (min-width:0px){ .name pre{font-size:min(1.94cqw,15px)} }
+/* sized against the column it sits in; the clamp above is the fallback.
+   37 characters wide, so roughly twice the type the old plate could take */
+@container (min-width:0px){ .name pre{font-size:min(3.8cqw,29px)} }
 /* Y2K chrome: a hard specular band travelling across the plate */
 .name > pre{
   background:linear-gradient(105deg,
@@ -458,7 +459,12 @@ section{padding:56px 0;scroll-margin-top:calc(var(--bar-h,31px) + var(--nav-h,39
 
 .lede{font-size:clamp(15px,1.9vw,19px);line-height:1.55;color:var(--primary-lo);margin:0 0 18px;min-height:3.2em}
 .cursor{display:inline-block;width:.6em;height:1.05em;background:var(--primary);vertical-align:-2px;animation:blink 1.05s steps(1) infinite}
-.hero-sub{color:var(--fg);margin:0 0 22px;max-width:60ch}
+.hero-sub{color:var(--fg);margin:0 0 22px;max-width:66ch;font-size:14px;line-height:1.65}
+/* the disclaimer is the one thing in it that should not be skimmed past */
+.hero-sub strong{
+  color:var(--accent);font-weight:500;
+  border-bottom:1px solid rgba(var(--accent-rgb),.4);
+}
 
 .rail{display:flex;flex-wrap:wrap;gap:8px}
 .chip{
@@ -1075,7 +1081,7 @@ footer pre{
 
 <!-- ===================== TOP BAR ===================== -->
 <header class="topbar">
-  <div><span class="dot">●</span> <b>MAVROS.N</b> <span class="hide-s">// ELECTRICAL &amp; COMPUTER ENGINEERING</span></div>
+  <div><span class="dot">●</span> <b>MAVROS.N</b> <span class="hide-s">// Undergraduate electrical and computer engineer</span></div>
   <div class="right">
     <a class="launch-mini" href="https://mavroul1s.github.io/neo_tracker/neo-tracker.html" target="_blank" rel="noopener"><span class="rad" aria-hidden="true"></span> NEOW TRACKER</a>
     <button type="button" class="sw" id="motionsw" aria-pressed="false" aria-label="Hold the animations still">
@@ -1113,28 +1119,28 @@ footer pre{
   <div class="hero-grid">
     <div class="hero-main">
   <div class="name" id="nameplate">
-    <pre aria-label="mavroul1s">███╗   ███╗ █████╗ ██╗   ██╗██████╗  ██████╗ ██╗   ██╗██╗      ██╗███████╗
-████╗ ████║██╔══██╗██║   ██║██╔══██╗██╔═══██╗██║   ██║██║     ███║██╔════╝
-██╔████╔██║███████║██║   ██║██████╔╝██║   ██║██║   ██║██║     ╚██║███████╗
-██║╚██╔╝██║██╔══██║╚██╗ ██╔╝██╔══██╗██║   ██║██║   ██║██║      ██║╚════██║
-██║ ╚═╝ ██║██║  ██║ ╚████╔╝ ██║  ██║╚██████╔╝╚██████╔╝███████╗ ██║███████║
-╚═╝     ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚══════╝ ╚═╝╚══════╝</pre>
-    <div class="lay r" aria-hidden="true"><pre>███╗   ███╗ █████╗ ██╗   ██╗██████╗  ██████╗ ██╗   ██╗██╗      ██╗███████╗
-████╗ ████║██╔══██╗██║   ██║██╔══██╗██╔═══██╗██║   ██║██║     ███║██╔════╝
-██╔████╔██║███████║██║   ██║██████╔╝██║   ██║██║   ██║██║     ╚██║███████╗
-██║╚██╔╝██║██╔══██║╚██╗ ██╔╝██╔══██╗██║   ██║██║   ██║██║      ██║╚════██║
-██║ ╚═╝ ██║██║  ██║ ╚████╔╝ ██║  ██║╚██████╔╝╚██████╔╝███████╗ ██║███████║
-╚═╝     ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚══════╝ ╚═╝╚══════╝</pre></div>
-    <div class="lay b" aria-hidden="true"><pre>███╗   ███╗ █████╗ ██╗   ██╗██████╗  ██████╗ ██╗   ██╗██╗      ██╗███████╗
-████╗ ████║██╔══██╗██║   ██║██╔══██╗██╔═══██╗██║   ██║██║     ███║██╔════╝
-██╔████╔██║███████║██║   ██║██████╔╝██║   ██║██║   ██║██║     ╚██║███████╗
-██║╚██╔╝██║██╔══██║╚██╗ ██╔╝██╔══██╗██║   ██║██║   ██║██║      ██║╚════██║
-██║ ╚═╝ ██║██║  ██║ ╚████╔╝ ██║  ██║╚██████╔╝╚██████╔╝███████╗ ██║███████║
-╚═╝     ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚══════╝ ╚═╝╚══════╝</pre></div>
+    <pre aria-label="wired">██╗    ██╗██╗██████╗ ███████╗██████╗ 
+██║    ██║██║██╔══██╗██╔════╝██╔══██╗
+██║ █╗ ██║██║██████╔╝█████╗  ██║  ██║
+██║███╗██║██║██╔══██╗██╔══╝  ██║  ██║
+╚███╔███╔╝██║██║  ██║███████╗██████╔╝
+ ╚══╝╚══╝ ╚═╝╚═╝  ╚═╝╚══════╝╚═════╝ </pre>
+    <div class="lay r" aria-hidden="true"><pre>██╗    ██╗██╗██████╗ ███████╗██████╗ 
+██║    ██║██║██╔══██╗██╔════╝██╔══██╗
+██║ █╗ ██║██║██████╔╝█████╗  ██║  ██║
+██║███╗██║██║██╔══██╗██╔══╝  ██║  ██║
+╚███╔███╔╝██║██║  ██║███████╗██████╔╝
+ ╚══╝╚══╝ ╚═╝╚═╝  ╚═╝╚══════╝╚═════╝ </pre></div>
+    <div class="lay b" aria-hidden="true"><pre>██╗    ██╗██╗██████╗ ███████╗██████╗ 
+██║    ██║██║██╔══██╗██╔════╝██╔══██╗
+██║ █╗ ██║██║██████╔╝█████╗  ██║  ██║
+██║███╗██║██║██╔══██╗██╔══╝  ██║  ██║
+╚███╔███╔╝██║██║  ██║███████╗██████╔╝
+ ╚══╝╚══╝ ╚═╝╚═╝  ╚═╝╚══════╝╚═════╝ </pre></div>
   </div>
 
       <p class="lede"><span id="typed"></span><span class="cursor" aria-hidden="true"></span></p>
-      <p class="hero-sub">Neural networks, computer vision, and remote sensing. Fifth-year ECE at the University of Thessaly.</p>
+      <p class="hero-sub">Personal site — <strong>not for professional use</strong>. I just post here whatever I do that I consider worth noticing about me and my career. I'm interested in neural nets, computer vision and signal processing, and I often work on projects that blend these categories. Take a look, and contact me if you have any questions or ideas you would like to discuss.</p>
 
       <div class="actions">
         <a class="btn primary" href="#projects"><span class="k">▸</span><span>Selected work</span></a>
