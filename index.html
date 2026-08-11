@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NIKOS MAVROS // ECE // UNIVERSITY OF THESSALY</title>
-<meta name="description" content="Nikos Mavros — fifth-year Electrical and Computer Engineering student at the University of Thessaly. Deep learning for remote sensing, computer vision, orbital mechanics.">
+<title>mavroul1s.navi // NIKOS MAVROS</title>
+<meta name="description" content="mavroul1s.navi — the personal site of Nikos Mavros, undergraduate electrical and computer engineer at the University of Thessaly. Neural nets, computer vision and signal processing.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -322,6 +322,13 @@ html[data-motion="off"] #pdpt{opacity:1;animation:none}
 .sw[aria-pressed="true"] b{color:var(--accent)}
 .sw .k{color:var(--accent)}
 @media(max-width:1000px){.sw .lbl{display:none}.sw{padding:3px 7px}}
+/* on a phone the bar runs out of room and the clock falls off the end. The
+   tracker launch goes instead: the ticker under it and the projects section
+   both carry the same link, and the clock does not exist anywhere else. */
+@media(max-width:560px){
+  .launch-mini{display:none}
+  .topbar .right{gap:11px}
+}
 
 /* ============================================================
    NAV
@@ -1026,7 +1033,7 @@ footer pre{
 
 <!-- ===================== TOP BAR ===================== -->
 <header class="topbar">
-  <div><span class="dot">●</span> <b>MAVROS.N</b> <span class="hide-s">// Undergraduate electrical and computer engineer</span></div>
+  <div><span class="dot">●</span> <b>mavroul1s.navi</b> <span class="hide-s">// Undergraduate electrical and computer engineer</span></div>
   <div class="right">
     <a class="launch-mini" href="https://mavroul1s.github.io/neo_tracker/neo-tracker.html" target="_blank" rel="noopener"><span class="rad" aria-hidden="true"></span> NEOW TRACKER</a>
     <button type="button" class="sw" id="motionsw" aria-pressed="false" aria-label="Hold the animations still">
