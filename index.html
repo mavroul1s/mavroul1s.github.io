@@ -1365,25 +1365,11 @@ footer pre{
       </span>
     </a>
 
-    <div class="cols" style="margin-top:16px">
-      <div>
-        <p style="margin:0 0 12px">Isometric cyberpunk city-builder and defence game. You hold one megacity sector: build nodes onto empty pads, let them link into a network, and purge intrusions before their timers run out — six rings deep around a central spire.</p>
-      </div>
-      <div>
-        <h4 class="sub">What is actually in there</h4>
-        <ul class="spec">
-          <li><span class="datum" tabindex="0" data-src="SOURCE: repository README — six rings, claiming every plot wins the game.">117 plots across six rings</span>, claimed outward from the core</li>
-          <li>Eight node classes over five tiers; each link pays +8%, an isolated node loses 25%</li>
-          <li>Six breach classes unlock as threat climbs <span class="datum" tabindex="0" data-src="SOURCE: repository README — seven threat levels; reaching 100 triggers lockdown and seizes 18% of credits.">SECURE → OVERRUN</span></li>
-          <li>Every building merges to <span class="datum" tabindex="0" data-src="SOURCE: repository README — merged geometry, roughly three draw calls per building regardless of detail.">~3 draw calls</span>, which is what makes tier-5 towers affordable</li>
-          <li>1,400 citizens, 260 vehicles and ~1,100 data packets drawn as points</li>
-          <li>Audio is synthesised through the Web Audio API — no sound files</li>
-        </ul>
-        <div class="actions" style="margin:16px 0 0">
-          <a class="btn primary" href="https://mavroul1s.github.io/Isometric-Cyberpunk-Megastructure-Defense-Grid/" target="_blank" rel="noopener"><span class="k">▸</span><span>Play in browser</span></a>
-          <a class="btn ghost" href="https://github.com/mavroul1s/Isometric-Cyberpunk-Megastructure-Defense-Grid" target="_blank" rel="noopener"><span class="k">▸</span><span>Source</span></a>
-        </div>
-      </div>
+    <p style="margin:16px 0 0;max-width:78ch">Isometric cyberpunk city-builder and defence game. You hold one megacity sector: build nodes onto empty pads, let them link into a network, and purge intrusions before their timers run out — six rings deep around a central spire.</p>
+
+    <div class="actions" style="margin:16px 0 0">
+      <a class="btn primary" href="https://mavroul1s.github.io/Isometric-Cyberpunk-Megastructure-Defense-Grid/" target="_blank" rel="noopener"><span class="k">▸</span><span>Play in browser</span></a>
+      <a class="btn ghost" href="https://github.com/mavroul1s/Isometric-Cyberpunk-Megastructure-Defense-Grid" target="_blank" rel="noopener"><span class="k">▸</span><span>Source</span></a>
     </div>
   </div>
 
@@ -2792,7 +2778,14 @@ footer pre{
     rules.forEach(function(r){ ro.observe(r); });
   }
 
-  /* ---------- NEOW schematic ---------- */
+  /* ---------- NEOW schematic ----------
+     The tracker's own method, in miniature: mean anomaly through a Newton
+     solve to eccentric anomaly, then the ellipse — nothing here is a circle
+     on a timer. Five planets and a debris belt hold the plane; two near-Earth
+     objects cross it on inclined, eccentric orbits, and the readout is the
+     live separation between the closest of them and Earth, in AU on the scale
+     Earth's own semi-major axis sets. The plane is seen from just above it, so
+     an inclined orbit reads as inclined. */
   var cv = document.getElementById('orbit');
   if(cv && cv.getContext){
     var ctx = cv.getContext('2d'), W=0, H=0, dpr = Math.min(window.devicePixelRatio||1, 2);
@@ -2809,71 +2802,253 @@ footer pre{
     if(window.ResizeObserver) new ResizeObserver(orbitBox).observe(cv);
 
     /* colours by name, resolved each frame so a theme change carries through */
-    var bodies = [
-      {a:0.30, e:0.10, s:1.62, r:1.6, c:'mid'},
-      {a:0.45, e:0.05, s:1.18, r:2.0, c:'mid'},
-      {a:0.60, e:0.06, s:1.00, r:2.4, c:'hi'},
-      {a:0.76, e:0.11, s:0.79, r:2.0, c:'acc'},
-      {a:0.93, e:0.34, s:0.55, r:1.6, c:'red'}
-    ];
     function bcol(k){ return k==='hi'?C_HI:k==='acc'?C_ACC:k==='red'?C_RED:C_MID_S; }
-    var t0 = performance.now();
+
+    var TILT = 0.42;          /* how flat the plane looks from the camera */
+    var LIFT = 0.55;          /* how far off-plane height rises on screen */
+    var AU   = 0.48;          /* Earth's semi-major axis, so one AU in these units */
+    var KGM  = 0.1393;        /* n = KGM·a^-1.5 — the third law sets every period */
+
+    /* w is the argument of perihelion, i the inclination; both matter only
+       because they are what makes a crossing orbit look like one */
+    var planets = [
+      {a:0.20, e:0.07, w:0.90, i:0,     r:1.5, c:'mid'},
+      {a:0.32, e:0.02, w:2.10, i:0,     r:1.9, c:'mid'},
+      {a:0.48, e:0.02, w:0.00, i:0,     r:2.5, c:'hi',  moon:0.048},
+      {a:0.66, e:0.09, w:2.70, i:0,     r:1.8, c:'acc'},
+      {a:0.90, e:0.05, w:4.40, i:0,     r:2.7, c:'mid', ring:1}
+    ];
+    /* both crossers are phased so their nodes fall on Earth's orbit while
+       Earth is there — the passes are the point of the panel, and left to an
+       arbitrary phase the two would spend minutes missing each other by an AU */
+    var neos = [
+      {a:0.366, e:0.52, w:0.458, i:0.52,  M0:3.011, r:1.6, c:'red', id:'2026 QF'},
+      {a:0.302, e:0.62, w:3.207, i:-0.36, M0:3.927, r:1.4, c:'red', id:'2026 HB'}
+    ];
+    var tracked = planets.concat(neos);
+    tracked.forEach(function(b,k){
+      b.n = KGM*Math.pow(b.a,-1.5);
+      if(b.M0 === undefined) b.M0 = (k*2.4+b.a*11)%6.2832;
+    });
+
+    /* the belt and the starfield are seeded, so the same sky comes back */
+    var belt = [], stars = [], oseed = 20831;
+    function ornd(){ oseed=(oseed*1103515245+12345)&0x7fffffff; return oseed/0x7fffffff; }
+    for(var bi=0;bi<110;bi++){
+      var ba = 0.735+ornd()*0.105;
+      belt.push({a:ba, e:ornd()*0.08, w:ornd()*6.2832, i:(ornd()-0.5)*0.10,
+                 n:KGM*Math.pow(ba,-1.5), M0:ornd()*6.2832, g:0.18+ornd()*0.34});
+    }
+    for(var si=0;si<64;si++){
+      stars.push({x:ornd(), y:ornd(), a:0.15+ornd()*0.5, sp:0.4+ornd()*1.5, ph:ornd()*6.2832});
+    }
+
+    /* Newton on Kepler's equation; four passes is machine precision at these e */
+    function kep(M,e){
+      var E=M;
+      for(var q=0;q<4;q++) E -= (E-e*Math.sin(E)-M)/(1-e*Math.cos(E));
+      return E;
+    }
+    /* heliocentric position, in the units above: along-plane x, y and height z */
+    function orb(b,t){
+      var E = kep((b.M0+b.n*t)%6.2832, b.e);
+      var x = b.a*(Math.cos(E)-b.e), y = b.a*Math.sqrt(1-b.e*b.e)*Math.sin(E);
+      var c=Math.cos(b.w), s=Math.sin(b.w), X=x*c-y*s, Y=x*s+y*c;
+      var ci=Math.cos(b.i||0);
+      return [X, Y*ci, Y*Math.sin(b.i||0)];
+    }
+
+    var t0 = performance.now(), ovis = true;
+    if(window.IntersectionObserver){
+      new IntersectionObserver(function(en){ ovis=en[0].isIntersecting; },{rootMargin:'160px'})
+        .observe(cv);
+    }
+
     function draw(now){
+      if(MOTION) requestAnimationFrame(draw);
+      if(!W || !ovis) return;
       var t = (now - t0)/1000;
       ctx.clearRect(0,0,W,H);
-      var cx = W*0.5, cy = H*0.5, R = Math.min(W*0.44, H*0.44);
 
-      // radar sweep — the ctOS scan arm
-      var sweepA = (t*0.55) % (Math.PI*2);
-      var gsw = ctx.createLinearGradient(cx, cy, cx+Math.cos(sweepA)*R*1.6, cy+Math.sin(sweepA)*R*1.6);
-      gsw.addColorStop(0, 'rgba('+C_PRIM_RGB+',.22)');
-      gsw.addColorStop(1, 'rgba('+C_PRIM_RGB+',0)');
-      ctx.strokeStyle = gsw; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(cx, cy);
-      ctx.lineTo(cx+Math.cos(sweepA)*R*1.6, cy+Math.sin(sweepA)*R*1.6);
-      ctx.stroke();
+      var cx = W*0.5, cy = H*0.54, S = Math.min(W*0.40, H*1.05);
+      function PX(p){ return cx + p[0]*S; }
+      function PY(p){ return cy + p[1]*S*TILT - p[2]*S*LIFT; }
 
-      // range rings
-      ctx.strokeStyle = 'rgba('+C_GRID_RGB+',.22)'; ctx.lineWidth = 1;
-      [0.35, 0.7, 1.05].forEach(function(k){
-        ctx.beginPath(); ctx.arc(cx, cy, R*k, 0, Math.PI*2); ctx.stroke();
-      });
+      /* the sky behind the plane */
+      for(var s0=0;s0<stars.length;s0++){
+        var st=stars[s0];
+        ctx.fillStyle = (s0%3 ? C_STARA : C_STARB);
+        ctx.globalAlpha = st.a*(0.45+0.55*Math.abs(Math.sin(t*st.sp+st.ph)));
+        ctx.fillRect(st.x*W, st.y*H, 1, 1);
+      }
+      ctx.globalAlpha = 1;
 
-      // crosshair reticle
-      ctx.strokeStyle = 'rgba('+C_GRID_RGB+',.35)';
+      /* the plane itself: spokes and range rings, marked at one AU */
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba('+C_GRID_RGB+',.13)';
       ctx.beginPath();
-      ctx.moveTo(cx-R-14, cy); ctx.lineTo(cx-R+2, cy);
-      ctx.moveTo(cx+R-2, cy); ctx.lineTo(cx+R+14, cy);
-      ctx.moveTo(cx, cy-R-14); ctx.lineTo(cx, cy-R+2);
-      ctx.moveTo(cx, cy+R-2); ctx.lineTo(cx, cy+R+14);
+      for(var sp=0;sp<8;sp++){
+        var sa=sp*0.7854;
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx+Math.cos(sa)*S*1.02, cy+Math.sin(sa)*S*TILT*1.02);
+      }
       ctx.stroke();
-
-      // sun
-      ctx.fillStyle = C_ACC;
-      ctx.beginPath(); ctx.arc(cx, cy, 3, 0, Math.PI*2); ctx.fill();
-      ctx.strokeStyle = 'rgba('+C_ACC_RGB+',.35)';
-      ctx.beginPath(); ctx.arc(cx, cy, 7 + Math.sin(t*1.6)*1.5, 0, Math.PI*2); ctx.stroke();
-
-      bodies.forEach(function(b){
-        var ax = R*b.a, by = R*b.a*(1-b.e*0.55), fx = cx - R*b.a*b.e*0.6;
-        ctx.strokeStyle = 'rgba('+C_GRID_RGB+',.5)';
-        ctx.beginPath(); ctx.ellipse(fx, cy, ax, by, 0, 0, Math.PI*2); ctx.stroke();
-        var th = t*b.s*0.45;
-        var px = fx + ax*Math.cos(th), py = cy + by*Math.sin(th);
-        // tick brackets on the tracked body
-        if(b.c === 'red'){
-          ctx.strokeStyle = 'rgba('+C_ALERT_RGB+',.7)';
-          ctx.strokeRect(px-6, py-6, 12, 12);
-        }
-        ctx.fillStyle = bcol(b.c);
-        ctx.beginPath(); ctx.arc(px, py, b.r, 0, Math.PI*2); ctx.fill();
+      [0.5, 1.0, 1.5, 2.0].forEach(function(au){
+        var rr = au*AU;
+        ctx.strokeStyle = 'rgba('+C_GRID_RGB+','+(au===1?0.30:0.16)+')';
+        ctx.beginPath(); ctx.ellipse(cx, cy, rr*S, rr*S*TILT, 0, 0, 6.2832); ctx.stroke();
       });
 
-      if(MOTION) requestAnimationFrame(draw);
+      /* the survey sweep, lying in the plane rather than across the screen */
+      var sweepA = (t*0.45)%6.2832;
+      ctx.beginPath(); ctx.moveTo(cx, cy);
+      for(var wq=0;wq<=10;wq++){
+        var wa = sweepA - 0.44 + wq*0.044;
+        ctx.lineTo(cx+Math.cos(wa)*S*1.02, cy+Math.sin(wa)*S*TILT*1.02);
+      }
+      ctx.closePath();
+      ctx.fillStyle = 'rgba('+C_PRIM_RGB+',.06)'; ctx.fill();
+      var gsw = ctx.createLinearGradient(cx, cy,
+                  cx+Math.cos(sweepA)*S, cy+Math.sin(sweepA)*S*TILT);
+      gsw.addColorStop(0, 'rgba('+C_PRIM_RGB+',.30)');
+      gsw.addColorStop(1, 'rgba('+C_PRIM_RGB+',0)');
+      ctx.strokeStyle = gsw; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(cx, cy);
+      ctx.lineTo(cx+Math.cos(sweepA)*S*1.02, cy+Math.sin(sweepA)*S*TILT*1.02);
+      ctx.stroke();
+
+      /* the debris belt, swept along by the same law as everything else */
+      for(var d=0;d<belt.length;d++){
+        var dp = orb(belt[d], t);
+        ctx.fillStyle = 'rgba('+C_MUTED_RGB+','+belt[d].g+')';
+        ctx.fillRect(PX(dp)-0.5, PY(dp)-0.5, 1.4, 1.4);
+      }
+
+      /* every orbit is sampled and projected, so an inclined one leans */
+      ctx.lineWidth = 1;
+      for(var o=0;o<tracked.length;o++){
+        var b = tracked[o], neo = b.c==='red';
+        ctx.strokeStyle = neo ? 'rgba('+C_ALERT_RGB+',.34)' : 'rgba('+C_GRID_RGB+',.46)';
+        if(neo){ ctx.setLineDash([3,3]); }
+        ctx.beginPath();
+        for(var k=0;k<=72;k++){
+          var E=k/72*6.2832;
+          var x=b.a*(Math.cos(E)-b.e), y=b.a*Math.sqrt(1-b.e*b.e)*Math.sin(E);
+          var c=Math.cos(b.w), s=Math.sin(b.w), X=x*c-y*s, Y=x*s+y*c;
+          var p=[X, Y*Math.cos(b.i||0), Y*Math.sin(b.i||0)];
+          if(k){ ctx.lineTo(PX(p), PY(p)); } else { ctx.moveTo(PX(p), PY(p)); }
+        }
+        ctx.stroke(); ctx.setLineDash([]);
+      }
+
+      /* the sun, with a corona that breathes */
+      var beat = 0.5+0.5*Math.sin(t*1.6);
+      var cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, 16+beat*3);
+      cg.addColorStop(0, 'rgba('+C_ACC_RGB+',.34)');
+      cg.addColorStop(1, 'rgba('+C_ACC_RGB+',0)');
+      ctx.fillStyle = cg;
+      ctx.beginPath(); ctx.arc(cx, cy, 16+beat*3, 0, 6.2832); ctx.fill();
+      ctx.fillStyle = C_ACC;
+      ctx.beginPath(); ctx.arc(cx, cy, 3.2, 0, 6.2832); ctx.fill();
+      ctx.strokeStyle = 'rgba('+C_ACC_RGB+',.40)';
+      ctx.beginPath(); ctx.arc(cx, cy, 7+beat*1.6, 0, 6.2832); ctx.stroke();
+
+      /* bodies, each pulling a short trail of where it has just been */
+      var pos = [], earth = null;
+      for(var m=0;m<tracked.length;m++){
+        var bd = tracked[m], p = orb(bd, t);
+        pos.push(p);
+        if(bd.moon) earth = p;
+        var step = (6.2832/bd.n)*0.014;
+        ctx.strokeStyle = bcol(bd.c); ctx.lineWidth = 1;
+        for(var g=0;g<7;g++){
+          var p1 = orb(bd, t-g*step), p2 = orb(bd, t-(g+1)*step);
+          ctx.globalAlpha = 0.34*(1-g/7);
+          ctx.beginPath(); ctx.moveTo(PX(p1), PY(p1)); ctx.lineTo(PX(p2), PY(p2)); ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+        var X = PX(p), Y = PY(p);
+        /* off-plane bodies get a dropped line to the plane they crossed */
+        if(bd.i){
+          var flat = [p[0], p[1], 0];
+          ctx.setLineDash([1,2]);
+          ctx.strokeStyle = 'rgba('+C_ALERT_RGB+',.30)';
+          ctx.beginPath(); ctx.moveTo(X, Y); ctx.lineTo(PX(flat), PY(flat)); ctx.stroke();
+          ctx.setLineDash([]);
+        }
+        if(bd.ring){
+          ctx.strokeStyle = 'rgba('+C_MUTED_RGB+',.55)';
+          ctx.beginPath(); ctx.ellipse(X, Y, bd.r*2.7, bd.r*0.95, 0.35, 0, 6.2832); ctx.stroke();
+        }
+        ctx.fillStyle = bcol(bd.c);
+        ctx.beginPath(); ctx.arc(X, Y, bd.r, 0, 6.2832); ctx.fill();
+        if(bd.moon){
+          var ma = t*3.1;
+          ctx.strokeStyle = 'rgba('+C_PRIM_RGB+',.35)';
+          ctx.beginPath();
+          ctx.ellipse(X, Y, bd.moon*S, bd.moon*S*TILT, 0, 0, 6.2832); ctx.stroke();
+          ctx.fillStyle = C_MID_S;
+          ctx.beginPath();
+          ctx.arc(X+Math.cos(ma)*bd.moon*S, Y+Math.sin(ma)*bd.moon*S*TILT, 1.2, 0, 6.2832);
+          ctx.fill();
+        }
+      }
+
+      /* which near-Earth object is closest right now, and how close */
+      var best = null, bestD = 1e9, bestP = null;
+      for(var v=0;v<neos.length;v++){
+        var np = pos[planets.length+v];
+        var dx=np[0]-earth[0], dy=np[1]-earth[1], dz=np[2]-earth[2];
+        var dd = Math.sqrt(dx*dx+dy*dy+dz*dz);
+        if(dd<bestD){ bestD=dd; best=neos[v]; bestP=np; }
+      }
+      var miss = bestD/AU, close = miss < 0.14;   /* an event, not a standing state */
+
+      /* lock brackets on it, and the separation drawn when the pass is on */
+      var LX = PX(bestP), LY = PY(bestP), br = close ? 8 : 6.5;
+      ctx.strokeStyle = 'rgba('+C_ALERT_RGB+','+(close?(0.55+0.45*Math.sin(t*7)):0.6)+')';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      [[-1,-1],[1,-1],[1,1],[-1,1]].forEach(function(q){
+        ctx.moveTo(LX+q[0]*br, LY+q[1]*br - q[1]*3.4);
+        ctx.lineTo(LX+q[0]*br, LY+q[1]*br);
+        ctx.lineTo(LX+q[0]*br - q[0]*3.4, LY+q[1]*br);
+      });
+      ctx.stroke();
+      if(close){
+        var EX = PX(earth), EY = PY(earth);
+        ctx.setLineDash([2,3]);
+        ctx.strokeStyle = 'rgba('+C_ALERT_RGB+',.5)';
+        ctx.beginPath(); ctx.moveTo(EX, EY); ctx.lineTo(LX, LY); ctx.stroke();
+        ctx.setLineDash([]);
+      }
+      ctx.font = '8px "Share Tech Mono",monospace'; ctx.textBaseline = 'middle';
+      ctx.textAlign = 'left';
+      ctx.fillStyle = 'rgba('+C_ALERT_RGB+',.85)';
+      ctx.fillText(best.id, LX+br+4, LY-br-2);
+
+      /* HUD — the bottom left corner belongs to the caption */
+      ctx.fillStyle = 'rgba('+C_PRIM_RGB+',.75)';
+      ctx.fillText('NEOW · ORBITAL', 10, 12);
+      var day = new Date(Date.UTC(2026,7,12) + Math.floor(t*3)*864e5);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = 'rgba('+C_MUTED_RGB+',.8)';
+      ctx.fillText('EPOCH '+day.toISOString().slice(0,10)+' · '+(planets.length+neos.length+belt.length)+' TRACKED',
+                   W-10, 12);
+      ctx.fillStyle = close ? 'rgba('+C_ALERT_RGB+',.9)' : 'rgba('+C_HAB_RGB+',.85)';
+      ctx.fillText((close?'CLOSE APPROACH ':'MISS ')+best.id+' '+miss.toFixed(3)+' AU', W-10, H-11);
     }
-    REPAINT.push(function(){ draw(performance.now()); });
+    /* a frame is forced even when the canvas is out of view, so a theme change
+       does not leave it holding the other palette until it is scrolled to */
+    function ostatic(){
+      var v = ovis, k = t0;
+      ovis = true; t0 = performance.now()-9000;
+      draw(performance.now());
+      ovis = v; t0 = k;
+    }
+    REPAINT.push(ostatic);
     onMotion(function(){ requestAnimationFrame(draw); });
-    if(!MOTION) draw(performance.now());
+    if(!MOTION) ostatic();
   }
 
   /* ---------- Sector 07 schematic ----------
@@ -3052,8 +3227,10 @@ footer pre{
       sg.font='8px "Share Tech Mono",monospace'; sg.textBaseline='middle';
       sg.textAlign='left';
       sg.fillStyle='rgba('+C_PRIM_RGB+',.75)'; sg.fillText('SECTOR 07',10,12);
+      /* the bottom left corner belongs to the caption, so credits sit under
+         the sector name rather than beside it */
       sg.fillStyle='rgba('+C_HAB_RGB+',.85)';
-      sg.fillText('⌁ '+Math.floor(4200+cyc*168).toLocaleString()+' CR',10,SH-11);
+      sg.fillText('⌁ '+Math.floor(4200+cyc*168).toLocaleString()+' CR',10,24);
       sg.textAlign='right';
       sg.fillStyle='rgba('+C_HAB_RGB+',.85)';
       sg.fillText('6 RINGS · 117 PLOTS',SW-10,12);
