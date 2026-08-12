@@ -859,19 +859,16 @@ footer pre{
     repeating-linear-gradient(-60deg,rgba(var(--grid-rgb),.10) 0 1px,transparent 1px 26px);
 }
 .bay .cta{
-  position:absolute;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:8px;
-  background:radial-gradient(ellipse at center,rgba(var(--bg-rgb),.45),rgba(var(--bg-rgb),.88));
-  transition:background .15s;
+  position:absolute;left:22px;bottom:20px;display:flex;
+  align-items:center;padding:5px 10px;white-space:nowrap;max-width:calc(100% - 44px);
+  background:rgba(var(--bg-rgb),.72);border:1px solid rgba(var(--accent-rgb),.28);
+  transition:background .15s,border-color .15s;
 }
-.bay:hover .cta{background:radial-gradient(ellipse at center,rgba(var(--bg-rgb),.2),rgba(var(--bg-rgb),.78))}
+.bay:hover .cta{background:rgba(var(--bg-rgb),.88);border-color:rgba(var(--accent-rgb),.6)}
 .bay .cta strong{
-  font-family:var(--hud);font-size:clamp(15px,2.6vw,22px);letter-spacing:.32em;
+  font-family:var(--hud);font-size:11px;letter-spacing:.22em;
   color:var(--accent);text-transform:uppercase;font-weight:400;
-  text-shadow:0 0 24px rgba(var(--accent-rgb),.4);
-}
-.bay .cta em{
-  font-style:normal;font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);
+  text-shadow:0 0 14px rgba(var(--accent-rgb),.35);
 }
 .bay .reticle{
   position:absolute;top:10px;left:10px;right:10px;bottom:10px;pointer-events:none;
@@ -1365,7 +1362,6 @@ footer pre{
       <span class="reticle" aria-hidden="true"></span>
       <span class="cta">
         <strong>▸ Enter the grid</strong>
-        <em>Isometric defence grid · runs in this browser</em>
       </span>
     </a>
 
