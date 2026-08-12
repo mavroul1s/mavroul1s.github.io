@@ -1832,8 +1832,10 @@ footer pre{
      sixty calls an hour and a reload should not spend them all. */
   var CAL_REPOS = 12, CAL_PAGES = 3, CAL_TTL = 6*3600*1000, CAL_KEY = 'ghcal-v2';
   var calBox = document.getElementById('ghcal'), calDays = {}, calCells = [];
+  var CAL_TOPUP = 8;                        /* most repositories to re-read on a visit */
   var calAsked = 0, calCounted = 0;         /* how many repositories were asked, and answered */
   var calBuilt = null;                      /* set when the counts came from the committed file */
+  var calSince2 = '', calLive = false, calFound = 0;   /* the per-visit top-up */
   var calSince = '';                        /* the first day the grid shows, in ISO */
 
   function dayKey(d){
@@ -1896,7 +1898,8 @@ footer pre{
     function repos(n){ return n + (n === 1 ? ' repository' : ' repositories'); }
     if(calBuilt){
       return head + ' · counted over all ' + repos(calAsked) + ', commits only' +
-             (calBuilt.length ? ' · rebuilt ' + calBuilt : '');
+             (calLive ? ' · checked for new ones just now'
+                      : (calBuilt.length ? ' · rebuilt ' + calBuilt : ''));
     }
     if(calCounted < calAsked){
       return head + ' · counted over ' + calCounted + ' of ' + repos(calAsked) +
@@ -1904,25 +1907,69 @@ footer pre{
     }
     return head + ' · summed over ' + repos(calAsked) + ' from the public API, commits only';
   }
-  /* The counting is done once, in the workflow, and committed as a file: the
-     unauthenticated API allows sixty calls an hour shared by everyone behind
-     one address, which a dozen calls a visit will exhaust on any busy network.
-     Reading a file costs nothing, is the same for every visitor, and covers
-     every repository rather than the dozen most recent. The API path below is
-     kept as the fallback for a checkout without the file. */
+  /* Two halves, because neither alone is good enough.
+
+     The year is counted once in the workflow and committed as a file, so the
+     grid is populated the instant the page opens, covers every repository,
+     and is the same for every visitor whatever the API is doing.
+
+     Then it is brought up to date on every visit. Only the repositories
+     pushed since the file was built can have anything to add, and only the
+     commits after that moment, so the top-up is two or three requests rather
+     than the dozen a full recount costs — and a visitor's sixty an hour is
+     their own. If those requests fail, nothing happens: the file's year is
+     already on screen. */
   function calFromFile(){
     if(!calBox || !window.fetch) return Promise.resolve(false);
-    return fetch('data/commits.json')
+    return fetch('data/commits.json', {cache:'no-cache'})
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(d){
         if(!d || !d.days || !Object.keys(d.days).length) return false;
         calDays = d.days;
         calAsked = calCounted = d.repos || 0;
         calBuilt = d.generated ? d.generated.slice(0,10) : '';
+        /* a second past the build, so a commit on the boundary is not counted twice */
+        calSince2 = d.generated
+          ? new Date(new Date(d.generated).getTime() + 1000).toISOString().slice(0,19) + 'Z'
+          : '';
         paintCal();
         return true;
       })
       .catch(function(){ return false; });
+  }
+  /* everything this repository has done since the file was written */
+  function calAfter(fullName, page, done){
+    fetch('https://api.github.com/repos/'+fullName+'/commits?since='+calSince2+
+          '&per_page=100&page='+page)
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(commits){
+        if(!commits || !commits.length){ done(); return; }
+        commits.forEach(function(c){
+          var when = c.commit && (c.commit.author || c.commit.committer);
+          if(!when || !when.date) return;
+          var key = dayKey(new Date(when.date));
+          calDays[key] = (calDays[key] || 0) + 1;
+          calFound++;
+        });
+        if(commits.length === 100 && page < CAL_PAGES) calAfter(fullName, page+1, done);
+        else done();
+      })
+      .catch(function(){ done(); });
+  }
+  function calTopUp(list){
+    if(!calSince2) return;
+    var moved = list.filter(function(r){
+      return r.pushed_at && r.pushed_at > calSince2;
+    }).slice(0, CAL_TOPUP);
+    if(!moved.length) return;                 /* the file is still current */
+    var left = moved.length;
+    moved.forEach(function(r){
+      calAfter(r.full_name, 1, function(){
+        if(--left > 0) return;
+        calLive = true;                       /* asked, whether or not it found any */
+        paintCal();
+      });
+    });
   }
   /* Counted from the commit list rather than from /stats/commit_activity.
      The statistics endpoint is computed on demand: a repository pushed
@@ -2035,8 +2082,8 @@ footer pre{
         ghNum('stars', stars);
         if(last) ghAgo(last);
         ghLangs(list);
-        /* only count from the browser if the committed file was not there */
-        calFile.then(function(had){ if(!had) ghCal(list); });
+        /* with the file, top it up from the API; without it, count the lot */
+        calFile.then(function(had){ if(had) calTopUp(list); else ghCal(list); });
       })
       .catch(function(){ calFile.then(function(had){ if(!had) calFail(); }); });
   }
