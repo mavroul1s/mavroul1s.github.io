@@ -490,7 +490,7 @@ html[data-motion="off"] .portrait .ln{opacity:1}
    ============================================================ */
 .panel{
   border:1px solid rgba(var(--grid-rgb),.42);background:rgba(var(--surface-rgb),.55);
-  padding:22px;position:relative;
+  padding:18px;position:relative;
 }
 .panel.flag{border-left:2px solid var(--accent)}
 .panel-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin:0 0 4px}
@@ -557,7 +557,7 @@ caption{caption-side:bottom;text-align:left;font-size:11px;color:var(--muted);pa
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
 .card{
   border:1px solid rgba(var(--grid-rgb),.35);background:rgba(var(--surface-rgb),.45);
-  padding:18px;display:flex;flex-direction:column;gap:10px;
+  padding:15px;display:flex;flex-direction:column;gap:9px;
   transition:border-color .15s,background .15s;
 }
 .card:hover{border-color:var(--primary);background:rgba(var(--surface-rgb),.8)}
@@ -838,7 +838,7 @@ footer pre{
    PROJECT VISUALISERS — one canvas per project, drawing its own subject
    ============================================================ */
 .viz{
-  display:block;width:100%;height:104px;
+  display:block;width:100%;height:88px;
   border:1px solid rgba(var(--grid-rgb),.28);
   background:rgba(var(--bg-rgb),.6);
 }
@@ -887,8 +887,8 @@ footer pre{
   opacity:.45;transition:opacity .15s,inset .15s;
 }
 .bay:hover .reticle{opacity:1;top:6px;left:6px;right:6px;bottom:6px}
-#orbit,#sector,#firemap{display:block;width:100%;height:230px}
-@media(max-width:620px){#orbit,#sector,#firemap{height:180px}}
+#orbit,#sector,#firemap{display:block;width:100%;height:180px}
+@media(max-width:620px){#orbit,#sector,#firemap{height:145px}}
 /* DeepFire has no live demo to launch, so its bay is a readout rather than a
    door: no CTA plate over the canvas, and the frame does not react to a hover
    that leads nowhere */
@@ -1303,8 +1303,6 @@ footer pre{
       <h3 class="paper">SpaSE-UNet3D: Sensor-Driven Wildfire Detection and Progression Prediction from VIIRS Multispectral Imagery</h3>
       <span class="tag acc">Accepted in MDPI Sensors journal</span>
     </div>
-    <p class="stack">MIT licensed</p>
-
     <div class="bay readout" aria-hidden="true">
       <canvas id="firemap"></canvas>
       <span class="hexmask"></span>
@@ -1354,7 +1352,6 @@ footer pre{
         <p style="margin:0 0 12px">A watch post for the traffic around Earth. Pick a date range and see every near-Earth object NASA is tracking in it — how close it passes, how big it is, how well its orbit is known — placed in a solar system you can fly around.</p>
         <p style="margin:0 0 12px">Nothing is animated: eight planets, fifteen moons and every tracked asteroid are propagated from published elements through a Kepler solver. Lock onto a contact for its telemetry, or sort the registry by miss distance.</p>
         <p style="margin:0 0 12px">It ships on the shared <code>DEMO_KEY</code>, which is rate-limited. Paste a free key from <a href="https://api.nasa.gov/" target="_blank" rel="noopener">api.nasa.gov</a> into the data link panel for live close-approach data over any dates, with the hazard and uncertainty codes as NASA publishes them.</p>
-        <p style="margin:0;color:var(--muted);font-size:13px">Publishes its own scale factors rather than faking scale, and corrects the "potentially hazardous means close now" misconception. Bilingual English / Ελληνικά. One HTML file, three.js only.</p>
       </div>
       <div>
         <h4 class="sub">Checked against independent ground truth</h4>
@@ -1388,7 +1385,6 @@ footer pre{
     <div class="cols" style="margin-top:16px">
       <div>
         <p style="margin:0 0 12px">Isometric cyberpunk city-builder and defence game. You hold one megacity sector: build nodes onto empty pads, let them link into a network, and purge intrusions before their timers run out — six rings deep around a central spire.</p>
-        <p style="margin:0;color:var(--muted);font-size:13px">The whole thing is one HTML file. Geometry, icons and audio are generated at runtime rather than loaded, and every balance number — costs, yields, steal rates, drone stats — sits in a single object at the top of the file.</p>
       </div>
       <div>
         <h4 class="sub">What is actually in there</h4>
@@ -1432,19 +1428,6 @@ footer pre{
         <span class="kv">Endpoints <b>14</b></span>
         <span class="kv">Setup <b>one docker compose up</b></span>
         <a class="go" href="https://github.com/mavroul1s/GridSense_collab" target="_blank" rel="noopener">Open repository</a>
-      </div>
-    </article>
-
-    <article class="card">
-      <h3>NCF Reproduction</h3>
-      <p class="stack" style="margin:0">PyTorch<span>/</span>ECE480</p>
-      <p>Reproduction of Neural Collaborative Filtering (He et al., WWW 2017) on MovieLens-100K. Every experiment repeated ten times with independent seeds, all results reported as mean ± standard deviation. MLP depth and GMF+MLP pretraining show no mean benefit at this dataset size, contradicting the paper's MovieLens-1M finding.</p>
-      <canvas class="viz" data-viz="ncf" aria-hidden="true"></canvas>
-      <div class="meta">
-        <span class="kv">NeuMF best <b><span class="datum" tabindex="0" data-src="SOURCE: 10 seeds, mean ± std. 107,761 parameters.">HR@10 0.649 ± 0.011</span></b></span>
-        <span class="kv">KD student <b><span class="datum" tabindex="0" data-src="SOURCE: response-based knowledge distillation, 53,177 parameters — matches the teacher on 50.7% fewer.">HR@10 0.655 ± 0.010</span></b></span>
-        <span class="kv">FitNets-style <b>0.582</b></span>
-        <a class="go" href="https://github.com/mavroul1s/ncf-assignment" target="_blank" rel="noopener">Open repository</a>
       </div>
     </article>
 
@@ -1510,8 +1493,6 @@ footer pre{
       <span class="ghsum-cue" aria-hidden="true"></span>
     </summary>
     <div class="fold-body">
-    <p class="stack" style="margin-top:2px">counted live from the public API<span>/</span>no third-party badge services</p>
-
     <div class="ghgrid">
       <div class="ghstat"><b data-gh="repos" data-fb="18">18</b><span>public repositories</span></div>
       <div class="ghstat"><b data-gh="stars" data-fb="6">6</b><span>stars earned</span></div>
@@ -1520,13 +1501,11 @@ footer pre{
       <div class="ghstat"><b data-gh="lastpush">today</b><span>last push</span></div>
     </div>
 
-    <h4 class="sub" style="margin:22px 0 10px">Commits per day — last 52 weeks</h4>
-    <div class="ghcal-wrap">
+    <div class="ghcal-wrap" style="margin-top:20px">
       <div class="ghcal-months" id="ghcalmonths" aria-hidden="true"></div>
       <div class="ghcal" id="ghcal" role="img" aria-label="Commit calendar for the last 52 weeks"></div>
     </div>
     <div class="ghcal-foot">
-      <span id="ghcalnote">counting…</span>
       <span class="ghcal-key" aria-hidden="true">less <i data-l="0"></i><i data-l="1"></i><i data-l="2"></i><i data-l="3"></i><i data-l="4"></i> more</span>
     </div>
 
@@ -1580,6 +1559,14 @@ footer pre{
         <h4>Computer Vision</h4>
         <p>Otsu thresholding, spatial filter comparison by PSNR (Gaussian 26.31 dB versus Box 25.80 dB), Sobel / Prewitt / Laplacian / Canny compared by edge density, frequency-domain edge detection. Python, NumPy, OpenCV.</p>
         <a class="go" href="https://github.com/mavroul1s/ECE457-Coursework" target="_blank" rel="noopener">Open repository</a>
+      </div>
+    </li>
+    <li>
+      <span class="code">ECE480</span>
+      <div>
+        <h4>Neural Collaborative Filtering — reproduction</h4>
+        <p>Reproduction of He et al. (WWW 2017) on MovieLens-100K. Every experiment repeated ten times with independent seeds, all results reported as mean ± standard deviation. NeuMF reaches <span class="datum" tabindex="0" data-src="SOURCE: 10 seeds, mean ± std. 107,761 parameters.">HR@10 0.649 ± 0.011</span>, and a response-based distillation student matches it at <span class="datum" tabindex="0" data-src="SOURCE: response-based knowledge distillation, 53,177 parameters — matches the teacher on 50.7% fewer.">0.655 ± 0.010</span> on half the parameters. MLP depth and GMF+MLP pretraining show no mean benefit at this dataset size, contradicting the paper's MovieLens-1M finding. PyTorch.</p>
+        <a class="go" href="https://github.com/mavroul1s/ncf-assignment" target="_blank" rel="noopener">Open repository</a>
       </div>
     </li>
   </ul>
@@ -2552,29 +2539,6 @@ footer pre{
     g.fillText('REST',gx+16,cy-4); g.fillText('14 EP',gx+16,cy+5);
   }
 
-  /* NCF — a rank-k reconstruction of the user x item matrix */
-  function vizNcf(g,W,H,t){
-    var cols=26, rows=9, cw=(W-58)/cols, ch=(H-16)/rows, ox=8, oy=8;
-    for(var i=0;i<rows;i++) for(var j=0;j<cols;j++){
-      var v=0;
-      for(var k=0;k<3;k++)
-        v+=Math.sin(i*0.7+k*2.1+t*(0.5+k*0.2))*Math.sin(j*0.45+k*1.3-t*(0.4+k*0.15));
-      v=v/3*0.5+0.5;
-      g.fillStyle='rgba('+C_PRIM_RGB+','+(0.06+v*v*0.8)+')';
-      g.fillRect(ox+j*cw,oy+i*ch,Math.max(1,cw-1),Math.max(1,ch-1));
-    }
-    g.font='7px "Share Tech Mono",monospace'; g.textBaseline='middle'; g.textAlign='left';
-    var bx=W-46;
-    g.fillStyle=C_MID; g.fillText('HR@10',bx,10);
-    var vals=[0.649,0.655,0.582], labs=['NeuMF','KD','FitN'];
-    for(var b=0;b<3;b++){
-      var y=24+b*13, w=(vals[b]/0.7)*34;
-      g.fillStyle=C_DIM; g.fillRect(bx,y,34,5);
-      g.fillStyle=b===1?C_ACC:C_HI; g.fillRect(bx,y,w,5);
-      g.fillStyle=C_MID; g.fillText(labs[b],bx,y+11);
-    }
-  }
-
   /* vit-gradient-flow — attention map with a query row sweeping down it */
   function vizVit(g,W,H,t){
     var n=16, s=Math.min((W-56)/n,(H-14)/n), ox=10, oy=(H-n*s)/2;
@@ -2746,7 +2710,7 @@ footer pre{
     g.fillStyle=C_HI;  g.fillText('21.7% in one task',bx,oy+rh*2+4);
   }
 
-  var VIZ={gridsense:vizGridsense,ncf:vizNcf,vit:vizVit,neuron:vizNeuron,
+  var VIZ={gridsense:vizGridsense,vit:vizVit,neuron:vizNeuron,
            galaxy:vizGalaxy,kineticore:vizKineticore,gmm:vizGmm};
   var vizzes=[];
   var vdpr=Math.min(window.devicePixelRatio||1,2);
