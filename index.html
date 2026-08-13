@@ -513,7 +513,7 @@ html[data-motion="off"] .portrait .ln{opacity:1}
 }
 .notice.ok em{font-style:italic}
 .notice.ok a{color:var(--primary-lo);border-bottom-color:rgba(var(--primary-lo-rgb),.45)}
-/* the acceptance reads as a stack: what happened, who wrote it, the caveat */
+/* the paper reads as a stack: what it is, who wrote it, where it appeared */
 .notice .row{display:block;white-space:normal;letter-spacing:normal}
 .notice .row + .row{margin-top:3px}
 .notice .row.by{color:var(--fg);letter-spacing:.04em}
@@ -1185,7 +1185,7 @@ footer pre{
         <!-- NEWS:START -->
         <li>
           <time datetime="2026-08-10">(Aug 10th, '26)</time>
-          <a class="what" href="certs/Acceptance-Certificate-sensors-4426418.pdf" target="_blank" rel="noopener">A paper got accepted in MDPI <em>Sensors</em> journal</a>
+          <a class="what" href="https://www.mdpi.com/1424-8220/26/16/5116" target="_blank" rel="noopener">A paper got accepted in MDPI <em>Sensors</em> journal</a>
         </li>
         <li data-repo="1324097243">
           <time datetime="2026-08-05">(Aug 05th, '26)</time>
@@ -1286,7 +1286,7 @@ footer pre{
   <div class="panel flag" style="margin-bottom:16px">
     <div class="panel-h">
       <h3 class="paper">SpaSE-UNet3D: Sensor-Driven Wildfire Detection and Progression Prediction from VIIRS Multispectral Imagery</h3>
-      <span class="tag acc">Accepted in MDPI Sensors journal</span>
+      <span class="tag acc">Published in MDPI Sensors journal</span>
     </div>
     <div class="bay readout" aria-hidden="true">
       <canvas id="firemap"></canvas>
@@ -1299,7 +1299,7 @@ footer pre{
       <b>PAPER</b>
       <span>
         <span class="row by">Nikolaos Mavros · Dimitrios Katsaros</span>
-        <span class="row fine">Accepted 10 August 2026, manuscript sensors-4426418. In press: no DOI or page numbers until it appears. <a href="certs/Acceptance-Certificate-sensors-4426418.pdf" target="_blank" rel="noopener">Certificate of acceptance (PDF)</a></span>
+        <span class="row fine">Published 12 August 2026, open access — <em>Sensors</em> 2026, 26(16), 5116. <a href="https://www.mdpi.com/1424-8220/26/16/5116" target="_blank" rel="noopener">doi:10.3390/s26165116</a></span>
       </span>
     </div>
 
@@ -1564,12 +1564,15 @@ footer pre{
 
   <h4 class="sub">Publications</h4>
   <ul class="creds" style="margin:0 0 26px">
-    <li><a class="cert" href="certs/Acceptance-Certificate-sensors-4426418.pdf" target="_blank" rel="noopener">
+    <li><a class="cert" href="https://www.mdpi.com/1424-8220/26/16/5116" target="_blank" rel="noopener">
       <span>Mavros, N. and Katsaros, D. — <em>SpaSE-UNet3D: Sensor-Driven Wildfire Detection and Progression Prediction from VIIRS Multispectral Imagery</em></span>
-      <span class="who">Sensors (MDPI), ISSN 1424-8220 — accepted, in press</span>
-      <span class="when">10 Aug 2026</span>
-      <span class="doc">PDF</span>
-    </a></li>
+      <span class="who">Sensors (MDPI) 2026, 26(16), 5116 — doi:10.3390/s26165116, open access</span>
+      <span class="when">12 Aug 2026</span>
+      <span class="doc">MDPI</span>
+    </a>
+    <!-- the acceptance certificate keeps a home here, now that the article
+         itself is what every other link on the page points at -->
+    <span class="who" style="width:100%;padding:0 0 9px;font-size:12px">Accepted 10 August 2026 — <a href="certs/Acceptance-Certificate-sensors-4426418.pdf" target="_blank" rel="noopener">certificate of acceptance (PDF)</a></span></li>
   </ul>
 
   <div class="cols">
