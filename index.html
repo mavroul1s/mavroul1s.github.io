@@ -13,7 +13,7 @@
 (function(){
   var r=document.documentElement,t=null,m=null;
   try{ t=localStorage.getItem('theme'); m=localStorage.getItem('motion'); }catch(e){}
-  if(t==='light') r.setAttribute('data-theme','light');
+  if(t==='light' || t==='unit02') r.setAttribute('data-theme',t);
   if(m==='off' || (m===null && window.matchMedia &&
      window.matchMedia('(prefers-reduced-motion: reduce)').matches))
     r.setAttribute('data-motion','off');
@@ -104,6 +104,47 @@ html[data-theme="light"]{
 
   --vig-a:.13;
   --crt-a:.05;
+}
+
+/* ============================================================
+   UNIT 02 — red armour, amber pylons, and the green of the eyes
+   kept for the alarms, which is the only cool note the unit has
+   ============================================================ */
+html[data-theme="unit02"]{
+  color-scheme:dark;
+  --bg:#0a0304;
+  --surface:#1c0709;
+  --primary:#ff4633;
+  --primary-lo:#ff8a6a;
+  --accent:#ffc247;        /* the shoulder pylons */
+  --alert:#7dff4d;         /* the eyes */
+  --muted:#b06a63;
+  --grid:#8e2f2b;
+  --fg:#f3d9d2;
+
+  --bg-rgb:10,3,4;
+  --surface-rgb:28,7,9;
+  --primary-rgb:255,70,51;
+  --primary-lo-rgb:255,138,106;
+  --accent-rgb:255,194,71;
+  --alert-rgb:125,255,77;
+  --muted-rgb:176,106,99;
+  --grid-rgb:142,47,43;
+  --hab-rgb:214,140,90;
+  --shade-rgb:0,0,0;
+  --rain-rgb:255,70,51;
+  --rain-head-rgb:255,225,200;
+  --rain-a:.55;
+  --bay:#0c0304;
+  --surface-2:#160507;
+  --bright:#fff0ea;
+  --spec:#ffffff;
+  --starA:255,225,200;
+  --starB:255,138,106;
+  --core:255,214,170;
+
+  --vig-a:.85;
+  --crt-a:.28;
 }
 
 /* ============================================================
@@ -918,8 +959,8 @@ footer pre{
 
 /* ---- commit calendar ----
    Five steps from the grid colour up to the bright end of the palette, so it
-   reads purple under Unit 01 and blue under Unit 00 without a second set of
-   values to keep in step */
+   reads blue under Unit 00, purple under Unit 01 and red under Unit 02
+   without a second set of values to keep in step */
 .ghcal-wrap{overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
 .ghcal-months{
   position:relative;height:13px;min-width:min-content;
@@ -1291,7 +1332,7 @@ footer pre{
       <span class="hexmask"></span>
       <span class="reticle"></span>
     </div>
-    <p class="capt">Schematic, not model output: a fire front advancing across a VIIRS tile — burn scar behind it, active front on the edge, and in cyan the perimeter the model is asked to place for the next acquisition.</p>
+    <p class="capt">Schematic, not model output: a fire front advancing across a VIIRS tile — burn scar behind it, active front on the edge, and outlined against them the perimeter the model is asked to place for the next acquisition.</p>
 
     <div class="notice ok">
       <b>PAPER</b>
@@ -2164,21 +2205,38 @@ footer pre{
     if(on){ if(!running){ running = true; STARTERS.forEach(function(f){ try{ f(); }catch(e){} }); } }
     else { running = false; repaint(); }   /* leave each canvas on a finished frame */
   }
-  function setTheme(light){
-    root.setAttribute('data-theme', light ? 'light' : 'dark');
-    tsw.setAttribute('aria-pressed', String(light));
-    tsw.querySelector('b').textContent = light ? '01' : '00';
-    tsw.title = light ? 'Back to the dark terminal' : 'Unit 01: white, purple and neon green';
-    store('theme', light ? 'light' : 'dark');
+  /* three plugsuits, cycled by the one switch: the terminal it boots in,
+     Unit 01 in white and purple, Unit 02 in red */
+  var THEMES = [
+    {id:'dark',   n:'00', label:'the dark terminal',
+                  next:'Unit 01: white, purple and neon green'},
+    {id:'light',  n:'01', label:'Unit 01',
+                  next:'Unit 02: red armour and amber pylons'},
+    {id:'unit02', n:'02', label:'Unit 02',
+                  next:'Back to the dark terminal'}
+  ];
+  function themeAt(id){
+    for(var i=0;i<THEMES.length;i++) if(THEMES[i].id===id) return i;
+    return 0;
+  }
+  function setTheme(id){
+    var th = THEMES[themeAt(id)];
+    root.setAttribute('data-theme', th.id);
+    tsw.setAttribute('aria-pressed', String(th.id !== 'dark'));
+    tsw.setAttribute('aria-label', th.next);
+    tsw.querySelector('b').textContent = th.n;
+    tsw.title = th.next;
+    store('theme', th.id);
     readPalette();
     if(!MOTION) repaint();   /* nothing is redrawing itself, so re-tint by hand */
   }
   msw.addEventListener('click', function(){ setMotion(!MOTION); });
   tsw.addEventListener('click', function(){
-    setTheme(root.getAttribute('data-theme') !== 'light');
+    var i = themeAt(root.getAttribute('data-theme'));
+    setTheme(THEMES[(i+1)%THEMES.length].id);
   });
   setMotion(MOTION);
-  setTheme(root.getAttribute('data-theme') === 'light');
+  setTheme(root.getAttribute('data-theme') || 'dark');
 
   /* ---------- portrait: drawn on line by line, bottom edge upward ---------- */
   var portrait = document.querySelector('.portrait');
