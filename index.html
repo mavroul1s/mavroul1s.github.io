@@ -162,6 +162,7 @@ html[data-motion="off"] .ticker-track{animation:roll 58s linear infinite!importa
 html[data-motion="off"] .sweep,
 html[data-motion="off"] .hum,
 html[data-motion="off"] #glyphs,
+html[data-motion="off"] #ascii-trail,
 html[data-motion="off"] .wires i::after,
 html[data-motion="off"] .scanline,
 html[data-motion="off"] .profiler .scan{display:none}
@@ -234,6 +235,13 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-off
 #glyphs{
   position:fixed;inset:0;z-index:1;pointer-events:none;opacity:var(--rain-a,.42);
 }
+
+/* Codex-inspired cursor telemetry — a flowing canvas made from ASCII cells */
+#ascii-trail{
+  position:fixed;inset:0;z-index:45;width:100%;height:100%;
+  pointer-events:none;opacity:.92;
+}
+@media(pointer:coarse){#ascii-trail{display:none}}
 
 /* --- horizontal-hold slip: rare, brief, mechanical --- */
 main.slip,footer.slip{animation:slip .34s steps(3) 1}
@@ -1049,6 +1057,7 @@ footer pre{
   <i style="left:93%;animation-delay:-6.6s"></i>
 </div>
 <canvas id="glyphs" aria-hidden="true"></canvas>
+<canvas id="ascii-trail" aria-hidden="true" data-ascii-overlay-state="running"></canvas>
 <div class="crt" aria-hidden="true"></div>
 <div class="sweep" aria-hidden="true"></div>
 <div class="hum" aria-hidden="true"></div>
@@ -1656,7 +1665,7 @@ footer pre{
       <span class="lbl">GitHub</span><span class="val">mavroul1s</span>
     </a>
     <a class="link-box" href="https://scholar.google.com/citations?user=amrZS6cAAAAJ&amp;hl=en" target="_blank" rel="noopener">
-      <span class="lbl">Google Scholar</span><span class="val">Nikos Mavros</span>
+      <span class="lbl">Google Scholar</span><span class="val">Nikolaos Mavros</span>
     </a>
     <a class="link-box" href="https://www.linkedin.com/in/nikos-mavros-37a94a259/" target="_blank" rel="noopener">
       <span class="lbl">LinkedIn</span><span class="val">nikos-mavros</span>
@@ -1712,6 +1721,105 @@ footer pre{
     C_DIM='rgba('+C_GRID_RGB+',.45)'; C_MID='rgba('+C_MUTED_RGB+',.9)';
   }
   readPalette();
+
+  /* ---------- Codex-style ASCII cursor field ---------- */
+  var trail = document.getElementById('ascii-trail');
+  var trailCtx = trail && trail.getContext ? trail.getContext('2d') : null;
+  var trailChars = ['0','1','+','*','.',':','x','/','[',']'];
+  var trailPoints = [], trailTarget = null, trailHead = null;
+  var trailRAF = 0, trailW = 0, trailH = 0, trailDpr = 1;
+  var trailFine = !window.matchMedia || window.matchMedia('(pointer:fine)').matches;
+
+  function sizeAsciiTrail(){
+    if(!trail || !trailCtx) return;
+    trailW = window.innerWidth; trailH = window.innerHeight;
+    trailDpr = Math.min(2,window.devicePixelRatio || 1);
+    trail.width = Math.max(1,Math.round(trailW*trailDpr));
+    trail.height = Math.max(1,Math.round(trailH*trailDpr));
+    trail.style.width = trailW+'px'; trail.style.height = trailH+'px';
+    trailCtx.setTransform(trailDpr,0,0,trailDpr,0,0);
+  }
+  function clearAsciiTrail(){
+    if(trailCtx) trailCtx.clearRect(0,0,trailW,trailH);
+    trailPoints=[]; trailTarget=null; trailHead=null;
+    if(trail) trail.setAttribute('data-ascii-overlay-state','paused');
+  }
+  function aimAsciiTrail(e){
+    if(!MOTION || !trailFine || e.pointerType === 'touch') return;
+    trailTarget={x:e.clientX,y:e.clientY};
+    if(!trailHead){
+      trailHead={x:e.clientX,y:e.clientY};
+      trailPoints.push({x:e.clientX,y:e.clientY,t:performance.now()});
+    }
+  }
+  function leaveAsciiTrail(){ trailTarget=null; }
+
+  function paintAsciiTrail(now){
+    trailRAF=0;
+    if(!MOTION || !trailCtx || !trailFine){ clearAsciiTrail(); return; }
+    trail.setAttribute('data-ascii-overlay-state','running');
+    trailCtx.clearRect(0,0,trailW,trailH);
+
+    /* Ease the head toward the real pointer so sharp mouse turns become the
+       same slow, liquid wake used by the Codex hero overlay. */
+    if(trailTarget && trailHead){
+      trailHead.x += (trailTarget.x-trailHead.x)*.22;
+      trailHead.y += (trailTarget.y-trailHead.y)*.22;
+      var last=trailPoints[trailPoints.length-1];
+      var mx=last ? trailHead.x-last.x : 99, my=last ? trailHead.y-last.y : 99;
+      if(!last || mx*mx+my*my>20)
+        trailPoints.push({x:trailHead.x,y:trailHead.y,t:now});
+    }
+
+    var live=[];
+    for(var i=0;i<trailPoints.length;i++)
+      if(now-trailPoints[i].t<1050) live.push(trailPoints[i]);
+    trailPoints=live.slice(-34);
+
+    /* Rasterise the wake into a character grid. Nearby samples merge, which
+       makes a continuous cloud instead of a row of separate floating spans. */
+    var cell=13, field=new Map();
+    for(var p=0;p<trailPoints.length;p++){
+      var pt=trailPoints[p], age=(now-pt.t)/1050, energy=Math.pow(1-age,1.45);
+      var radius=24+52*energy;
+      var gx0=Math.max(0,Math.floor((pt.x-radius)/cell));
+      var gy0=Math.max(0,Math.floor((pt.y-radius)/cell));
+      var gx1=Math.min(Math.ceil(trailW/cell),Math.ceil((pt.x+radius)/cell));
+      var gy1=Math.min(Math.ceil(trailH/cell),Math.ceil((pt.y+radius)/cell));
+      for(var gy=gy0;gy<=gy1;gy++) for(var gx=gx0;gx<=gx1;gx++){
+        var cx=(gx+.5)*cell, cy=(gy+.5)*cell;
+        var dd=Math.sqrt((cx-pt.x)*(cx-pt.x)+(cy-pt.y)*(cy-pt.y));
+        if(dd>radius) continue;
+        var strength=(1-dd/radius)*energy;
+        var key=gx+','+gy, old=field.get(key);
+        if(!old || strength>old.v) field.set(key,{gx:gx,gy:gy,v:strength});
+      }
+    }
+
+    trailCtx.textAlign='center'; trailCtx.textBaseline='middle';
+    field.forEach(function(q){
+      if(q.v<.055) return;
+      var hot=q.v>.48, rgb=hot ? C_ACC_RGB : C_PRIM_RGB;
+      var alpha=Math.min(.9,.08+q.v*.9);
+      var n=Math.abs(q.gx*17+q.gy*31)%trailChars.length;
+      trailCtx.font=(9+Math.round(q.v*4))+'px "Share Tech Mono",monospace';
+      trailCtx.fillStyle='rgba('+rgb+','+alpha.toFixed(3)+')';
+      trailCtx.fillText(trailChars[n],(q.gx+.5)*cell,(q.gy+.5)*cell);
+    });
+
+    trailRAF=requestAnimationFrame(paintAsciiTrail);
+  }
+  function startAsciiTrail(){
+    if(!trailCtx || !trailFine || trailRAF) return;
+    sizeAsciiTrail();
+    trailRAF=requestAnimationFrame(paintAsciiTrail);
+  }
+  if(trailFine){
+    window.addEventListener('pointermove',aimAsciiTrail,{passive:true});
+    document.documentElement.addEventListener('pointerleave',leaveAsciiTrail,{passive:true});
+    window.addEventListener('resize',sizeAsciiTrail);
+  }
+  onMotion(startAsciiTrail);
 
   /* ---------- clock ---------- */
   var clock = document.getElementById('clock');
@@ -2206,7 +2314,7 @@ footer pre{
     store('motion', on ? 'on' : 'off');
     /* `running` keeps a second start from stacking a duplicate frame loop */
     if(on){ if(!running){ running = true; STARTERS.forEach(function(f){ try{ f(); }catch(e){} }); } }
-    else { running = false; repaint(); }   /* leave each canvas on a finished frame */
+    else { running = false; clearAsciiTrail(); repaint(); } /* leave each canvas on a finished frame */
   }
   /* three plugsuits, cycled by the one switch: the terminal it boots in,
      Unit 01 in white and purple, Unit 02 in red */
