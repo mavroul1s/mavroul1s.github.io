@@ -1773,15 +1773,15 @@ footer pre{
 
     var live=[];
     for(var i=0;i<trailPoints.length;i++)
-      if(now-trailPoints[i].t<1050) live.push(trailPoints[i]);
-    trailPoints=live.slice(-34);
+      if(now-trailPoints[i].t<560) live.push(trailPoints[i]);
+    trailPoints=live.slice(-20);
 
     /* Rasterise the wake into a character grid. Nearby samples merge, which
        makes a continuous cloud instead of a row of separate floating spans. */
     var cell=13, field=new Map();
     for(var p=0;p<trailPoints.length;p++){
-      var pt=trailPoints[p], age=(now-pt.t)/1050, energy=Math.pow(1-age,1.45);
-      var radius=24+52*energy;
+      var pt=trailPoints[p], age=(now-pt.t)/560, energy=Math.pow(1-age,1.45);
+      var radius=14+34*energy;
       var gx0=Math.max(0,Math.floor((pt.x-radius)/cell));
       var gy0=Math.max(0,Math.floor((pt.y-radius)/cell));
       var gx1=Math.min(Math.ceil(trailW/cell),Math.ceil((pt.x+radius)/cell));
