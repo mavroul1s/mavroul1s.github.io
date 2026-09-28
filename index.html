@@ -1362,14 +1362,14 @@ Always open to collaborating—feel free to reach out.</p>
     <p style="margin:0 0 20px;max-width:78ch"><p style="margin:0 0 20px;max-width:78ch">Using satellite imagery and deep learning to detect active wildfires and predict where they will spread next, so that response teams get earlier, more reliable warnings.</p></p>
 
     <div class="cols">
-      <div>
-        <h4 class="sub">The architecture</h4>
-        <p style="margin:0;font-size:13.5px">A 3D U-Net whose convolutions are <span class="datum" tabindex="0" data-src="SOURCE: ResBlock3D definition, DeepFire-Forecaster.">spatial-only (1, 3, 3)</span>: it refuses to mix across days, because the observation windows are too short to pay for it, and squeeze-and-excitation reweights the VIIRS bands instead. <span class="datum" tabindex="0" data-src="SOURCE: F1 micro-averaged over all test pixels, mean ± std, 15 verified test fires. DeepFire-Forecaster manuscript.">F1 0.8549</span> on active fire, matching the strongest baselines on their own terms with a third of their temporal context at <span class="datum" tabindex="0" data-src="SOURCE: DeepFire-Forecaster manuscript abstract.">2.72× fewer parameters</span>.</p>
-      </div>
-      <div>
-        <h4 class="sub">The audit</h4>
-        <p style="margin:0;font-size:13.5px">Many fires in the benchmark carry no ground truth at all. <span class="datum" tabindex="0" data-src="SOURCE: label-completeness audit, DeepFire-Forecaster manuscript.">18 training fires and 2 test fires</span> are excluded for active fire — and those two cannot be scored by any model, not just this one. Training on audited data raised recall from <span class="datum" tabindex="0" data-src="SOURCE: before/after audit training runs, DeepFire-Forecaster.">~0.80 to 0.86</span>, which makes the label quality the finding rather than the model.</p>
-      </div>
+     <div>
+  <h4 class="sub">The model</h4>
+  <p style="margin:0;font-size:13.5px">A lightweight 3D U-Net that reads VIIRS satellite bands and reaches <span class="datum" tabindex="0" data-src="SOURCE: F1 micro-averaged over all test pixels, mean ± std, 15 verified test fires. DeepFire-Forecaster manuscript.">F1 0.8549</span> on active fire with <span class="datum" tabindex="0" data-src="SOURCE: DeepFire-Forecaster manuscript abstract.">2.72× fewer parameters</span> than the strongest baselines, small enough to train on a single Kaggle GPU.</p>
+</div>
+<div>
+  <h4 class="sub">The data</h4>
+  <p style="margin:0;font-size:13.5px">Many fires in the benchmark have no ground truth. Removing them raised recall from <span class="datum" tabindex="0" data-src="SOURCE: before/after audit training runs, DeepFire-Forecaster.">~0.80 to 0.86</span>, so cleaner environmental data mattered as much as the architecture.</p>
+</div>
     </div>
 
     <p style="margin:18px 0 0;font-size:13px;color:var(--muted)">Reproduces on a Kaggle T4 inside the 12-hour session limit. <a href="https://github.com/mavroul1s/DeepFire-Forecaster" target="_blank" rel="noopener">github.com/mavroul1s/DeepFire-Forecaster →</a></p>
