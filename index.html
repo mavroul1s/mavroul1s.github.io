@@ -44,7 +44,7 @@
   --shade-rgb:0,0,0;
   --rain-rgb:255,166,44;
   --rain-head-rgb:255,238,198;
-  --rain-a:.46;
+  --rain-a:.28;
   --bay:#05080e;
   --surface-2:#071019;
   --bright:#eafcff;
@@ -90,7 +90,7 @@ html[data-theme="light"]{
   --shade-rgb:95,42,158;
   --rain-rgb:124,208,0;
   --rain-head-rgb:52,100,0;
-  --rain-a:.58;
+  --rain-a:.34;
   --bay:#f1ecfa;
   --surface-2:#f6f2fd;
   --bright:#8fd400;
@@ -131,7 +131,7 @@ html[data-theme="unit02"]{
   --shade-rgb:0,0,0;
   --rain-rgb:255,70,51;
   --rain-head-rgb:255,225,200;
-  --rain-a:.44;
+  --rain-a:.26;
   --bay:#0c0304;
   --surface-2:#160507;
   --bright:#fff0ea;
@@ -229,7 +229,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-off
 
 /* --- LAIN: glyph drift, edges only, centre stays legible --- */
 #glyphs{
-  position:fixed;inset:0;z-index:1;pointer-events:none;opacity:var(--rain-a,.42);
+  position:fixed;inset:0;z-index:1;pointer-events:none;opacity:var(--rain-a,.28);
 }
 
 /* --- horizontal-hold slip: rare, brief, mechanical --- */
@@ -480,7 +480,7 @@ a.chip:hover{color:var(--primary);border-color:var(--primary);background:rgba(va
 .portrait .ln.on{opacity:1}
 html[data-motion="off"] .portrait .ln{opacity:1}
 
-.profiler{border:1px solid rgba(var(--grid-rgb),.55);background:linear-gradient(180deg,rgba(var(--surface-rgb),.94),rgba(var(--bg-rgb),.94));position:relative}
+.profiler{border:1px solid rgba(var(--grid-rgb),.55);background:linear-gradient(180deg,rgba(var(--surface-rgb),.98),rgba(var(--bg-rgb),.98));position:relative}
 .profiler::before,.profiler::after{
   content:"";position:absolute;width:11px;height:11px;border:2px solid var(--primary);
 }
@@ -526,7 +526,7 @@ html[data-motion="off"] .portrait .ln{opacity:1}
    PANELS / CARDS
    ============================================================ */
 .panel{
-  border:1px solid rgba(var(--grid-rgb),.42);background:rgba(var(--surface-rgb),.72);
+  border:1px solid rgba(var(--grid-rgb),.42);background:rgba(var(--surface-rgb),.9);
   padding:18px;position:relative;
 }
 .panel.flag{border-left:2px solid var(--accent)}
@@ -593,11 +593,11 @@ caption{caption-side:bottom;text-align:left;font-size:11px;color:var(--muted);pa
 /* project grid */
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
 .card{
-  border:1px solid rgba(var(--grid-rgb),.35);background:rgba(var(--surface-rgb),.65);
+  border:1px solid rgba(var(--grid-rgb),.35);background:rgba(var(--surface-rgb),.88);
   padding:15px;display:flex;flex-direction:column;gap:9px;
   transition:border-color .15s,background .15s;
 }
-.card:hover{border-color:var(--primary);background:rgba(var(--surface-rgb),.85)}
+.card:hover{border-color:var(--primary);background:rgba(var(--surface-rgb),.96)}
 .card h3{margin:0;font-size:16px;color:var(--primary-lo);font-weight:700}
 .card p{margin:0;font-size:13px;color:var(--fg)}
 .card .meta{margin-top:auto;display:flex;flex-direction:column;gap:5px;font-size:11.5px}
@@ -708,7 +708,7 @@ ol.news{list-style:none;margin:0;padding:4px 0}
 
 /* toolchain */
 .term{
-  border:1px solid rgba(var(--grid-rgb),.42);background:rgba(var(--surface-rgb),.76);
+  border:1px solid rgba(var(--grid-rgb),.42);background:rgba(var(--surface-rgb),.92);
 }
 .term-bar{
   display:flex;gap:8px;align-items:center;padding:6px 12px;
@@ -752,9 +752,9 @@ ol.news{list-style:none;margin:0;padding:4px 0}
 .link-box{
   border:1px solid rgba(var(--grid-rgb),.4);padding:14px 16px;display:block;
   border-bottom:1px solid rgba(var(--grid-rgb),.4);
-  background:rgba(var(--surface-rgb),.72);
+  background:rgba(var(--surface-rgb),.9);
 }
-.link-box:hover{border-color:var(--primary);background:rgba(var(--surface-rgb),.85)}
+.link-box:hover{border-color:var(--primary);background:rgba(var(--surface-rgb),.96)}
 button.link-box{
   font:inherit;text-align:left;color:inherit;
   cursor:pointer;width:100%;position:relative;
@@ -2427,7 +2427,7 @@ Always open to collaborating—feel free to reach out.</p>
     var cols = [], CW = 14, CH = 16, GW = 0, GH = 0, ROWS = 0;
     function newCol(onscreen){
       var c = {
-        sp: 0.22 + Math.random()*0.5,          /* cells per tick */
+        sp: 0.11 + Math.random()*0.25,        /* cells per tick, half-speed drift */
         len: 7 + ((Math.random()*11)|0),       /* trail length */
         ch: []
       };
