@@ -1106,6 +1106,7 @@ footer pre{
 .feed > summary:hover .feed-bar{background:var(--window-alt)}
 .ghgrid{background:var(--window-border);border-color:var(--window-border)}
 .bay .cta,.datum::after{background:var(--window-alt);border-color:var(--window-border);color:var(--window-fg)}
+.bay:hover,.bay.readout:hover{background:var(--window-alt)}
 
 /* Buttons and toggle controls use an opaque control plane, never page colour. */
 .btn,.sw,.launch-mini,.tick-link,.feed-bar .cue,.gh-fold .ghsum-cue{
@@ -1116,7 +1117,7 @@ footer pre{
 .btn.ghost,.sw b,.sw .k{color:var(--control-fg)}
 .btn.primary{background:var(--control-bg);border-color:var(--window-accent);color:var(--control-fg)}
 .btn::before,.btn.primary::before{background:var(--window-accent)}
-.btn:hover,.btn.primary:hover,.btn.ghost:hover{color:var(--control-hover-fg);border-color:var(--window-accent)}
+.btn:hover,.btn.primary:hover,.btn.ghost:hover{background:var(--control-bg);color:var(--control-hover-fg);border-color:var(--window-accent)}
 .sw:hover,.launch-mini:hover,.tick-link:hover,.tick-link:focus-visible{
   background:var(--window-alt);
   border-color:var(--primary);
