@@ -769,6 +769,11 @@ ol.news{list-style:none;margin:0;padding:4px 0}
   display:grid;grid-template-columns:96px 1fr;gap:16px;
   padding:14px 0;border-bottom:1px solid rgba(var(--grid-rgb),.25);
 }
+/* lists that now live inside a panel lose their own outer rules */
+.panel .archive{border-top:0}
+.panel .archive li:first-child{padding-top:0}
+.panel .archive li:last-child{border-bottom:0;padding-bottom:0}
+.panel .creds li:last-child{border-bottom:0}
 .archive .code{color:var(--accent);font-size:12px;letter-spacing:.1em}
 .archive h4{margin:0 0 4px;font-size:14px;color:var(--primary-lo);font-weight:500}
 .archive p{margin:0;font-size:12.5px;color:var(--fg)}
@@ -1679,6 +1684,7 @@ Always open to collaborating—feel free to reach out.</p>
   <h2 class="sec-h"><span class="path">~/</span>archive <span class="rule"></span> <span class="tag course">Coursework</span></h2>
   <p style="margin:-12px 0 20px;color:var(--muted);font-size:13px">University coursework repositories. Listed for completeness, not presented as research.</p>
 
+  <div class="panel">
   <ul class="archive">
     <li>
       <span class="code">ECE328</span>
@@ -1721,6 +1727,7 @@ Always open to collaborating—feel free to reach out.</p>
       </div>
     </li>
   </ul>
+  </div>
 </section>
 
 <!-- ===================== TOOLCHAIN ===================== -->
@@ -1744,8 +1751,9 @@ Always open to collaborating—feel free to reach out.</p>
 <section id="credentials">
   <h2 class="sec-h"><span class="path">~/</span>credentials <span class="rule"></span></h2>
 
+  <div class="panel" style="margin-bottom:16px">
   <h4 class="sub">Publications</h4>
-  <ul class="creds" style="margin:0 0 26px">
+  <ul class="creds" style="margin:0">
     <li><a class="cert" href="https://www.mdpi.com/1424-8220/26/16/5116" target="_blank" rel="noopener">
       <span>Mavros, N. and Katsaros, D. — <em>SpaSE-UNet3D: Sensor-Driven Wildfire Detection and Progression Prediction from VIIRS Multispectral Imagery</em></span>
       <span class="who">Sensors (MDPI) 2026, 26(16), 5116 — doi:10.3390/s26165116, open access</span>
@@ -1761,9 +1769,10 @@ Always open to collaborating—feel free to reach out.</p>
       <span class="doc">PDF</span>
     </a></li>
   </ul>
+  </div>
 
-  <div class="cols">
-    <div>
+  <div class="cols" style="gap:16px">
+    <div class="panel">
       <h4 class="sub">Certifications</h4>
       <ul class="creds">
         <li><a class="cert" href="certs/ΒΕΒΑΙΩΣΗ ΕΠΙΚΟΥΡΙΚΟΥ ΕΡΓΟΥ ΜΑΥΡΟΣ ΝΙΚΟΛΑΟΣ.pdf" target="_blank" rel="noopener"><span>Teaching assistance certificate — Algorithms</span> <span class="who">University of Thessaly · Summer semester 2025–2026</span> <span class="when">2 Oct 2026</span> <span class="doc">PDF</span></a></li>
@@ -1775,7 +1784,7 @@ Always open to collaborating—feel free to reach out.</p>
         <li><a class="cert" href="certs/ecce-b2-english.pdf" target="_blank" rel="noopener"><span>ECCE, Competency in English — level B2</span> <span class="who">Michigan Language Assessment</span> <span class="when">2019</span> <span class="doc">PDF</span></a></li>
       </ul>
     </div>
-    <div>
+    <div class="panel">
       <h4 class="sub">Conferences attended</h4>
       <ul class="creds">
         <li><a class="cert" href="certs/etc-2024-edge-intelligence.pdf" target="_blank" rel="noopener"><span>3rd Emerging Tech Conference: Edge Intelligence</span> <span class="who">UTh, Volos</span> <span class="when">Oct 2024</span> <span class="doc">PDF</span></a></li>
