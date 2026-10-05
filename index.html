@@ -23,8 +23,13 @@
 :root{
   --bg:#04060b;
   --surface:#0b1620;
-  --window:#0b3b49;
-  --window-alt:#124d5c;
+  --window:#08303c;
+  --window-alt:#0d3f4d;
+  --window-rgb:8,48,60;
+  --window-alt-rgb:13,63,77;
+  --control-rgb:10,67,82;
+  --win-a:.70;
+  --ctl-a:.72;
   --window-border:#62d9e8;
   --window-fg:#eafcff;
   --window-primary:#b7f6ff;
@@ -37,7 +42,7 @@
   --window-accent-rgb:255,204,120;
   --window-alert:var(--alert);
   --window-alert-rgb:var(--alert-rgb);
-  --control-bg:#0c5364;
+  --control-bg:#0a4352;
   --control-fg:#eafcff;
   --control-hover-fg:#071a22;
   --primary:#35e0f0;
@@ -87,8 +92,13 @@ html[data-theme="light"]{
   color-scheme:light;
   --bg:#f4f3f0;
   --surface:#ffffff;
-  --window:#48266b;
-  --window-alt:#59367e;
+  --window:#5d3b86;
+  --window-alt:#6e4a9a;
+  --window-rgb:93,59,134;
+  --window-alt-rgb:110,74,154;
+  --control-rgb:117,82,161;
+  --win-a:.82;
+  --ctl-a:.84;
   --window-border:#b5e77d;
   --window-fg:#ffffff;
   --window-primary:#d7ffad;
@@ -101,7 +111,7 @@ html[data-theme="light"]{
   --window-accent-rgb:188,248,119;
   --window-alert:#ffb5c4;
   --window-alert-rgb:255,181,196;
-  --control-bg:#623992;
+  --control-bg:#7552a1;
   --control-fg:#ffffff;
   --control-hover-fg:#29133e;
   --primary:#5f2a9e;
@@ -145,8 +155,13 @@ html[data-theme="unit02"]{
   color-scheme:dark;
   --bg:#0a0304;
   --surface:#1c0709;
-  --window:#541b22;
-  --window-alt:#6b242c;
+  --window:#451419;
+  --window-alt:#561c23;
+  --window-rgb:69,20,25;
+  --window-alt-rgb:86,28,35;
+  --control-rgb:127,43,36;
+  --win-a:.70;
+  --ctl-a:.72;
   --window-border:#ff927c;
   --window-fg:#fff2ec;
   --window-primary:#ffe2d6;
@@ -157,7 +172,7 @@ html[data-theme="unit02"]{
   --window-grid-rgb:242,179,151;
   --window-accent:#ffd16e;
   --window-accent-rgb:255,209,110;
-  --control-bg:#96372d;
+  --control-bg:#7f2b24;
   --control-fg:#fff0ea;
   --control-hover-fg:#2a0b0f;
   --primary:#ff4633;
@@ -1095,40 +1110,45 @@ footer pre{
   --alert-rgb:var(--window-alert-rgb);
 }
 #boot-frame,.profiler,.panel,.card,.term,.link-box,.ghstat,.bay,.viz{
-  background:var(--window);
+  background:rgba(var(--window-rgb),var(--win-a));
   color:var(--window-fg);
   border-color:var(--window-border);
   box-shadow:0 8px 22px rgba(var(--shade-rgb),.18),inset 0 1px 0 rgba(var(--primary-rgb),.12);
 }
-.profiler{background:linear-gradient(180deg,var(--window),var(--window-alt))}
-.profiler h3{background:var(--window-alt);color:var(--window-primary);border-bottom:1px solid var(--window-border)}
-.feed-bar,.term-bar{background:var(--window-alt)}
-.feed > summary:hover .feed-bar{background:var(--window-alt)}
+/* a light blur keeps text readable over the glyph rain and wires */
+#boot-frame,.profiler,.panel,.card,.term,.link-box,.ghstat{
+  -webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);
+}
+.profiler{background:linear-gradient(180deg,rgba(var(--window-rgb),var(--win-a)),rgba(var(--window-alt-rgb),var(--win-a)))}
+.profiler h3{background:rgba(var(--window-alt-rgb),var(--win-a));color:var(--window-primary);border-bottom:1px solid var(--window-border)}
+.feed-bar,.term-bar{background:rgba(var(--window-alt-rgb),var(--win-a))}
+.feed > summary:hover .feed-bar{background:rgba(var(--window-alt-rgb),var(--win-a))}
 .ghgrid{background:var(--window-border);border-color:var(--window-border)}
+/* tooltip and CTA plate stay solid so they read over anything */
 .bay .cta,.datum::after{background:var(--window-alt);border-color:var(--window-border);color:var(--window-fg)}
-.bay:hover,.bay.readout:hover{background:var(--window-alt)}
+.bay:hover,.bay.readout:hover{background:rgba(var(--window-alt-rgb),var(--win-a))}
 
-/* Buttons and toggle controls use an opaque control plane, never page colour. */
+/* Buttons and toggle controls */
 .btn,.sw,.launch-mini,.tick-link,.feed-bar .cue,.gh-fold .ghsum-cue{
-  background:var(--control-bg);
+  background:rgba(var(--control-rgb),var(--ctl-a));
   border-color:var(--window-border);
   color:var(--control-fg);
 }
 .btn.ghost,.sw b,.sw .k{color:var(--control-fg)}
-.btn.primary{background:var(--control-bg);border-color:var(--window-accent);color:var(--control-fg)}
+.btn.primary{background:rgba(var(--control-rgb),var(--ctl-a));border-color:var(--window-accent);color:var(--control-fg)}
 .btn::before,.btn.primary::before{background:var(--window-accent)}
-.btn:hover,.btn.primary:hover,.btn.ghost:hover{background:var(--control-bg);color:var(--control-hover-fg);border-color:var(--window-accent)}
+.btn:hover,.btn.primary:hover,.btn.ghost:hover{background:rgba(var(--control-rgb),var(--ctl-a));color:var(--control-hover-fg);border-color:var(--window-accent)}
 .sw:hover,.launch-mini:hover,.tick-link:hover,.tick-link:focus-visible{
-  background:var(--window-alt);
+  background:rgba(var(--window-alt-rgb),var(--win-a));
   border-color:var(--primary);
   color:var(--primary-lo);
 }
 .chip,a.chip,.tag,.cert .doc{
-  background:var(--window-alt);
+  background:rgba(var(--window-alt-rgb),var(--win-a));
   border-color:var(--window-border);
 }
-a.chip:hover{background:var(--control-bg);color:var(--control-fg)}
-button.link-box:hover,.link-box:hover,.card:hover{background:var(--window-alt);border-color:var(--primary)}
+a.chip:hover{background:rgba(var(--control-rgb),var(--ctl-a));color:var(--control-fg)}
+button.link-box:hover,.link-box:hover,.card:hover{background:rgba(var(--window-alt-rgb),var(--win-a));border-color:var(--primary)}
 
 /* ============================================================
    REDUCED MOTION
