@@ -81,6 +81,7 @@
   --vig-a:.85;
   --crt-a:.28;
 
+  --tick-h:0px;
   --gut:clamp(18px,4vw,48px);
   --maxw:1180px;
 }
@@ -90,7 +91,7 @@
    ============================================================ */
 html[data-theme="light"]{
   color-scheme:light;
-  --bg:#f4f3f0;
+  --bg:#ece5f6;
   --surface:#ffffff;
   --window:#5d3b86;
   --window-alt:#6e4a9a;
@@ -122,7 +123,7 @@ html[data-theme="light"]{
   --grid:#8a6fb8;
   --fg:#1b1226;
 
-  --bg-rgb:244,243,240;
+  --bg-rgb:236,229,246;
   --surface-rgb:255,255,255;
   --primary-rgb:95,42,158;
   --primary-lo-rgb:62,26,105;
@@ -392,7 +393,7 @@ html[data-motion="off"] #pdpt{opacity:1;animation:none}
 .topbar b{color:var(--primary);font-weight:500}
 .dot{color:var(--accent);animation:blink 1.6s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
-.topbar .right{display:flex;gap:16px;align-items:center}
+.topbar .right{display:flex;gap:16px;align-items:center;margin-left:auto}
 @media(max-width:1120px){.topbar .hide-s{display:none}}
 
 /* NEOW launch control, pinned in the bar — always one click away */
@@ -1193,16 +1194,13 @@ button.link-box:hover,.link-box:hover,.card:hover{background:rgba(var(--window-a
 
 <!-- ===================== TOP BAR ===================== -->
 <header class="topbar">
-  <div><span class="dot">●</span> <b>mavroul1s.navi</b> <span class="hide-s">// Undergraduate electrical and computer engineer</span></div>
   <div class="right">
-    <a class="launch-mini" href="https://mavroul1s.github.io/neo_tracker/neo-tracker.html" target="_blank" rel="noopener"><span class="rad" aria-hidden="true"></span> NEOW TRACKER</a>
     <button type="button" class="sw" id="motionsw" aria-pressed="false" aria-label="Hold the animations still">
       <span class="k" aria-hidden="true">◈</span> <span class="lbl">MOTION <b>ON</b></span>
     </button>
     <button type="button" class="sw" id="themesw" aria-pressed="false" aria-label="Unit 01 light theme">
       <span class="k" aria-hidden="true">◐</span> <span class="lbl">UNIT <b>01</b></span>
     </button>
-    <span class="hide-s">VOLOS · GR</span>
     <span id="clock">--:--:--</span>
   </div>
 </header>
@@ -1220,9 +1218,6 @@ button.link-box:hover,.link-box:hover,.card:hover{background:rgba(var(--window-a
   </ul>
 </nav>
 
-<div class="ticker">
-  <nav class="ticker-track" id="tick" aria-label="Project repositories"></nav>
-</div>
 
 <main>
 
@@ -1868,29 +1863,6 @@ Always open to collaborating—feel free to reach out.</p>
   tick(); setInterval(tick,1000);
   document.getElementById('yr').textContent = new Date().getFullYear();
 
-  /* ---------- ticker ---------- */
-  /* each project name is its own button through to the repository */
-  var items = [
-    ['SpaSE-UNet3D',               'https://github.com/mavroul1s/DeepFire-Forecaster'],
-    ['neuron-death',               'https://github.com/mavroul1s/neuron-death'],
-    ['NEOW / neo_tracker',         'https://github.com/mavroul1s/neo_tracker'],
-    ['Sector 07 — Grid Expansion', 'https://github.com/mavroul1s/Isometric-Cyberpunk-Megastructure-Defense-Grid'],
-    ['GridSense',                  'https://github.com/mavroul1s/GridSense_collab'],
-    ['NCF Reproduction',           'https://github.com/mavroul1s/ncf-assignment'],
-    ['vit-gradient-flow',          'https://github.com/mavroul1s/vit-gradient-flow'],
-    ['Galaxy-Morphology-CNN',      'https://github.com/mavroul1s/Galaxy-Morphology-CNN'],
-    ['KinetiCore',                 'https://github.com/mavroul1s/KinetiCore'],
-    ['GMM Music Genre Recognition','https://github.com/mavroul1s/GMM-Music-Genre-Recognition']
-  ];
-  /* the belt is one list rendered twice; the second pass is scenery, so it is
-     hidden from assistive tech and taken out of the tab order */
-  function belt(dup){
-    return items.map(function(p){
-      return '<a class="tick-link" href="'+p[1]+'" target="_blank" rel="noopener"'+
-             (dup ? ' tabindex="-1" aria-hidden="true"' : '')+'>'+p[0]+'</a>';
-    }).join('');
-  }
-  document.getElementById('tick').innerHTML = belt(false) + belt(true);
 
   /* ---------- public repo count ----------
      Asked for rather than typed in: every place the page prints the number
@@ -2345,7 +2317,7 @@ Always open to collaborating—feel free to reach out.</p>
     root.setAttribute('data-motion', on ? 'on' : 'off');
     msw.setAttribute('aria-pressed', String(!on));
     msw.querySelector('b').textContent = on ? 'ON' : 'OFF';
-    msw.title = on ? 'Hold every animation still (the ticker keeps running)'
+    msw.title = on ? 'Hold every animation still'
                    : 'Let the animations run again';
     store('motion', on ? 'on' : 'off');
     /* `running` keeps a second start from stacking a duplicate frame loop */
