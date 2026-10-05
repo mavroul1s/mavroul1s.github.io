@@ -23,6 +23,23 @@
 :root{
   --bg:#04060b;
   --surface:#0b1620;
+  --window:#0b3b49;
+  --window-alt:#124d5c;
+  --window-border:#62d9e8;
+  --window-fg:#eafcff;
+  --window-primary:#b7f6ff;
+  --window-primary-rgb:183,246,255;
+  --window-muted:#b0dce6;
+  --window-muted-rgb:176,220,230;
+  --window-grid:#82d8e5;
+  --window-grid-rgb:130,216,229;
+  --window-accent:#ffcc78;
+  --window-accent-rgb:255,204,120;
+  --window-alert:var(--alert);
+  --window-alert-rgb:var(--alert-rgb);
+  --control-bg:#0c5364;
+  --control-fg:#eafcff;
+  --control-hover-fg:#071a22;
   --primary:#35e0f0;
   --primary-lo:#7defff;
   --accent:#ffb347;
@@ -70,6 +87,23 @@ html[data-theme="light"]{
   color-scheme:light;
   --bg:#f4f3f0;
   --surface:#ffffff;
+  --window:#48266b;
+  --window-alt:#59367e;
+  --window-border:#b5e77d;
+  --window-fg:#ffffff;
+  --window-primary:#d7ffad;
+  --window-primary-rgb:215,255,173;
+  --window-muted:#e5d8f4;
+  --window-muted-rgb:229,216,244;
+  --window-grid:#c0e996;
+  --window-grid-rgb:192,233,150;
+  --window-accent:#bcf877;
+  --window-accent-rgb:188,248,119;
+  --window-alert:#ffb5c4;
+  --window-alert-rgb:255,181,196;
+  --control-bg:#623992;
+  --control-fg:#ffffff;
+  --control-hover-fg:#29133e;
   --primary:#5f2a9e;
   --primary-lo:#3e1a69;
   --accent:#417500;        /* text green, dark enough to read on white */
@@ -96,7 +130,7 @@ html[data-theme="light"]{
   --bright:#8fd400;
   --spec:#c9ff5c;
   --starA:143,212,0;
-  --starB:95,42,158;
+  --starB:255,255,255;
   --core:143,212,0;
 
   --vig-a:.13;
@@ -111,6 +145,21 @@ html[data-theme="unit02"]{
   color-scheme:dark;
   --bg:#0a0304;
   --surface:#1c0709;
+  --window:#541b22;
+  --window-alt:#6b242c;
+  --window-border:#ff927c;
+  --window-fg:#fff2ec;
+  --window-primary:#ffe2d6;
+  --window-primary-rgb:255,226,214;
+  --window-muted:#f5c5b4;
+  --window-muted-rgb:245,197,180;
+  --window-grid:#f2b397;
+  --window-grid-rgb:242,179,151;
+  --window-accent:#ffd16e;
+  --window-accent-rgb:255,209,110;
+  --control-bg:#96372d;
+  --control-fg:#fff0ea;
+  --control-hover-fg:#2a0b0f;
   --primary:#ff4633;
   --primary-lo:#ff8a6a;
   --accent:#ffc247;        /* the shoulder pylons */
@@ -1026,6 +1075,61 @@ footer pre{
 }
 
 /* ============================================================
+   SURFACE CONTRAST — every window and control stays visibly apart
+   from the page plane in all three units.
+   ============================================================ */
+#boot-frame,.profiler,.panel,.card,.term,.link-box,.ghstat,.bay,.viz,
+.btn,.sw,.launch-mini,.tick-link,.chip,.tag,.cert .doc,.datum::after{
+  --fg:var(--window-fg);
+  --primary:var(--window-primary);
+  --primary-lo:var(--window-primary);
+  --primary-rgb:var(--window-primary-rgb);
+  --primary-lo-rgb:var(--window-primary-rgb);
+  --muted:var(--window-muted);
+  --muted-rgb:var(--window-muted-rgb);
+  --grid:var(--window-grid);
+  --grid-rgb:var(--window-grid-rgb);
+  --accent:var(--window-accent);
+  --accent-rgb:var(--window-accent-rgb);
+  --alert:var(--window-alert);
+  --alert-rgb:var(--window-alert-rgb);
+}
+#boot-frame,.profiler,.panel,.card,.term,.link-box,.ghstat,.bay,.viz{
+  background:var(--window);
+  color:var(--window-fg);
+  border-color:var(--window-border);
+  box-shadow:0 8px 22px rgba(var(--shade-rgb),.18),inset 0 1px 0 rgba(var(--primary-rgb),.12);
+}
+.profiler{background:linear-gradient(180deg,var(--window),var(--window-alt))}
+.profiler h3{background:var(--window-alt);color:var(--window-primary);border-bottom:1px solid var(--window-border)}
+.feed-bar,.term-bar{background:var(--window-alt)}
+.feed > summary:hover .feed-bar{background:var(--window-alt)}
+.ghgrid{background:var(--window-border);border-color:var(--window-border)}
+.bay .cta,.datum::after{background:var(--window-alt);border-color:var(--window-border);color:var(--window-fg)}
+
+/* Buttons and toggle controls use an opaque control plane, never page colour. */
+.btn,.sw,.launch-mini,.tick-link,.feed-bar .cue,.gh-fold .ghsum-cue{
+  background:var(--control-bg);
+  border-color:var(--window-border);
+  color:var(--control-fg);
+}
+.btn.ghost,.sw b,.sw .k{color:var(--control-fg)}
+.btn.primary{background:var(--control-bg);border-color:var(--window-accent);color:var(--control-fg)}
+.btn::before,.btn.primary::before{background:var(--window-accent)}
+.btn:hover,.btn.primary:hover,.btn.ghost:hover{color:var(--control-hover-fg);border-color:var(--window-accent)}
+.sw:hover,.launch-mini:hover,.tick-link:hover,.tick-link:focus-visible{
+  background:var(--window-alt);
+  border-color:var(--primary);
+  color:var(--primary-lo);
+}
+.chip,a.chip,.tag,.cert .doc{
+  background:var(--window-alt);
+  border-color:var(--window-border);
+}
+a.chip:hover{background:var(--control-bg);color:var(--control-fg)}
+button.link-box:hover,.link-box:hover,.card:hover{background:var(--window-alt);border-color:var(--primary)}
+
+/* ============================================================
    REDUCED MOTION
    ============================================================ */
 @media(prefers-reduced-motion:reduce){
@@ -1718,12 +1822,12 @@ Always open to collaborating—feel free to reach out.</p>
   function readPalette(){
     var cs = getComputedStyle(root);
     function v(n){ return cs.getPropertyValue(n).trim(); }
-    C_PRIM_RGB=v('--primary-rgb'); C_GRID_RGB=v('--grid-rgb'); C_ACC_RGB=v('--accent-rgb');
-    C_ALERT_RGB=v('--alert-rgb');  C_MUTED_RGB=v('--muted-rgb'); C_HAB_RGB=v('--hab-rgb');
+    C_PRIM_RGB=v('--window-primary-rgb'); C_GRID_RGB=v('--window-grid-rgb'); C_ACC_RGB=v('--window-accent-rgb');
+    C_ALERT_RGB=v('--window-alert-rgb');  C_MUTED_RGB=v('--window-muted-rgb'); C_HAB_RGB=v('--hab-rgb');
     C_BG_RGB=v('--bg-rgb'); C_STARA=v('--starA'); C_STARB=v('--starB'); C_CORE=v('--core');
-    C_PLO_RGB=v('--primary-lo-rgb');
+    C_PLO_RGB=v('--window-primary-rgb');
     C_RAIN_RGB=v('--rain-rgb'); C_RAINH_RGB=v('--rain-head-rgb');
-    C_HI=v('--primary'); C_ACC=v('--accent'); C_RED=v('--alert'); C_MID_S=v('--muted');
+    C_HI=v('--window-primary'); C_ACC=v('--window-accent'); C_RED=v('--window-alert'); C_MID_S=v('--window-muted');
     C_DIM='rgba('+C_GRID_RGB+',.45)'; C_MID='rgba('+C_MUTED_RGB+',.9)';
   }
   readPalette();
