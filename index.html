@@ -81,6 +81,7 @@
   --vig-a:.85;
   --crt-a:.28;
 
+  --bar-h:0px;
   --tick-h:0px;
   --gut:clamp(18px,4vw,48px);
   --maxw:1180px;
@@ -440,12 +441,19 @@ html[data-motion="off"] #pdpt{opacity:1;animation:none}
   position:fixed;top:var(--bar-h,31px);left:0;right:0;z-index:39;
   background:rgba(var(--bg-rgb),.88);border-bottom:1px solid rgba(var(--grid-rgb),.22);
   backdrop-filter:blur(6px);
-  overflow-x:auto;scrollbar-width:none;
+  display:flex;align-items:center;justify-content:space-between;overflow:hidden;
 }
-.nav::-webkit-scrollbar{display:none}
 .nav ul{
   display:flex;gap:4px;list-style:none;margin:0;
   padding:0 var(--gut);white-space:nowrap;
+  flex:1;min-width:0;overflow-x:auto;scrollbar-width:none;
+}
+.nav ul::-webkit-scrollbar{display:none}
+.nav-tools{
+  flex:none;display:flex;align-items:center;gap:12px;
+  padding:0 var(--gut) 0 12px;
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+  white-space:nowrap;
 }
 .nav a{
   display:block;padding:8px 12px;font-size:11.5px;letter-spacing:.1em;
@@ -1192,18 +1200,6 @@ button.link-box:hover,.link-box:hover,.card:hover{background:rgba(var(--window-a
   <div class="skip">click anywhere to enter</div>
 </div>
 
-<!-- ===================== TOP BAR ===================== -->
-<header class="topbar">
-  <div class="right">
-    <button type="button" class="sw" id="motionsw" aria-pressed="false" aria-label="Hold the animations still">
-      <span class="k" aria-hidden="true">◈</span> <span class="lbl">MOTION <b>ON</b></span>
-    </button>
-    <button type="button" class="sw" id="themesw" aria-pressed="false" aria-label="Unit 01 light theme">
-      <span class="k" aria-hidden="true">◐</span> <span class="lbl">UNIT <b>01</b></span>
-    </button>
-    <span id="clock">--:--:--</span>
-  </div>
-</header>
 
 <nav class="nav" aria-label="Sections">
   <ul>
@@ -1216,6 +1212,15 @@ button.link-box:hover,.link-box:hover,.card:hover{background:rgba(var(--window-a
     <li><a href="#credentials">~/credentials</a></li>
     <li><a href="#contact">~/contact</a></li>
   </ul>
+  <div class="nav-tools">
+    <button type="button" class="sw" id="motionsw" aria-pressed="false" aria-label="Hold the animations still">
+      <span class="k" aria-hidden="true">◈</span> <span class="lbl">MOTION <b>ON</b></span>
+    </button>
+    <button type="button" class="sw" id="themesw" aria-pressed="false" aria-label="Unit 01 light theme">
+      <span class="k" aria-hidden="true">◐</span> <span class="lbl">UNIT <b>01</b></span>
+    </button>
+    <span id="clock">--:--:--</span>
+  </div>
 </nav>
 
 
