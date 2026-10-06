@@ -1215,6 +1215,7 @@ button.link-box:hover,.link-box:hover,.card:hover{background:rgba(var(--window-a
     <li><a href="#archive">~/archive</a></li>
     <li><a href="#toolchain">~/toolchain</a></li>
     <li><a href="#credentials">~/credentials</a></li>
+    <li><a href="#interactive-games">~/interactive/games</a></li>
     <li><a href="#contact">~/contact</a></li>
   </ul>
   <div class="nav-tools">
@@ -1503,60 +1504,6 @@ Always open to collaborating—feel free to reach out.</p>
     <p style="margin:18px 0 0;font-size:13px;color:var(--muted)">Reproduces on a Kaggle T4 inside the 12-hour session limit. <a href="https://github.com/mavroul1s/DeepFire-Forecaster" target="_blank" rel="noopener">github.com/mavroul1s/DeepFire-Forecaster →</a></p>
   </div>
 
-  <div class="panel flag" style="margin-bottom:16px;border-left-color:var(--accent)">
-    <div class="panel-h"><h3>NEOW / neo_tracker</h3></div>
-
-    <a class="bay" href="https://mavroul1s.github.io/neo_tracker/neo-tracker.html" target="_blank" rel="noopener" aria-label="Launch the NEOW orbital tracker">
-      <canvas id="orbit" aria-hidden="true"></canvas>
-      <span class="hexmask" aria-hidden="true"></span>
-      <span class="reticle" aria-hidden="true"></span>
-      <span class="cta">
-        <strong>▸ Explore the simulation</strong>
-      </span>
-    </a>
-
-    <div class="cols" style="margin-top:16px">
-      <div>
-        <p style="margin:0 0 12px">A watch post for the traffic around Earth. Pick a date range and see every near-Earth object NASA is tracking in it — how close it passes, how big it is, how well its orbit is known — placed in a solar system you can fly around.</p>
-        <p style="margin:0 0 12px">Nothing is animated: eight planets, fifteen moons and every tracked asteroid are propagated from published elements through a Kepler solver. Lock onto a contact for its telemetry, or sort the registry by miss distance.</p>
-        <p style="margin:0 0 12px">It ships on the shared <code>DEMO_KEY</code>, which is rate-limited. Paste a free key from <a href="https://api.nasa.gov/" target="_blank" rel="noopener">api.nasa.gov</a> into the data link panel for live close-approach data over any dates, with the hazard and uncertainty codes as NASA publishes them.</p>
-      </div>
-      <div>
-        <h4 class="sub">Checked against independent ground truth</h4>
-        <ul class="spec">
-          <li>Earth perihelion <span class="datum" tabindex="0" data-src="SOURCE: NEOW verification pass against published values.">0.98329 AU</span>, aphelion <span class="datum" tabindex="0" data-src="SOURCE: NEOW verification pass against published values.">1.01671 AU</span></li>
-          <li>Equinox and solstice solar longitudes within 0.4°</li>
-          <li>Kepler solver converges to machine precision through e = 0.99</li>
-          <li>Earth computed twice by unrelated routes, agreeing to 44,000 km and 59 arcseconds</li>
-        </ul>
-        <div class="actions" style="margin:16px 0 0">
-          <a class="btn primary" href="https://mavroul1s.github.io/neo_tracker/neo-tracker.html" target="_blank" rel="noopener"><span class="k">▸</span><span>Open tracker</span></a>
-          <a class="btn ghost" href="https://github.com/mavroul1s/neo_tracker" target="_blank" rel="noopener"><span class="k">▸</span><span>Source</span></a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="panel flag" style="margin-bottom:16px;border-left-color:var(--accent)">
-    <div class="panel-h"><h3>Sector 07 — Grid Expansion</h3></div>
-
-    <a class="bay" href="https://mavroul1s.github.io/Isometric-Cyberpunk-Megastructure-Defense-Grid/" target="_blank" rel="noopener" aria-label="Play Sector 07, the isometric defence grid">
-      <canvas id="sector" aria-hidden="true"></canvas>
-      <span class="hexmask" aria-hidden="true"></span>
-      <span class="reticle" aria-hidden="true"></span>
-      <span class="cta">
-        <strong>▸ Enter the grid</strong>
-      </span>
-    </a>
-
-    <p style="margin:16px 0 0;max-width:78ch">Isometric cyberpunk city-builder and defence game. You hold one megacity sector: build nodes onto empty pads, let them link into a network, and purge intrusions before their timers run out — six rings deep around a central spire.</p>
-
-    <div class="actions" style="margin:16px 0 0">
-      <a class="btn primary" href="https://mavroul1s.github.io/Isometric-Cyberpunk-Megastructure-Defense-Grid/" target="_blank" rel="noopener"><span class="k">▸</span><span>Play in browser</span></a>
-      <a class="btn ghost" href="https://github.com/mavroul1s/Isometric-Cyberpunk-Megastructure-Defense-Grid" target="_blank" rel="noopener"><span class="k">▸</span><span>Source</span></a>
-    </div>
-  </div>
-
   <div class="cards">
 
     <article class="card">
@@ -1787,6 +1734,61 @@ Always open to collaborating—feel free to reach out.</p>
         <li><a class="cert" href="certs/etc-2024-edge-intelligence.pdf" target="_blank" rel="noopener"><span>3rd Emerging Tech Conference: Edge Intelligence</span> <span class="who">UTh, Volos</span> <span class="when">Oct 2024</span> <span class="doc">PDF</span></a></li>
         <li><a class="cert" href="certs/ecescon-14.pdf" target="_blank" rel="noopener"><span>ECESCON 14</span> <span class="who">Univ. of Thessaly, Volos</span> <span class="when">Apr 2023</span> <span class="doc">PDF</span></a></li>
       </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== INTERACTIVE / GAMES ===================== -->
+<section id="interactive-games">
+  <h2 class="sec-h"><span class="path">~/</span>interactive/games <span class="rule"></span></h2>
+
+  <div class="panel flag" style="margin-bottom:16px;border-left-color:var(--accent)">
+    <div class="panel-h"><h3>NEOW / neo_tracker</h3></div>
+
+    <a class="bay" href="https://mavroul1s.github.io/neo_tracker/neo-tracker.html" target="_blank" rel="noopener" aria-label="Launch the NEOW orbital tracker">
+      <canvas id="orbit" aria-hidden="true"></canvas>
+      <span class="hexmask" aria-hidden="true"></span>
+      <span class="reticle" aria-hidden="true"></span>
+      <span class="cta"><strong>▸ Explore the simulation</strong></span>
+    </a>
+
+    <div class="cols" style="margin-top:16px">
+      <div>
+        <p style="margin:0 0 12px">A watch post for the traffic around Earth. Pick a date range and see every near-Earth object NASA is tracking in it — how close it passes, how big it is, how well its orbit is known — placed in a solar system you can fly around.</p>
+        <p style="margin:0 0 12px">Nothing is animated: eight planets, fifteen moons and every tracked asteroid are propagated from published elements through a Kepler solver. Lock onto a contact for its telemetry, or sort the registry by miss distance.</p>
+        <p style="margin:0 0 12px">It ships on the shared <code>DEMO_KEY</code>, which is rate-limited. Paste a free key from <a href="https://api.nasa.gov/" target="_blank" rel="noopener">api.nasa.gov</a> into the data link panel for live close-approach data over any dates, with the hazard and uncertainty codes as NASA publishes them.</p>
+      </div>
+      <div>
+        <h4 class="sub">Checked against independent ground truth</h4>
+        <ul class="spec">
+          <li>Earth perihelion <span class="datum" tabindex="0" data-src="SOURCE: NEOW verification pass against published values.">0.98329 AU</span>, aphelion <span class="datum" tabindex="0" data-src="SOURCE: NEOW verification pass against published values.">1.01671 AU</span></li>
+          <li>Equinox and solstice solar longitudes within 0.4°</li>
+          <li>Kepler solver converges to machine precision through e = 0.99</li>
+          <li>Earth computed twice by unrelated routes, agreeing to 44,000 km and 59 arcseconds</li>
+        </ul>
+        <div class="actions" style="margin:16px 0 0">
+          <a class="btn primary" href="https://mavroul1s.github.io/neo_tracker/neo-tracker.html" target="_blank" rel="noopener"><span class="k">▸</span><span>Open tracker</span></a>
+          <a class="btn ghost" href="https://github.com/mavroul1s/neo_tracker" target="_blank" rel="noopener"><span class="k">▸</span><span>Source</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel flag" style="border-left-color:var(--accent)">
+    <div class="panel-h"><h3>Sector 07 — Grid Expansion</h3></div>
+
+    <a class="bay" href="https://mavroul1s.github.io/Isometric-Cyberpunk-Megastructure-Defense-Grid/" target="_blank" rel="noopener" aria-label="Play Sector 07, the isometric defence grid">
+      <canvas id="sector" aria-hidden="true"></canvas>
+      <span class="hexmask" aria-hidden="true"></span>
+      <span class="reticle" aria-hidden="true"></span>
+      <span class="cta"><strong>▸ Enter the grid</strong></span>
+    </a>
+
+    <p style="margin:16px 0 0;max-width:78ch">Isometric cyberpunk city-builder and defence game. You hold one megacity sector: build nodes onto empty pads, let them link into a network, and purge intrusions before their timers run out — six rings deep around a central spire.</p>
+
+    <div class="actions" style="margin:16px 0 0">
+      <a class="btn primary" href="https://mavroul1s.github.io/Isometric-Cyberpunk-Megastructure-Defense-Grid/" target="_blank" rel="noopener"><span class="k">▸</span><span>Play in browser</span></a>
+      <a class="btn ghost" href="https://github.com/mavroul1s/Isometric-Cyberpunk-Megastructure-Defense-Grid" target="_blank" rel="noopener"><span class="k">▸</span><span>Source</span></a>
     </div>
   </div>
 </section>
