@@ -1036,14 +1036,6 @@ footer pre{
   color:var(--accent);letter-spacing:.04em;line-height:1;
 }
 .ghstat span{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.ghlangs{display:flex;flex-direction:column;gap:7px}
-.lang{display:grid;grid-template-columns:minmax(96px,140px) 1fr 30px;gap:12px;align-items:center}
-.lang .l{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.lang .bar{height:7px;background:rgba(var(--grid-rgb),.25);display:block}
-.lang .bar i{display:block;height:100%;background:var(--primary);opacity:.75}
-.lang:first-child .bar i{background:var(--accent);opacity:.9}
-.lang .n{font-size:11px;color:var(--primary-lo);text-align:right}
-
 /* ---- commit calendar ----
    Five steps from the grid colour up to the bright end of the palette, so it
    reads blue under Unit 00, purple under Unit 01 and red under Unit 02
@@ -1055,17 +1047,17 @@ footer pre{
 }
 .ghcal-months span{position:absolute;top:0;white-space:nowrap}
 .ghcal{
-  display:grid;grid-template-rows:repeat(7,11px);grid-auto-flow:column;
-  grid-auto-columns:11px;gap:3px;min-width:min-content;
+  display:grid;grid-template-rows:repeat(7,13px);grid-auto-flow:column;
+  grid-auto-columns:13px;gap:3px;min-width:min-content;
 }
 .ghcal i{
-  display:block;width:11px;height:11px;
-  background:rgba(var(--grid-rgb),.14);box-shadow:inset 0 0 0 1px rgba(var(--grid-rgb),.16);
+  display:block;width:13px;height:13px;
+  background:rgba(var(--grid-rgb),.24);box-shadow:inset 0 0 0 1px rgba(var(--grid-rgb),.36);
 }
-.ghcal i[data-l="1"]{background:rgba(var(--primary-rgb),.30);box-shadow:inset 0 0 0 1px rgba(var(--primary-rgb),.34)}
-.ghcal i[data-l="2"]{background:rgba(var(--primary-rgb),.55);box-shadow:none}
-.ghcal i[data-l="3"]{background:rgba(var(--primary-rgb),.82);box-shadow:none}
-.ghcal i[data-l="4"]{background:var(--primary-lo);box-shadow:0 0 7px rgba(var(--primary-rgb),.45)}
+.ghcal i[data-l="1"]{background:rgba(var(--primary-rgb),.48);box-shadow:inset 0 0 0 1px rgba(var(--primary-rgb),.62)}
+.ghcal i[data-l="2"]{background:rgba(var(--primary-rgb),.70);box-shadow:inset 0 0 0 1px rgba(var(--primary-rgb),.76)}
+.ghcal i[data-l="3"]{background:rgba(var(--primary-rgb),.92);box-shadow:inset 0 0 0 1px rgba(var(--primary-rgb),.96)}
+.ghcal i[data-l="4"]{background:var(--primary-lo);box-shadow:0 0 8px rgba(var(--primary-rgb),.62)}
 .ghcal i[data-l="0"].void{background:transparent;box-shadow:none}
 .ghcal-foot{
   display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin-top:10px;
@@ -1373,6 +1365,10 @@ Always open to collaborating—feel free to reach out.</p>
           <time datetime="2026-10-02">(Oct 02nd, '26)</time>
           <a class="what" href="certs/ΒΕΒΑΙΩΣΗ ΕΠΙΚΟΥΡΙΚΟΥ ΕΡΓΟΥ ΜΑΥΡΟΣ ΝΙΚΟΛΑΟΣ.pdf" target="_blank" rel="noopener">Received a teaching assistance certificate for Algorithms at the University of Thessaly</a>
         </li>
+        <li>
+          <time datetime="2026-10-01">(Oct 01st, '26)</time>
+          <span class="what">Started working on my thesis</span>
+        </li>
         <li data-repo="1366546625" data-auto="1">
           <time datetime="2026-09-11">(Sep 11th, '26)</time>
           <a class="what" href="https://github.com/mavroul1s/geolifeclef-risk-aware-sdm" target="_blank" rel="noopener">New repository created (geolifeclef-risk-aware-sdm)</a>
@@ -1609,6 +1605,7 @@ Always open to collaborating—feel free to reach out.</p>
       <div class="ghstat"><b data-gh="repos" data-fb="18">18</b><span>public repositories</span></div>
       <div class="ghstat"><b data-gh="stars" data-fb="6">6</b><span>stars earned</span></div>
       <div class="ghstat"><b data-gh="followers" data-fb="10">10</b><span>followers</span></div>
+      <div class="ghstat"><b data-gh="commits" data-fb="1055">1,055</b><span>commits in the last year</span></div>
       <div class="ghstat"><b data-gh="since">Dec 2022</b><span>on GitHub since</span></div>
       <div class="ghstat"><b data-gh="lastpush">today</b><span>last push</span></div>
     </div>
@@ -1619,15 +1616,6 @@ Always open to collaborating—feel free to reach out.</p>
     </div>
     <div class="ghcal-foot">
       <span class="ghcal-key" aria-hidden="true">less <i data-l="0"></i><i data-l="1"></i><i data-l="2"></i><i data-l="3"></i><i data-l="4"></i> more</span>
-    </div>
-
-    <h4 class="sub" style="margin:22px 0 10px">Languages by repository</h4>
-    <div class="ghlangs" id="ghlangs">
-      <div class="lang"><span class="l">Jupyter Notebook</span><span class="bar"><i style="width:100%"></i></span><span class="n">7</span></div>
-      <div class="lang"><span class="l">HTML</span><span class="bar"><i style="width:42.9%"></i></span><span class="n">3</span></div>
-      <div class="lang"><span class="l">Python</span><span class="bar"><i style="width:42.9%"></i></span><span class="n">3</span></div>
-      <div class="lang"><span class="l">MATLAB</span><span class="bar"><i style="width:28.6%"></i></span><span class="n">2</span></div>
-      <div class="lang"><span class="l">TeX</span><span class="bar"><i style="width:14.3%"></i></span><span class="n">1</span></div>
     </div>
 
     <p style="margin:16px 0 0"><a href="https://github.com/mavroul1s" target="_blank" rel="noopener">github.com/mavroul1s →</a></p>
@@ -1901,11 +1889,11 @@ Always open to collaborating—feel free to reach out.</p>
   function countTo(el, n){
     if(el.getAttribute('data-shown') === String(n)) return;
     el.setAttribute('data-shown', n);
-    if(!MOTION){ el.textContent = n; return; }
+    if(!MOTION){ el.textContent = n.toLocaleString(); return; }
     var t0 = performance.now();
     requestAnimationFrame(function step(now){
       var k = Math.min(1,(now-t0)/700);
-      el.textContent = Math.round(n*(1-Math.pow(1-k,3)));
+      el.textContent = Math.round(n*(1-Math.pow(1-k,3))).toLocaleString();
       if(k<1) requestAnimationFrame(step);
     });
   }
@@ -1929,30 +1917,6 @@ Always open to collaborating—feel free to reach out.</p>
                      : days < 365 ? Math.round(days/30) + ' months ago'
                                   : Math.round(days/365) + ' years ago');
   }
-  function ghLangs(list){
-    var box = document.getElementById('ghlangs');
-    if(!box) return;
-    var m = {}, k;
-    for(var i=0;i<list.length;i++) if(list[i].language) m[list[i].language] = (m[list[i].language]||0) + 1;
-    var rows = [];
-    for(k in m) if(m.hasOwnProperty(k)) rows.push([k, m[k]]);
-    if(!rows.length) return;                /* nothing to say: leave the printed rows */
-    rows.sort(function(a,b){ return b[1]-a[1]; });
-    rows = rows.slice(0,6);
-    var top = rows[0][1];
-    box.innerHTML = '';
-    rows.forEach(function(r){
-      var row = document.createElement('div'); row.className = 'lang';
-      var l = document.createElement('span'); l.className = 'l'; l.textContent = r[0];
-      var bar = document.createElement('span'); bar.className = 'bar';
-      var fill = document.createElement('i'); fill.style.width = (r[1]/top*100) + '%';
-      bar.appendChild(fill);
-      var n = document.createElement('span'); n.className = 'n'; n.textContent = r[1];
-      row.appendChild(l); row.appendChild(bar); row.appendChild(n);
-      box.appendChild(row);
-    });
-  }
-
   /* ---------- commit calendar ----------
      GitHub's own contribution graph is not in the public REST API, and this
      site does not use badge services, so the grid is built from what the API
@@ -2059,6 +2023,7 @@ Always open to collaborating—feel free to reach out.</p>
         if(!d || !d.days || !Object.keys(d.days).length) return false;
         calDays = d.days;
         calAsked = calCounted = d.repos || 0;
+        if(typeof d.total === 'number') ghNum('commits', d.total);
         calBuilt = d.generated ? d.generated.slice(0,10) : '';
         /* a second past the build, so a commit on the boundary is not counted twice */
         calSince2 = d.generated
@@ -2213,7 +2178,6 @@ Always open to collaborating—feel free to reach out.</p>
         }
         ghNum('stars', stars);
         if(last) ghAgo(last);
-        ghLangs(list);
         /* with the file, top it up from the API; without it, count the lot */
         calFile.then(function(had){ if(had) calTopUp(list); else ghCal(list); });
       })
