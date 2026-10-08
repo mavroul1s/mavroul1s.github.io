@@ -1,9 +1,8 @@
 name: news
 
-# Keeps the ~/news log in step with the public repository list: a repository
-# that appears is announced, one that is deleted is removed from the log, and
-# one that is renamed is announced again. Everything hand-written in the log
-# is left alone — see scripts/sync_news.py.
+# Keeps repository renames and deletions in sync with the ~/news log and
+# refreshes the commit calendar. New repositories are recorded in the
+# snapshot without adding news announcements — see scripts/sync_news.py.
 #
 # To stop it: disable this workflow in the Actions tab, or delete this file.
 

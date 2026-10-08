@@ -4,7 +4,7 @@
 Run from a scheduled workflow. It compares GitHub's answer against the
 snapshot in data/repos.json and edits index.html between the NEWS markers:
 
-    a repository appears   -> an entry is added, dated when it was created
+    a repository appears   -> the snapshot is updated without a news entry
     a repository is gone   -> every entry tied to it is removed
     a repository is renamed-> an entry is added, dated today
 
@@ -84,19 +84,6 @@ def load_snapshot():
         return {}
 
 
-def entry_html(repo):
-    """One <li>, in the same shape a hand-written entry takes."""
-    created = repo["created_at"][:10]
-    what = "New repository created (%s)" % repo["name"]
-    return (
-        '        <li data-repo="%d" data-auto="1">\n'
-        '          <time datetime="%s">%s</time>\n'
-        '          <a class="what" href="%s" target="_blank" rel="noopener">%s</a>\n'
-        '        </li>' % (repo["id"], created, pretty(created),
-                           esc(repo["html_url"]), esc(what))
-    )
-
-
 def rename_html(repo, old_name, today):
     what = "%s renamed to %s" % (old_name, repo["name"])
     return (
@@ -143,7 +130,6 @@ def main():
     today = os.environ.get("NEWS_TODAY") or \
         __import__("datetime").date.today().isoformat()
 
-    fresh = [] if not snap else [i for i in now if i not in snap]
     gone = [i for i in snap if i not in now]
     renamed = [(i, snap[i]["name"], now[i]["name"]) for i in now
                if i in snap and snap[i]["name"] != now[i]["name"]]
@@ -169,9 +155,6 @@ def main():
     entries = [li for li in entries if entry_id(li) not in gone]
 
     added = []
-    for rid in fresh:
-        log("new:     %s (%s)" % (now[rid]["name"], rid))
-        added.append(entry_html(now[rid]))
     for rid, old, new in renamed:
         log("renamed: %s -> %s (%s)" % (old, new, rid))
         added.append(rename_html(now[rid], old, today))
