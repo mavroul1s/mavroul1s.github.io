@@ -1360,44 +1360,33 @@ Always open to collaborating—feel free to reach out.</p>
 
     <article class="card">
       <h3>neuron-death</h3>
-      <p class="stack" style="margin:0">PyTorch<span>/</span>335 runs<span>/</span>MIT</p>
       <p>Do the methods that revive dormant neurons work by reviving dead ones? Analysis-only study of continual learning, with the analysis plan frozen before any data existed. Its control is the missing one: at every recycling event, recycle the <em>same number</em> of units chosen at random. Random selection recovers most of the benefit, and units left alone come back by themselves.</p>
       <canvas class="viz" data-viz="neuron" aria-hidden="true"></canvas>
       <div class="meta">
-        <span class="kv">Random control <b><span class="datum" tabindex="0" data-src="SOURCE: τ-sweep, 4 arms × 6 τ × 10 seeds, 190 runs. Late-window online accuracy against a size-matched random control.">88–92% of ReDo's gain</span></b></span>
-        <span class="kv">Dead units revive <b><span class="datum" tabindex="0" data-src="SOURCE: 25 no-intervention runs, fixed reference batch, pooled over layers, stratified bootstrap 95% CI [21.37, 22.21].">21.7% within one task</span></b></span>
-        <span class="kv">Status <b>submitted to Machine Learning</b></span>
         <a class="go" href="https://github.com/mavroul1s/neuron-death" target="_blank" rel="noopener">Open repository</a>
       </div>
     </article>
 
     <article class="card">
       <h3>GridSense</h3>
-      <p class="stack" style="margin:0">FastAPI<span>/</span>Docker Compose</p>
-      <p>GridSense combines sensor readings with power grid topology to show which parts of the network a fault affects and identify paths to restore service.</p>
+      <p>When a fault occurs on a power grid, operators need to know which equipment is downstream and how service could be restored. GridSense is a prototype that brings sensor readings, equipment records, and grid connections into one API so users can trace the impact of a fault and explore possible restoration paths.</p>
       <canvas class="viz" data-viz="gridsense" aria-hidden="true"></canvas>
       <div class="meta">
-        <span class="kv">Endpoints <b>14</b></span>
-        <span class="kv">Setup <b>one docker compose up</b></span>
         <a class="go" href="https://github.com/mavroul1s/GridSense_collab" target="_blank" rel="noopener">Open repository</a>
       </div>
     </article>
 
     <article class="card">
       <h3>vit-gradient-flow</h3>
-      <p class="stack" style="margin:0">Julia<span>/</span>ECE452</p>
       <p>A Vision Transformer built from scratch in Julia — attention, initialisation and training loop — in order to take matrix calculus to it. The Jacobian of the self-attention mechanism is derived by hand with matrix differential rules, then checked numerically against ForwardDiff.jl to prove the derivation right. With that in hand, the experiment: does orthogonal initialisation (WᵀW = I) keep gradients better conditioned through attention than Xavier/Glorot? Measured on Jacobian condition numbers and feature saliency, with MNIST fed in as sequential patches.</p>
       <canvas class="viz" data-viz="vit" aria-hidden="true"></canvas>
       <div class="meta">
-        <span class="kv">Commits <b>52</b></span>
-        <span class="kv">Verification <b>numerical vs analytic</b></span>
         <a class="go" href="https://github.com/mavroul1s/vit-gradient-flow" target="_blank" rel="noopener">Open repository</a>
       </div>
     </article>
 
     <article class="card">
       <h3>Galaxy-Morphology-CNN</h3>
-      <p class="stack" style="margin:0">TensorFlow</p>
       <p>Custom VGG-style CNN predicting 37 probabilistic morphological features on Galaxy Zoo, through a five-phase experimental pipeline that isolates each architectural decision one at a time. Includes an IEEE-formatted report.</p>
       <canvas class="viz" data-viz="galaxy" aria-hidden="true"></canvas>
       <div class="meta">
@@ -1409,24 +1398,18 @@ Always open to collaborating—feel free to reach out.</p>
 
     <article class="card">
       <h3>KinetiCore</h3>
-      <p class="stack" style="margin:0">Python<span>/</span>OpenCV<span>/</span>MediaPipe</p>
       <p>Real-time bare-hand computer vision sandbox. Webcam gesture and face tracking, biometric mapping, and standalone demo scripts. Runs entirely locally — no network, no API.</p>
       <canvas class="viz" data-viz="kineticore" aria-hidden="true"></canvas>
       <div class="meta">
-        <span class="kv">Input <b>webcam only</b></span>
-        <span class="kv">Network <b>none</b></span>
         <a class="go" href="https://github.com/mavroul1s/KinetiCore" target="_blank" rel="noopener">Open repository</a>
       </div>
     </article>
 
     <article class="card">
       <h3>GMM Music Genre Recognition</h3>
-      <p class="stack" style="margin:0">MATLAB<span>/</span>MFCC</p>
       <p>Audio genre classifier built on MFCC features with cepstral mean subtraction, k-means initialisation, and Expectation-Maximization written from scratch rather than called from a toolbox.</p>
       <canvas class="viz" data-viz="gmm" aria-hidden="true"></canvas>
       <div class="meta">
-        <span class="kv">Test set <b><span class="datum" tabindex="0" data-src="SOURCE: three-genre coursework test set — blues, reggae, classical.">100% on three genres</span></b></span>
-        <span class="kv">EM <b>implemented from scratch</b></span>
         <a class="go" href="https://github.com/mavroul1s/GMM-Music-Genre-Recognition" target="_blank" rel="noopener">Open repository</a>
       </div>
     </article>
