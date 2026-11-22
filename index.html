@@ -723,21 +723,6 @@ ol.news{list-style:none;margin:0;padding:4px 0}
 .archive .go::after{content:" →"}
 @media(max-width:600px){.archive li{grid-template-columns:1fr;gap:4px}}
 
-/* toolchain */
-.term{
-  border:1px solid rgba(var(--grid-rgb),.42);background:rgba(var(--surface-rgb),.92);
-}
-.term-bar{
-  display:flex;gap:8px;align-items:center;padding:6px 12px;
-  border-bottom:1px solid rgba(var(--grid-rgb),.32);
-  font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
-}
-.term-bar em{color:var(--grid);font-style:normal;margin-left:auto}
-.term dl{margin:0;padding:16px;display:grid;grid-template-columns:130px 1fr;gap:10px 18px;font-size:13px}
-.term dt{color:var(--accent);letter-spacing:.12em;text-transform:uppercase;font-size:11px;padding-top:2px}
-.term dd{margin:0;color:var(--fg)}
-@media(max-width:620px){.term dl{grid-template-columns:1fr;gap:2px 0}.term dd{padding-bottom:10px}}
-
 /* credentials */
 .creds{list-style:none;margin:0;padding:0;font-size:13.5px}
 .creds li{display:flex;flex-wrap:wrap;gap:10px;padding:9px 0;border-bottom:1px dashed rgba(var(--grid-rgb),.28)}
@@ -1023,9 +1008,6 @@ footer pre{
    Y2K — beveled terminal chrome + dither rails
    ============================================================ */
 .term{box-shadow:inset 1px 1px 0 rgba(var(--primary-rgb),.14),inset -1px -1px 0 rgba(var(--shade-rgb),.6)}
-.term-bar{background:linear-gradient(180deg,rgba(var(--primary-rgb),.14),rgba(var(--surface-rgb),.2))}
-.term-bar .win{display:inline-flex;gap:4px;margin-right:6px}
-.term-bar .win b{width:9px;height:9px;border:1px solid var(--grid);font-size:0;display:block}
 .dither{
   height:10px;margin:0 0 24px;
   background:repeating-linear-gradient(90deg,var(--grid) 0 2px,transparent 2px 6px);
@@ -1066,7 +1048,7 @@ footer pre{
 }
 .profiler{background:linear-gradient(180deg,rgba(var(--window-rgb),var(--win-a)),rgba(var(--window-alt-rgb),var(--win-a)))}
 .profiler h3{background:rgba(var(--window-alt-rgb),var(--win-a));color:var(--window-primary);border-bottom:1px solid var(--window-border)}
-.feed-bar,.term-bar{background:rgba(var(--window-alt-rgb),var(--win-a))}
+.feed-bar{background:rgba(var(--window-alt-rgb),var(--win-a))}
 .feed > summary:hover .feed-bar{background:rgba(var(--window-alt-rgb),var(--win-a))}
 .ghgrid{background:var(--window-border);border-color:var(--window-border)}
 /* tooltip and CTA plate stay solid so they read over anything */
@@ -1129,7 +1111,6 @@ button.link-box:hover,.link-box:hover,.card:hover{background:rgba(var(--window-a
     <li><a href="#projects">~/projects</a></li>
     <li><a href="#github">~/github</a></li>
     <li><a href="#archive">~/archive</a></li>
-    <li><a href="#toolchain">~/toolchain</a></li>
     <li><a href="#credentials">~/credentials</a></li>
     <li><a href="#contact">~/contact</a></li>
     <li><a href="#interactive-games">~/interactive/games</a></li>
@@ -1534,23 +1515,6 @@ Always open to collaborating—feel free to reach out.</p>
       </div>
     </li>
   </ul>
-  </div>
-</section>
-
-<!-- ===================== TOOLCHAIN ===================== -->
-<section id="toolchain">
-  <h2 class="sec-h"><span class="path">~/</span>toolchain <span class="rule"></span></h2>
-  <div class="term">
-    <div class="term-bar"><span class="win" aria-hidden="true"><b></b><b></b><b></b></span><span>mavros@uth</span><span>:~$ cat toolchain.txt</span><em>read only</em></div>
-    <dl>
-      <dt>Languages</dt><dd>Python · C · Assembly · Verilog · SQL · MATLAB · Julia · JavaScript</dd>
-      <dt>Machine learning</dt><dd>PyTorch · TensorFlow · scikit-learn · neural networks · reinforcement learning · 3D segmentation · CNNs · ViTs</dd>
-      <dt>Data / backend</dt><dd>FastAPI · Docker Compose · Cassandra · Neo4j · MongoDB · PostgreSQL · Redis</dd>
-      <dt>CV / DSP</dt><dd>OpenCV · MediaPipe · MFCC and LPC · spectral analysis · classical filtering</dd>
-      <dt>Realtime / media</dt><dd>TouchDesigner · Avidemux</dd>
-      <dt>Other</dt><dd>three.js · LaTeX · Git · Kaggle GPU workflows · rasterio and geospatial rasters</dd>
-      <dt>Domains</dt><dd>Wildfire remote sensing · orbital mechanics · astronomy imaging · information retrieval · speech and audio</dd>
-    </dl>
   </div>
 </section>
 
