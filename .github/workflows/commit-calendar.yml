@@ -1,10 +1,4 @@
-name: news
-
-# Keeps repository renames and deletions in sync with the ~/news log and
-# refreshes the commit calendar. New repositories are recorded in the
-# snapshot without adding news announcements — see scripts/sync_news.py.
-#
-# To stop it: disable this workflow in the Actions tab, or delete this file.
+name: Commit calendar
 
 on:
   schedule:
@@ -15,7 +9,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: news
+  group: commit-calendar
   cancel-in-progress: false
 
 jobs:
@@ -23,11 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Read the repository list and edit the log
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python3 scripts/sync_news.py
 
       # Counted here rather than in the browser: this token allows five
       # thousand calls an hour, the visitor's address allows sixty.
@@ -38,14 +27,14 @@ jobs:
 
       - name: Commit, but only if something actually moved
         run: |
-          if [ -z "$(git status --porcelain index.html data/)" ]; then
+          if [ -z "$(git status --porcelain data/commits.json)" ]; then
             echo "nothing changed"
             exit 0
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html data/
-          git commit -m "Sync the news log and the commit calendar
+          git add data/commits.json
+          git commit -m "Refresh the commit calendar
 
-          Written by .github/workflows/news.yml."
+          Written by .github/workflows/commit-calendar.yml."
           git push
